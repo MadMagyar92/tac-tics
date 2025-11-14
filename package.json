@@ -1,0 +1,15 @@
+{
+  "name": "tac-tics",
+  "version": "0.0.1",
+  "description": "Tactics engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "author": "MadMagyar92",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
