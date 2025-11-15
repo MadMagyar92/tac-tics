@@ -1,7 +1,7 @@
     // attack-service.test.js
-    const attack = require('../attack-service'); // Import the function to be tested
+    import attack from '../attack-service';
 
-    describe('attack function', () => { // Optional: Group related tests with describe
+    describe('attack function', () => {
       test('100 health soldier attacks 100 health soldier', () => {
         expect(attack({
          type: {
@@ -43,4 +43,24 @@
          health: 95,
         });
       });
+      test('100 health soldier attacks 100 health soldier with no ammo', () => {
+         expect(attack({
+          type: {
+             attackType: 'melee',
+             unitType: 'soldier',
+          },
+          health: 100,
+          ammo: 0,
+         }, {
+          type: {
+             unitType: 'soldier',
+          },
+          health: 100,
+         })).toStrictEqual({
+          type: {
+             unitType: 'soldier',
+          },
+          health: 100,
+         });
+       }); 
     });

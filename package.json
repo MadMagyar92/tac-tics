@@ -1,10 +1,11 @@
 {
   "name": "tac-tics",
+  "type": "module",
   "version": "0.0.1",
   "description": "Tactics engine",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest",
     "test:watch": "jest --watchAll"
   },
   "author": "MadMagyar92",

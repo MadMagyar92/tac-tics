@@ -1,10 +1,10 @@
-module.exports = {
+export default {
    testEnvironment: 'node',
    // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
    moduleFileExtensions: ['js', 'ts'],
-   // transform: {
+   transform: {
    //  '^.+\\.(ts)$': 'ts-jest',
-   //},
+   },
    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(js|ts)$',
    collectCoverageFrom: [
      'src/**/*.{js,ts}',
