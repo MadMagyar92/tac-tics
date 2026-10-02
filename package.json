@@ -1,16 +1,21 @@
 {
   "name": "tac-tics",
+  "author": "MadMagyar92",
+  "description": "Tactics engine",
+  "license": "ISC",
+  "private": true,
+  "workspaces": ["packages/*"],
   "type": "module",
   "version": "0.0.1",
-  "description": "Tactics engine",
   "main": "index.js",
   "scripts": {
-    "test": "node --experimental-vm-modules ./node_modules/.bin/jest",
-    "test:watch": "jest --watchAll"
+    "build": "tsc -b",
+    "dev": "tsc -b --watch",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "tsc -b --clean"
   },
-  "author": "MadMagyar92",
-  "license": "ISC",
   "devDependencies": {
-    "jest": "^30.2.0"
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
   }
 }
