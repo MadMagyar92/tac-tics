@@ -1,0 +1,8 @@
+[
+  { "scope": "game", "definition": "definition/game.config.json", "object": "object/game.json" },
+  { "scope": "movement", "definition": "definition/movement.config.json" },
+  { "scope": "offense", "definition": "definition/offense.config.json", "object": "object/offense.json" },
+  { "scope": "player", "definition": "definition/player.config.json", "object": "object/player.json" },
+  { "scope": "terrain", "definition": "definition/terrain.config.json", "object": "object/terrain.json" },
+  { "scope": "unit", "definition": "definition/unit.config.json", "object": "object/unit.json" }
+]

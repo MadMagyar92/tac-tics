@@ -12,7 +12,7 @@
     "build": "tsc -b",
     "dev": "tsc -b --watch",
     "test": "npm run test --workspaces --if-present",
-    "clean": "tsc -b --clean"
+    "clean": "npm run clean --workspaces --if-present && node scripts/clean.mjs dist node_modules tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

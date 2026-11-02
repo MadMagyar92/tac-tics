@@ -1,0 +1,17 @@
+[
+  {
+    "definition": { "scope": "game", "name": "2-player" },
+    "turnsMax": 100,
+    "playersMax": 2
+  },
+  {
+    "definition": { "scope": "game", "name": "3-player" },
+    "turnsMax": 100,
+    "playersMax": 3
+  },
+  {
+    "definition": { "scope": "game", "name": "4-player" },
+    "turnsMax": 100,
+    "playersMax": 4
+  }
+]

@@ -1,0 +1,164 @@
+[
+  {
+    "definition": { "scope": "unit", "name": "infantry" },
+    "fundsCost": 1000,
+    "visionMax": 2,
+    "fuelMax": 99,
+    "moveMax": 3,
+    "movement": { "scope": "movement", "name": "foot" },
+    "offenses": [{ "scope": "offense", "name": "infantry" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "mech" },
+    "fundsCost": 3000,
+    "visionMax": 2,
+    "fuelMax": 70,
+    "moveMax": 2,
+    "movement": { "scope": "movement", "name": "mech" },
+    "offenses": [{ "scope": "offense", "name": "mech1" }, { "scope": "offense", "name": "mech2" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "recon" },
+    "fundsCost": 4000,
+    "visionMax": 5,
+    "fuelMax": 80,
+    "moveMax": 8,
+    "movement": { "scope": "movement", "name": "tire" },
+    "offenses": [{ "scope": "offense", "name": "recon" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "apc" },
+    "fundsCost": 5000,
+    "visionMax": 1,
+    "fuelMax": 70,
+    "moveMax": 6,
+    "movement": { "scope": "movement", "name": "tread" },
+    "offenses": []
+  },
+  {
+    "definition": { "scope": "unit", "name": "anti-air" },
+    "fundsCost": 8000,
+    "visionMax": 2,
+    "fuelMax": 60,
+    "moveMax": 6,
+    "movement": { "scope": "movement", "name": "tread" },
+    "offenses": [{ "scope": "offense", "name": "anti-air" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "tank" },
+    "fundsCost": 7000,
+    "visionMax": 3,
+    "fuelMax": 60,
+    "moveMax": 6,
+    "movement": { "scope": "movement", "name": "tread" },
+    "offenses": [{ "scope": "offense", "name": "tank1" }, { "scope": "offense", "name": "tank2" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "mid-tank" },
+    "fundsCost": 16000,
+    "visionMax": 1,
+    "fuelMax": 50,
+    "moveMax": 5,
+    "movement": { "scope": "movement", "name": "tread" },
+    "offenses": [{ "scope": "offense", "name": "mid-tank1" }, { "scope": "offense", "name": "mid-tank2" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "artillery" },
+    "fundsCost": 6000,
+    "visionMax": 1,
+    "fuelMax": 50,
+    "moveMax": 5,
+    "movement": { "scope": "movement", "name": "tread" },
+    "offenses": [{ "scope": "offense", "name": "artillery" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "rockets" },
+    "fundsCost": 15000,
+    "visionMax": 1,
+    "fuelMax": 50,
+    "moveMax": 5,
+    "movement": { "scope": "movement", "name": "tire" },
+    "offenses": [{ "scope": "offense", "name": "rockets" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "missile" },
+    "fundsCost": 12000,
+    "visionMax": 5,
+    "fuelMax": 50,
+    "moveMax": 4,
+    "movement": { "scope": "movement", "name": "tire" },
+    "offenses": [{ "scope": "offense", "name": "missile" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "t-copter" },
+    "fundsCost": 5000,
+    "visionMax": 2,
+    "fuelMax": 99,
+    "moveMax": 6,
+    "movement": { "scope": "movement", "name": "air" },
+    "offenses": []
+  },
+  {
+    "definition": { "scope": "unit", "name": "b-copter" },
+    "fundsCost": 9000,
+    "visionMax": 3,
+    "fuelMax": 99,
+    "moveMax": 6,
+    "movement": { "scope": "movement", "name": "air" },
+    "offenses": [{ "scope": "offense", "name": "b-copter1" }, { "scope": "offense", "name": "b-copter2" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "fighter" },
+    "fundsCost": 20000,
+    "visionMax": 2,
+    "fuelMax": 99,
+    "moveMax": 9,
+    "movement": { "scope": "movement", "name": "air" },
+    "offenses": [{ "scope": "offense", "name": "fighter" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "bomber" },
+    "fundsCost": 22000,
+    "visionMax": 2,
+    "fuelMax": 99,
+    "moveMax": 7,
+    "movement": { "scope": "movement", "name": "air" },
+    "offenses": [{ "scope": "offense", "name": "bomber" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "lander" },
+    "fundsCost": 12000,
+    "visionMax": 1,
+    "fuelMax": 99,
+    "moveMax": 7,
+    "movement": { "scope": "movement", "name": "transport" },
+    "offenses": []
+  },
+  {
+    "definition": { "scope": "unit", "name": "cruiser" },
+    "fundsCost": 18000,
+    "visionMax": 3,
+    "fuelMax": 99,
+    "moveMax": 7,
+    "movement": { "scope": "movement", "name": "sea" },
+    "offenses": [{ "scope": "offense", "name": "cruiser1" }, { "scope": "offense", "name": "cruiser2" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "sub" },
+    "fundsCost": 20000,
+    "visionMax": 5,
+    "fuelMax": 60,
+    "moveMax": 6,
+    "movement": { "scope": "movement", "name": "sea" },
+    "offenses": [{ "scope": "offense", "name": "sub" }]
+  },
+  {
+    "definition": { "scope": "unit", "name": "battleship" },
+    "fundsCost": 28000,
+    "visionMax": 2,
+    "fuelMax": 99,
+    "moveMax": 6,
+    "movement": { "scope": "movement", "name": "sea" },
+    "offenses": [{ "scope": "offense", "name": "battleship" }]
+  }
+]

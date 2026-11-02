@@ -1,0 +1,102 @@
+[
+  {
+    "definition": { "scope": "movement", "name": "foot" },
+    "cost": [
+      { "terrain": { "scope": "terrain", "name": "airport" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "base" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "bridge" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "city" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "headquarters" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "mountain" }, "cost": 2 },
+      { "terrain": { "scope": "terrain", "name": "plain" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "port" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "river" }, "cost": 2 },
+      { "terrain": { "scope": "terrain", "name": "road" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "shoal" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "woods" }, "cost": 1 }
+    ]
+  },
+  {
+    "definition": { "scope": "movement", "name": "mech" },
+    "cost": [
+      { "terrain": { "scope": "terrain", "name": "airport" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "base" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "bridge" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "city" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "headquarters" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "mountain" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "plain" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "port" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "river" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "road" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "shoal" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "woods" }, "cost": 1 }
+    ]
+  },
+  {
+    "definition": { "scope": "movement", "name": "tire" },
+    "cost": [
+      { "terrain": { "scope": "terrain", "name": "airport" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "base" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "bridge" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "city" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "headquarters" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "plain" }, "cost": 2 },
+      { "terrain": { "scope": "terrain", "name": "port" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "road" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "shoal" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "woods" }, "cost": 3 }
+    ]
+  },
+  {
+    "definition": { "scope": "movement", "name": "tread" },
+    "cost": [
+      { "terrain": { "scope": "terrain", "name": "airport" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "base" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "bridge" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "city" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "headquarters" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "plain" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "port" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "road" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "shoal" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "woods" }, "cost": 2 }
+    ]
+  },
+  {
+    "definition": { "scope": "movement", "name": "air" },
+    "cost": [
+      { "terrain": { "scope": "terrain", "name": "airport" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "base" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "bridge" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "city" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "headquarters" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "mountain" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "plain" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "port" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "reef" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "river" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "road" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "sea" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "shoal" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "woods" }, "cost": 1 }
+    ]
+  },
+  {
+    "definition": { "scope": "movement", "name": "sea" },
+    "cost": [
+      { "terrain": { "scope": "terrain", "name": "port" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "reef" }, "cost": 2 },
+      { "terrain": { "scope": "terrain", "name": "sea" }, "cost": 1 }
+    ]
+  },
+  {
+    "definition": { "scope": "movement", "name": "transport" },
+    "cost": [
+      { "terrain": { "scope": "terrain", "name": "port" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "reef" }, "cost": 2 },
+      { "terrain": { "scope": "terrain", "name": "sea" }, "cost": 1 },
+      { "terrain": { "scope": "terrain", "name": "shoal" }, "cost": 1 }
+    ]
+  }
+]

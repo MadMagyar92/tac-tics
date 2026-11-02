@@ -1,0 +1,13 @@
+[
+  {
+    "identifier": { "id": "unit-1", "gameId": "game-1" },
+    "definition": { "scope": "unit", "name": "tank" },
+    "position": { "x": 3, "y": 2 },
+    "moved": false,
+    "acted": false,
+    "health": 100,
+    "fuel": 60,
+    "playerId": "player-1",
+    "offenseIds": ["offense-1", "offense-2"]
+  }
+]

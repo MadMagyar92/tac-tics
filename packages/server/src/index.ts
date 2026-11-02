@@ -1,3 +1,2 @@
-export { GameService } from "./game";
-export { UnitService } from "./unit";
-export { TerrainService } from "./terrain";
+export { type AppOptions, createApp } from "./app";
+export { attackRouter, deployRouter, gameRouter, moveRouter, playerRouter, terrainRouter, unitRouter } from "./router";

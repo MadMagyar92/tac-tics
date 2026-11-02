@@ -1,0 +1,113 @@
+import { Router, json, type Request, type Response } from "express";
+import {
+  type ActionService,
+  type DeployAction,
+  type GameObject,
+  type ObjectService,
+  type PlayerObject,
+  Scope,
+  type TerrainObject,
+} from "@tac-tics/api";
+import { DEPLOY_ACTION, isNonEmptyString } from "@tac-tics/app";
+
+/**
+ * Mount this router before any router under `/game/:gameId/...`: it loads the game into
+ * `res.locals.game` (or responds 404) and then passes the request on.
+ */
+export function gameRouter(objectService: ObjectService): Router {
+  const router = Router();
+
+  router.param("gameId", (_req, res, next, gameId: string) => {
+    const game = objectService.load<GameObject>(Scope.Game, { id: gameId });
+    if (!game) {
+      res.status(404).json({ error: `Game ${gameId} not found` });
+      return;
+    }
+    res.locals.game = game;
+    next();
+  });
+
+  router.get("/", (_req, res) => {
+    res.json([...objectService.loadAll<GameObject>(Scope.Game).values()]);
+  });
+
+  router.use("/:gameId", (_req, _res, next) => next());
+
+  router.get("/:gameId", (_req, res) => {
+    res.json(res.locals.game);
+  });
+
+  return router;
+}
+
+/**
+ * Mount this router under `/game/:gameId/deploy`, after `gameRouter`. It loads the terrain of `/:terrainId` into
+ * `res.locals.terrain`. The player who deploys is the one whose turn it is, and the kind of unit is the `unit` of the
+ * JSON body, or of the query string for a `GET`.
+ *
+ * - `GET /:terrainId` previews deploying the unit on that terrain, if it can be done. It changes nothing.
+ * - `POST /:terrainId` deploys the unit and returns the action. The deploy service saves what it changes.
+ */
+export function deployRouter(
+  deployService: ActionService<DeployAction>,
+  objectService: ObjectService,
+): Router {
+  const router = Router({ mergeParams: true });
+  router.use(json());
+
+  function getDeployInRequest(req: Request, res: Response): DeployAction | undefined {
+    const name = req.method === "GET" ? req.query.unit : req.body?.unit;
+    if (!isNonEmptyString(name)) {
+      res.status(400).json({ error: 'Expected the name of the unit to deploy as "unit"' });
+      return undefined;
+    }
+
+    const { game, terrain } = res.locals;
+    const player = [...objectService.loadAll<PlayerObject>(Scope.Player).values()].find(
+      (candidate) => candidate.identifier.gameId === game.identifier.id && candidate.order === game.playerTurn,
+    );
+    if (!player) {
+      res.status(404).json({ error: `No player has the turn in game ${game.identifier.id}` });
+      return undefined;
+    }
+
+    return { definition: DEPLOY_ACTION, game, terrain, player, unitDefinition: { scope: Scope.Unit, name } };
+  }
+
+  router.param("terrainId", (req, res, next, terrainId: string) => {
+    const { gameId } = req.params as unknown as { gameId: string };
+    const terrain = objectService.load<TerrainObject>(Scope.Terrain, { id: terrainId, gameId });
+    if (!terrain) {
+      res.status(404).json({ error: `Terrain ${terrainId} not found in game ${gameId}` });
+      return;
+    }
+    res.locals.terrain = terrain;
+    next();
+  });
+
+  router.get<{ gameId: string; terrainId: string }>("/:terrainId", (req, res) => {
+    const deploy = getDeployInRequest(req, res);
+    if (!deploy) {
+      return;
+    }
+    if (!deployService.canExecute(deploy)) {
+      res.status(404).json({ error: `Unit ${deploy.unitDefinition.name} cannot be deployed on terrain ${req.params.terrainId}` });
+      return;
+    }
+    res.json(deployService.preview(deploy));
+  });
+
+  router.post<{ gameId: string; terrainId: string }>("/:terrainId", (req, res) => {
+    const deploy = getDeployInRequest(req, res);
+    if (!deploy) {
+      return;
+    }
+    if (!deployService.canExecute(deploy)) {
+      res.status(409).json({ error: `Unit ${deploy.unitDefinition.name} cannot be deployed on terrain ${req.params.terrainId}` });
+      return;
+    }
+    res.json(deployService.execute(deploy));
+  });
+
+  return router;
+}

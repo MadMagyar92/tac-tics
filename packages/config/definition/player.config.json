@@ -1,0 +1,18 @@
+[
+  {
+    "definition": { "scope": "player", "name": "orange-star" },
+    "fundsMax": 999999
+  },
+  {
+    "definition": { "scope": "player", "name": "blue-moon" },
+    "fundsMax": 999999
+  },
+  {
+    "definition": { "scope": "player", "name": "green-earth" },
+    "fundsMax": 999999
+  },
+  {
+    "definition": { "scope": "player", "name": "yellow-comet" },
+    "fundsMax": 999999
+  }
+]

@@ -1,0 +1,363 @@
+[
+  {
+    "definition": { "scope": "offense", "name": "infantry" },
+    "ammoMax": -1,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 12 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 14 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 5 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 5 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 1 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 15 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 30 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 7 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "mech1" },
+    "ammoMax": 3,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 75 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 15 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 70 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 85 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "mech2" },
+    "ammoMax": -1,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 18 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 20 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 6 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 6 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 1 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 32 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 9 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "recon" },
+    "ammoMax": -1,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 70 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 4 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 6 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 1 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 28 },
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 10 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "anti-air" },
+    "ammoMax": 9,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 60 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 50 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 10 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 50 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 120 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 120 },
+      { "unit": { "scope": "unit", "name": "fighter" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "bomber" }, "damage": 75 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "tank1" },
+    "ammoMax": 9,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 75 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 15 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 70 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 10 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 5 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 1 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 1 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "tank2" },
+    "ammoMax": -1,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 75 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 70 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 40 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 5 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 6 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 1 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 30 },
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 40 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 10 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "mid-tank1" },
+    "ammoMax": 8,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 10 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 10 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "mid-tank2" },
+    "ammoMax": -1,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 7 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 8 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 1 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 12 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "artillery" },
+    "ammoMax": 9,
+    "rangeMin": 2,
+    "rangeMax": 3,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 90 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 80 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 70 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 75 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 70 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 45 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 75 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 80 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 80 },
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 60 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 40 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "rockets" },
+    "ammoMax": 6,
+    "rangeMin": 3,
+    "rangeMax": 5,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 90 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 90 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 80 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 80 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 90 },
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 60 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 55 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "missile" },
+    "ammoMax": 6,
+    "rangeMin": 3,
+    "rangeMax": 5,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 120 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 120 },
+      { "unit": { "scope": "unit", "name": "fighter" }, "damage": 100 },
+      { "unit": { "scope": "unit", "name": "bomber" }, "damage": 100 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "b-copter1" },
+    "ammoMax": 6,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 65 },
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 25 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "b-copter2" },
+    "ammoMax": -1,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 75 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 75 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 30 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 20 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 6 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 6 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 1 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 35 },
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 65 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "fighter" },
+    "ammoMax": 9,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 100 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 100 },
+      { "unit": { "scope": "unit", "name": "fighter" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "bomber" }, "damage": 100 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "bomber" },
+    "ammoMax": 9,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 110 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 110 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 105 },
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 75 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "cruiser1" },
+    "ammoMax": 9,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [{ "unit": { "scope": "unit", "name": "sub" }, "damage": 90 }]
+  },
+  {
+    "definition": { "scope": "offense", "name": "cruiser2" },
+    "ammoMax": -1,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "t-copter" }, "damage": 115 },
+      { "unit": { "scope": "unit", "name": "b-copter" }, "damage": 115 },
+      { "unit": { "scope": "unit", "name": "fighter" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "bomber" }, "damage": 65 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "sub" },
+    "ammoMax": 6,
+    "rangeMin": 1,
+    "rangeMax": 1,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 25 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 55 }
+    ]
+  },
+  {
+    "definition": { "scope": "offense", "name": "battleship" },
+    "ammoMax": 9,
+    "rangeMin": 2,
+    "rangeMax": 6,
+    "damage": [
+      { "unit": { "scope": "unit", "name": "infantry" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "mech" }, "damage": 90 },
+      { "unit": { "scope": "unit", "name": "recon" }, "damage": 90 },
+      { "unit": { "scope": "unit", "name": "apc" }, "damage": 80 },
+      { "unit": { "scope": "unit", "name": "anti-air" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "tank" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "mid-tank" }, "damage": 55 },
+      { "unit": { "scope": "unit", "name": "artillery" }, "damage": 80 },
+      { "unit": { "scope": "unit", "name": "rockets" }, "damage": 85 },
+      { "unit": { "scope": "unit", "name": "missile" }, "damage": 90 },
+      { "unit": { "scope": "unit", "name": "lander" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "cruiser" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "sub" }, "damage": 95 },
+      { "unit": { "scope": "unit", "name": "battleship" }, "damage": 50 }
+    ]
+  }
+]

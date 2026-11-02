@@ -1,0 +1,12 @@
+[
+  {
+    "identifier": { "id": "offense-1", "gameId": "game-1", "unitId": "unit-1" },
+    "definition": { "scope": "offense", "name": "tank1" },
+    "ammo": 9
+  },
+  {
+    "identifier": { "id": "offense-2", "gameId": "game-1", "unitId": "unit-1" },
+    "definition": { "scope": "offense", "name": "tank2" },
+    "ammo": -1
+  }
+]

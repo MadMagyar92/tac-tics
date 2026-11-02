@@ -1,0 +1,14 @@
+[
+  {
+    "identifier": { "id": "player-1", "gameId": "game-1" },
+    "definition": { "scope": "player", "name": "orange-star" },
+    "order": 0,
+    "funds": 0
+  },
+  {
+    "identifier": { "id": "player-2", "gameId": "game-1" },
+    "definition": { "scope": "player", "name": "blue-moon" },
+    "order": 1,
+    "funds": 0
+  }
+]
