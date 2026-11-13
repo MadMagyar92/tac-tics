@@ -6,6 +6,7 @@ import { cleanUp, copyConfig, realAppConfig } from "../../../test/config";
 import { loadAppConfigFile } from "../../app";
 import {
   GameDefinitionHandler,
+  MapDefinitionHandler,
   MovementDefinitionHandler,
   OffenseDefinitionHandler,
   PlayerDefinitionHandler,
@@ -45,6 +46,7 @@ describe("sameKey", () => {
 
 describe.each([
     ["game", (appConfig: string) => new GameDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
+    ["map", (appConfig: string) => new MapDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["movement", (appConfig: string) => new MovementDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["offense", (appConfig: string) => new OffenseDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["player", (appConfig: string) => new PlayerDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],

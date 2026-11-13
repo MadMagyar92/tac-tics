@@ -3,7 +3,8 @@ import express from "express";
 import request from "supertest";
 import type {
   ActionService,
-  AttackAction,
+  AttackActionInput,
+  AttackActionOutput,
   BaseObject,
   Definition,
   DefinitionKey,
@@ -75,7 +76,7 @@ function createUnitService(units: UnitObject[]) {
  * Stands in for the routers mounted before the attack router: it loads `res.locals.game` and `res.locals.unit`
  * from the path, then hands over to the attack router.
  */
-function createApp(attackService: ActionService<AttackAction>, objectService: ObjectService) {
+function createApp(attackService: ActionService<AttackActionInput, AttackActionOutput>, objectService: ObjectService) {
   return express().use(
     "/game/:gameId/unit/:unitId/attack",
     (req, res, next) => {
@@ -88,27 +89,20 @@ function createApp(attackService: ActionService<AttackAction>, objectService: Ob
   );
 }
 
-/**
- * An attack service that accepts what `accepts` says and, when executing, returns a changed unit and a target with
- * 10 less health, so tests can tell the saved output from the input. It remembers every call.
- */
-function createStubAttackService(accepts: (action: AttackAction) => boolean = () => true) {
-  const asked: AttackAction[] = [];
-  const executed: AttackAction[] = [];
-  const changed = (action: AttackAction): AttackAction => ({
-    ...action,
-    unit: { ...action.unit, acted: true },
-    target: { ...action.target, health: action.target.health - 10 },
-  });
-  const service: ActionService<AttackAction> = {
-    canExecute(action) {
-      asked.push(action);
-      return accepts(action);
+/** An attack service that accepts what `accepts` says and always gives 10 damage with the offense "gun". It remembers every call. */
+function createStubAttackService(accepts: (actionInput: AttackActionInput) => boolean = () => true) {
+  const asked: AttackActionInput[] = [];
+  const executed: AttackActionInput[] = [];
+  const outputOf = ({ definition }: AttackActionInput): AttackActionOutput => ({ definition, damage: 10, offenseId: "gun" });
+  const service: ActionService<AttackActionInput, AttackActionOutput> = {
+    canExecute(actionInput) {
+      asked.push(actionInput);
+      return accepts(actionInput);
     },
-    preview: changed,
-    execute(action) {
-      executed.push(action);
-      return changed(action);
+    preview: outputOf,
+    execute(actionInput) {
+      executed.push(actionInput);
+      return outputOf(actionInput);
     },
   };
   return { service, asked, executed };
@@ -122,7 +116,7 @@ const roster = () => [
   unit("enemy-2", "recon", { playerId: "p2" }),
   unit("elsewhere", "recon", { playerId: "p2", gameId: "g2" }),
 ];
-const enemiesOnly = (action: AttackAction) => action.target.playerId !== action.unit.playerId;
+const enemiesOnly = (actionInput: AttackActionInput) => actionInput.target.playerId !== actionInput.unit.playerId;
 
 describe("attackRouter", () => {
   describe("GET /game/:gameId/unit/:unitId/attack", () => {
@@ -145,7 +139,7 @@ describe("attackRouter", () => {
 
       await request(createApp(service, units.service)).get("/game/g1/unit/attacker/attack");
 
-      expect(asked.map((action) => action.target.identifier.id)).toEqual(["enemy-1", "ally", "enemy-2"]);
+      expect(asked.map((actionInput) => actionInput.target.identifier.id)).toEqual(["enemy-1", "ally", "enemy-2"]);
     });
 
     it("lists everything canExecute accepts, even units of the same player: the rules are the service's", async () => {
@@ -154,7 +148,7 @@ describe("attackRouter", () => {
 
       const res = await request(createApp(service, units.service)).get("/game/g1/unit/attacker/attack");
 
-      expect(res.body.map((action: AttackAction) => action.target.identifier.id)).toEqual(["enemy-1", "ally", "enemy-2"]);
+      expect(res.body.map((actionInput: AttackActionInput) => actionInput.target.identifier.id)).toEqual(["enemy-1", "ally", "enemy-2"]);
     });
 
     it("lists nothing when canExecute accepts no one", async () => {
@@ -260,19 +254,14 @@ describe("attackRouter", () => {
       expect(executed).toEqual([{ definition: ATTACK_ACTION, game: game(), unit: roster()[0], target: roster()[1] }]);
     });
 
-    it("responds with the action the service returned", async () => {
+    it("responds with the output the service returned", async () => {
       const units = createUnitService(roster());
       const { service } = createStubAttackService();
 
       const res = await request(createApp(service, units.service)).post("/game/g1/unit/attacker/attack/enemy-1");
 
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({
-        definition: ATTACK_ACTION,
-        game: game(),
-        unit: { ...roster()[0], acted: true },
-        target: { ...roster()[1], health: 90 },
-      });
+      expect(res.body).toEqual({ definition: ATTACK_ACTION, damage: 10, offenseId: "gun" });
     });
 
     it("leaves saving to the attack service: it saves no unit itself", async () => {
@@ -388,7 +377,7 @@ describe("attackRouter", () => {
       const res = await request(app).get("/game/g1/unit/attacker/attack");
 
       expect(res.status).toBe(200);
-      expect(res.body.map((action: AttackAction) => action.target.identifier.id)).toEqual(["close"]);
+      expect(res.body.map((actionInput: AttackActionInput) => actionInput.target.identifier.id)).toEqual(["close"]);
     });
 
     it("carries the attack out: lowers the target's health in the unit store and spends a round of the cannon", async () => {
@@ -397,7 +386,7 @@ describe("attackRouter", () => {
       const res = await request(app).post("/game/g1/unit/attacker/attack/close");
 
       expect(res.status).toBe(200);
-      expect(res.body.target.health).toBe(15);
+      expect(res.body).toEqual({ definition: ATTACK_ACTION, damage: 85, offenseId: "cannon" });
       expect(units.stored.get("g1:close")?.health).toBe(15);
       expect(rounds("cannon")).toBe(8);
       expect(rounds("mg")).toBe(-1);
@@ -409,7 +398,7 @@ describe("attackRouter", () => {
       const res = await request(app).post("/game/g1/unit/attacker/attack/close");
 
       expect(res.status).toBe(200);
-      expect(res.body.target.health).toBe(0);
+      expect(res.body).toEqual({ definition: ATTACK_ACTION, damage: 85, offenseId: "cannon" });
       expect(units.stored.has("g1:close")).toBe(false);
       expect(units.stored.has("g1:attacker")).toBe(true);
     });
@@ -457,23 +446,33 @@ describe("attackRouter", () => {
       expect(units.stored.get("g1:close")?.health).toBe(1);
     });
 
-    it("shows the lowered health to the next request", async () => {
-      const { app } = createWorld(9, [enemy("close")]);
+    it("marks the attacker as acted in the unit store, and refuses its next attack", async () => {
+      const { app, units } = createWorld(9, [enemy("first"), enemy("second", { y: 1, x: 0 })]);
 
-      await request(app).post("/game/g1/unit/attacker/attack/close");
-      const res = await request(app).get("/game/g1/unit/attacker/attack/close");
+      await request(app).post("/game/g1/unit/attacker/attack/first");
+      const res = await request(app).post("/game/g1/unit/attacker/attack/second");
 
-      expect(res.body.target.health).toBe(15);
+      expect(units.stored.get("g1:attacker")?.acted).toBe(true);
+      expect(res.status).toBe(409);
+      expect(units.stored.get("g1:second")?.health).toBe(100);
     });
 
-    it("falls back to the machine gun once the cannon is empty, spending no more rounds", async () => {
-      const { app, rounds } = createWorld(1, [enemy("first"), enemy("second", { y: 1, x: 0 })]);
+    it("spends the last round of the cannon", async () => {
+      const { app, units, rounds } = createWorld(1, [enemy("close")]);
 
-      const first = await request(app).post("/game/g1/unit/attacker/attack/first");
-      const second = await request(app).post("/game/g1/unit/attacker/attack/second");
+      await request(app).post("/game/g1/unit/attacker/attack/close");
 
-      expect(first.body.target.health).toBe(15); // the last round of the cannon
-      expect(second.body.target.health).toBe(60); // the machine gun
+      expect(units.stored.get("g1:close")?.health).toBe(15);
+      expect(rounds("cannon")).toBe(0);
+    });
+
+    it("falls back to the machine gun when the cannon is empty, spending no rounds", async () => {
+      const { app, units, rounds } = createWorld(0, [enemy("close")]);
+
+      const res = await request(app).post("/game/g1/unit/attacker/attack/close");
+
+      expect(res.body).toEqual({ definition: ATTACK_ACTION, damage: 40, offenseId: "mg" });
+      expect(units.stored.get("g1:close")?.health).toBe(60);
       expect(rounds("cannon")).toBe(0);
       expect(rounds("mg")).toBe(-1);
     });

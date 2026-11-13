@@ -8,14 +8,16 @@ export {
   DeployActionService,
   getAttackDamage,
   getMoveCost,
-  isOccupied,
+  hasUnit,
   MOVE_ACTION,
   MoveActionService,
+  MultiMoveActionService,
 } from "./action";
 export { isDefinitionKey, isId, isNonEmptyString, isPlainObject, loadAppConfigFile, loadScopeFile, saveObjectFile } from "./app";
 export {
   DefinitionServiceImpl,
   GameDefinitionHandler,
+  MapDefinitionHandler,
   MemoryDefinitionHandler,
   MovementDefinitionHandler,
   OffenseDefinitionHandler,

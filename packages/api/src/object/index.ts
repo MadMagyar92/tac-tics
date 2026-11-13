@@ -1,4 +1,4 @@
-export { type BaseObject, type Id, type ObjectHandler, type ObjectService, type UiBaseObject } from "./app";
+export { type BaseObject, type Id, type ObjectHandler, type ObjectService, type Position, type UiBaseObject } from "./app";
 export { type GameObject, type GameReferenceId } from "./game";
 export { type OffenseObject } from "./offense";
 export { type PlayerObject } from "./player";

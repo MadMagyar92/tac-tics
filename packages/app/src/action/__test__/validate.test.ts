@@ -10,7 +10,7 @@ import type {
   UnitObject,
 } from "@tac-tics/api";
 import { describe, expect, it } from "vitest";
-import { canAttack, canDeploy, canMove, getAttackDamage, getMoveCost, isOccupied } from "../validate";
+import { canAttack, canDeploy, canMove, getAttackDamage, getMoveCost, hasUnit } from "../validate";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
@@ -144,6 +144,14 @@ describe("canAttack", () => {
     expect(canAttack(attacker, recon(1, 0), offense(9), definition())).toBe(true);
   });
 
+  it("is false when the attacker has already acted", () => {
+    expect(canAttack({ ...attacker, acted: true }, recon(1, 0), offense(9), definition())).toBe(false);
+  });
+
+  it("is true when the attacker has moved but not acted", () => {
+    expect(canAttack({ ...attacker, moved: true }, recon(1, 0), offense(9), definition())).toBe(true);
+  });
+
   it("changes nothing it was given", () => {
     const gun = offense(9);
     const gunDefinition = definition();
@@ -271,6 +279,10 @@ describe("canMove", () => {
     expect(canMove(walker(0, 0, 2), mountain, kind(2), walking)).toBe(false);
   });
 
+  it.each([["moved", { moved: true }], ["acted", { acted: true }]])("does not look at whether the unit has %s", (_flag, flags) => {
+    expect(canMove({ ...walker(0, 0), ...flags }, terrain("plain", 1, 0), kind(3), walking)).toBe(true);
+  });
+
   it("changes nothing it was given", () => {
     const moving = walker(0, 0);
     const next = terrain("plain", 1, 0);
@@ -294,33 +306,33 @@ const standing = (x: number, y: number, gameId = "g1", playerId = "p2"): UnitObj
   playerId,
 });
 
-describe("isOccupied", () => {
+describe("hasUnit", () => {
   it("is true when a unit is on the square of the terrain", () => {
-    expect(isOccupied(tile(2, 3), [standing(2, 3)])).toBe(true);
+    expect(hasUnit(tile(2, 3), [standing(2, 3)])).toBe(true);
   });
 
   it("is true when one of several units is on it, whoever's it is", () => {
-    expect(isOccupied(tile(2, 3), [standing(0, 0), standing(2, 3, "g1", "p1"), standing(5, 5)])).toBe(true);
-    expect(isOccupied(tile(2, 3), [standing(0, 0), standing(2, 3, "g1", "p2")])).toBe(true);
+    expect(hasUnit(tile(2, 3), [standing(0, 0), standing(2, 3, "g1", "p1"), standing(5, 5)])).toBe(true);
+    expect(hasUnit(tile(2, 3), [standing(0, 0), standing(2, 3, "g1", "p2")])).toBe(true);
   });
 
   it.each([[2, 4], [2, 2], [3, 3], [1, 3], [3, 4], [0, 0], [3, 2]])("is false when the only unit is at (%i, %i), not on (2, 3)", (x, y) => {
-    expect(isOccupied(tile(2, 3), [standing(x, y)])).toBe(false);
+    expect(hasUnit(tile(2, 3), [standing(x, y)])).toBe(false);
   });
 
   it("is false when there are no units", () => {
-    expect(isOccupied(tile(2, 3), [])).toBe(false);
+    expect(hasUnit(tile(2, 3), [])).toBe(false);
   });
 
   it("is false when the unit on the square is in another game", () => {
-    expect(isOccupied(tile(2, 3), [standing(2, 3, "g2")])).toBe(false);
+    expect(hasUnit(tile(2, 3), [standing(2, 3, "g2")])).toBe(false);
   });
 
   it("looks at the position of the unit as it is every time it is asked", () => {
     const there = standing(0, 0);
-    expect(isOccupied(tile(2, 3), [there])).toBe(false);
+    expect(hasUnit(tile(2, 3), [there])).toBe(false);
     there.position = { x: 2, y: 3 };
-    expect(isOccupied(tile(2, 3), [there])).toBe(true);
+    expect(hasUnit(tile(2, 3), [there])).toBe(true);
   });
 });
 

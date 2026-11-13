@@ -16,6 +16,9 @@ export function getAttackDamage(definition: OffenseDefinition, target: UnitObjec
 
 export function canAttack(unit: UnitObject, target: UnitObject, offense: OffenseObject, definition: OffenseDefinition): boolean {
   const distance = Math.abs(unit.position.x - target.position.x) + Math.abs(unit.position.y - target.position.y);
+  if (unit.acted) {
+    return false;
+  }
   if (getAttackDamage(definition, target) < 0) {
     return false;
   }
@@ -29,7 +32,7 @@ export function canAttack(unit: UnitObject, target: UnitObject, offense: Offense
 };
 
 export function getMoveCost(definition: MovementDefinition, target: TerrainObject): number {
-  return definition.cost.find(({ terrain }) => sameKey(terrain, target.definition))?.cost ?? -1;
+  return definition.cost.find(({ terrain }: { terrain: typeof target.definition }) => sameKey(terrain, target.definition))?.cost ?? -1;
 };
 
 export function canMove(unit: UnitObject, target: TerrainObject, definition: UnitDefinition, movement: MovementDefinition): boolean {
@@ -47,7 +50,7 @@ export function canMove(unit: UnitObject, target: TerrainObject, definition: Uni
   return true;
 };
 
-export function isOccupied(terrain: TerrainObject, units: UnitObject[]): boolean {
+export function hasUnit(terrain: TerrainObject, units: UnitObject[]): boolean {
   return units.some(
     (unit) => unit.identifier.gameId === terrain.identifier.gameId && unit.position.x === terrain.position.x && unit.position.y === terrain.position.y,
   );
@@ -63,7 +66,7 @@ export function canDeploy(game: GameObject, player: PlayerObject, terrain: Terra
   if (player.funds < definition.fundsCost) {
     return false;
   }
-  if (isOccupied(terrain, units)) {
+  if (hasUnit(terrain, units)) {
     return false;
   }
   return true;

@@ -10,8 +10,13 @@ export type BaseObject<I extends Id> = {
   definition: DefinitionKey;
 };
 
+export type Position = {
+  x: number;
+  y: number;
+}
+
 export type UiBaseObject<I extends Id>  = BaseObject<I> & {
-  position: { x: number, y: number };
+  position: Position;
 };
 
 export interface ObjectHandler<I extends Id, O extends BaseObject<I>> extends AppConfigService<I, O> {

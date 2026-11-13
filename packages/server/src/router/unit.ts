@@ -1,8 +1,10 @@
 import { Router, type Response } from "express";
 import {
   type ActionService,
-  type AttackAction,
-  type MoveAction,
+  type AttackActionInput,
+  type AttackActionOutput,
+  type MultiMoveActionInput,
+  type MultiMoveActionOutput,
   type ObjectService,
   Scope,
   type TerrainObject,
@@ -48,19 +50,18 @@ export function unitRouter(objectService: ObjectService): Router {
  *
  * - `GET /` lists the attacks the unit can carry out: one for each other unit in the game that `canExecute` accepts.
  * - `GET /:targetId` returns the attack on that target, if it can be carried out. It changes nothing.
- * - `POST /:targetId` carries the attack out and returns the action. The attack service saves, or deletes, what it changes.
+ * - `POST /:targetId` carries the attack out and returns its output. The attack service saves, or deletes, what it changes.
  */
 export function attackRouter(
-  attackService: ActionService<AttackAction>,
+  attackService: ActionService<AttackActionInput, AttackActionOutput>,
   objectService: ObjectService,
 ): Router {
   const router = Router({ mergeParams: true });
 
-  /** The attack of the unit on the target in the request, or undefined when it cannot be carried out. */
-  const attackOf = (res: Response): AttackAction | undefined => {
+  const attackOf = (res: Response): AttackActionInput | undefined => {
     const { game, unit, target } = res.locals;
-    const action: AttackAction = { definition: ATTACK_ACTION, game, unit, target };
-    return attackService.canExecute(action) ? action : undefined;
+    const input: AttackActionInput = { definition: ATTACK_ACTION, game, unit, target };
+    return attackService.canExecute(input) ? input : undefined;
   };
 
   router.param("targetId", (req, res, next, targetId: string) => {
@@ -78,27 +79,27 @@ export function attackRouter(
     const { game, unit } = res.locals;
     const actions = [...objectService.loadAll<UnitObject>(Scope.Unit).values()]
       .filter((other) => other.identifier.gameId === game.identifier.id && other.identifier.id !== unit.identifier.id)
-      .map((target): AttackAction => ({ definition: ATTACK_ACTION, game, unit, target }))
-      .filter((action) => attackService.canExecute(action));
+      .map((target): AttackActionInput => ({ definition: ATTACK_ACTION, game, unit, target }))
+      .filter((input) => attackService.canExecute(input));
     res.json(actions);
   });
 
   router.get<{ gameId: string; unitId: string; targetId: string }>("/:targetId", (req, res) => {
-    const action = attackOf(res);
-    if (!action) {
+    const input = attackOf(res);
+    if (!input) {
       res.status(404).json({ error: `Unit ${req.params.targetId} cannot be attacked by unit ${req.params.unitId}` });
       return;
     }
-    res.json(action);
+    res.json(input);
   });
 
   router.post<{ gameId: string; unitId: string; targetId: string }>("/:targetId", (req, res) => {
-    const action = attackOf(res);
-    if (!action) {
+    const input = attackOf(res);
+    if (!input) {
       res.status(409).json({ error: `Unit ${req.params.targetId} cannot be attacked by unit ${req.params.unitId}` });
       return;
     }
-    res.json(attackService.execute(action));
+    res.json(attackService.execute(input));
   });
 
   return router;
@@ -110,17 +111,17 @@ export function attackRouter(
  *
  * - `GET /` lists the moves the unit can make: one for each terrain in the game that `canExecute` accepts.
  * - `GET /:terrainId` previews the move onto that terrain, if it can be made. It changes nothing.
- * - `POST /:terrainId` makes the move and returns the action. The move service saves what it changes.
+ * - `POST /:terrainId` makes the move and returns its output. The move service saves what it changes.
  */
 export function moveRouter(
-  moveService: ActionService<MoveAction>,
+  moveService: ActionService<MultiMoveActionInput, MultiMoveActionOutput>,
   objectService: ObjectService,
 ): Router {
   const router = Router({ mergeParams: true });
 
-  function getMoveInRequest(res: Response): MoveAction {
+  function getMoveFromRequest(res: Response): MultiMoveActionInput {
     const { game, unit, terrain } = res.locals;
-    return { definition: MOVE_ACTION, game, unit, target: terrain };
+    return { definition: MOVE_ACTION, game, unit, path: [terrain] };
   }
 
   router.param("terrainId", (req, res, next, terrainId: string) => {
@@ -138,13 +139,13 @@ export function moveRouter(
     const { game, unit } = res.locals;
     const moves = [...objectService.loadAll<TerrainObject>(Scope.Terrain).values()]
       .filter((terrain) => terrain.identifier.gameId === game.identifier.id)
-      .map((target): MoveAction => ({ definition: MOVE_ACTION, game, unit, target }))
+      .map((terrain): MultiMoveActionInput => ({ definition: MOVE_ACTION, game, unit, path: [terrain] }))
       .filter((move) => moveService.canExecute(move));
     res.json(moves);
   });
 
   router.get<{ gameId: string; unitId: string; terrainId: string }>("/:terrainId", (req, res) => {
-    const move = getMoveInRequest(res);
+    const move = getMoveFromRequest(res);
     if (!moveService.canExecute(move)) {
       res.status(404).json({ error: `Unit ${req.params.unitId} cannot move onto terrain ${req.params.terrainId}` });
       return;
@@ -153,7 +154,7 @@ export function moveRouter(
   });
 
   router.post<{ gameId: string; unitId: string; terrainId: string }>("/:terrainId", (req, res) => {
-    const move = getMoveInRequest(res);
+    const move = getMoveFromRequest(res);
     if (!moveService.canExecute(move)) {
       res.status(409).json({ error: `Unit ${req.params.unitId} cannot move onto terrain ${req.params.terrainId}` });
       return;

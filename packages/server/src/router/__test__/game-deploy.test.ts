@@ -1,12 +1,12 @@
 import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { type ActionService, type DeployAction, type GameObject, type PlayerObject, Scope, type TerrainObject } from "@tac-tics/api";
+import { type ActionService, type DeployActionInput, type DeployActionOutput, type GameObject, type PlayerObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { DEPLOY_ACTION, ObjectServiceImpl } from "@tac-tics/app";
 import { realAppConfig } from "../../../test/config";
 import { deployRouter } from "../game";
 
-function createApp(deployService: ActionService<DeployAction>, objectService: ObjectServiceImpl) {
+function createApp(deployService: ActionService<DeployActionInput, DeployActionOutput>, objectService: ObjectServiceImpl) {
   return express().use(
     "/game/:gameId/deploy",
     (req, res, next) => {
@@ -18,24 +18,35 @@ function createApp(deployService: ActionService<DeployAction>, objectService: Ob
   );
 }
 
-/** A deploy service that accepts what `accepts` says, and takes 1 off the player's funds so tests can tell the result from the input. */
-function createStubDeployService(accepts: (deploy: DeployAction) => boolean = () => true) {
-  const asked: DeployAction[] = [];
-  const previewed: DeployAction[] = [];
-  const executed: DeployAction[] = [];
-  const changed = (deploy: DeployAction): DeployAction => ({ ...deploy, player: { ...deploy.player, funds: deploy.player.funds - 1 } });
-  const service: ActionService<DeployAction> = {
+/** A deploy service that accepts what `accepts` says, gives unit-2 as the new unit's id, and saves that unit on the terrain to `objects`, if it is given them, when it executes. */
+function createStubDeployService(accepts: (deploy: DeployActionInput) => boolean = () => true, objects?: ObjectServiceImpl) {
+  const asked: DeployActionInput[] = [];
+  const previewed: DeployActionInput[] = [];
+  const executed: DeployActionInput[] = [];
+  const unitOf = ({ game, terrain, unitDefinition }: DeployActionInput): UnitObject => ({
+    identifier: { id: "unit-2", gameId: game.identifier.id },
+    definition: unitDefinition,
+    position: { ...terrain.position },
+    moved: false,
+    acted: false,
+    health: 100,
+    fuel: 1,
+    playerId: "player-1",
+    offenseIds: [],
+  });
+  const service: ActionService<DeployActionInput, DeployActionOutput> = {
     canExecute(deploy) {
       asked.push(deploy);
       return accepts(deploy);
     },
     preview(deploy) {
       previewed.push(deploy);
-      return changed(deploy);
+      return { definition: deploy.definition, unitId: "unit-2" };
     },
     execute(deploy) {
       executed.push(deploy);
-      return changed(deploy);
+      objects?.save<UnitObject>(Scope.Unit, unitOf(deploy));
+      return { definition: deploy.definition, unitId: "unit-2" };
     },
   };
   return { service, asked, previewed, executed };
@@ -49,7 +60,7 @@ const path = "/game/game-1/deploy/terrain-2";
 
 describe("deployRouter", () => {
   describe("POST /game/:gameId/deploy/:terrainId", () => {
-    it("builds the deploy from the game, the terrain, the player whose turn it is, and the unit named in the body", async () => {
+    it("builds the deploy from the game, the terrain, and the unit named in the body", async () => {
       const objects = startObjects();
       const { service, asked } = createStubDeployService();
 
@@ -60,22 +71,21 @@ describe("deployRouter", () => {
           definition: DEPLOY_ACTION,
           game: objects.load<GameObject>(Scope.Game, { id: "game-1" }),
           terrain: objects.load<TerrainObject>(Scope.Terrain, { id: "terrain-2", gameId: "game-1" }),
-          player: objects.load<PlayerObject>(Scope.Player, { id: "player-1", gameId: "game-1" }),
           unitDefinition: { scope: "unit", name: "tank" },
         },
       ]);
     });
 
-    it("executes the deploy, and gives the action the service returned", async () => {
+    it("executes the deploy, and gives the unit of the id the service returned", async () => {
       const objects = startObjects();
-      const { service, executed } = createStubDeployService();
-      const first = objects.load<PlayerObject>(Scope.Player, { id: "player-1", gameId: "game-1" })!;
+      const { service, executed } = createStubDeployService(() => true, objects);
 
       const res = await request(createApp(service, objects)).post(path).send({ unit: "tank" });
 
       expect(res.status).toBe(200);
       expect(executed).toHaveLength(1);
-      expect(res.body.player).toEqual({ ...first, funds: first.funds - 1 });
+      expect(res.body).toEqual(objects.load<UnitObject>(Scope.Unit, { id: "unit-2", gameId: "game-1" }));
+      expect(res.body.definition).toEqual({ scope: "unit", name: "tank" });
     });
 
     it("previews nothing", async () => {
@@ -84,25 +94,16 @@ describe("deployRouter", () => {
       expect(previewed).toEqual([]);
     });
 
-    it("deploys for the player whose turn it is, whichever that is", async () => {
-      const objects = startObjects();
-      const game = objects.load<GameObject>(Scope.Game, { id: "game-1" })!;
-      objects.save<GameObject>(Scope.Game, { ...game, playerTurn: 1 });
-      const { service, asked } = createStubDeployService();
-
-      await request(createApp(service, objects)).post(path).send({ unit: "tank" });
-
-      expect(asked[0].player.identifier.id).toBe("player-2");
-    });
-
-    it("leaves saving to the deploy service: it changes no stored player itself", async () => {
+    it("leaves saving to the deploy service: it changes no stored player or unit itself", async () => {
       const objects = startObjects();
       const before = objects.load<PlayerObject>(Scope.Player, { id: "player-1", gameId: "game-1" });
+      const units = objects.loadAll<UnitObject>(Scope.Unit);
       const { service } = createStubDeployService();
 
       await request(createApp(service, objects)).post(path).send({ unit: "tank" });
 
       expect(objects.load<PlayerObject>(Scope.Player, { id: "player-1", gameId: "game-1" })).toEqual(before);
+      expect(objects.loadAll<UnitObject>(Scope.Unit)).toEqual(units);
     });
 
     it("returns 409 and executes nothing when canExecute does not accept the deploy", async () => {
@@ -115,18 +116,16 @@ describe("deployRouter", () => {
   });
 
   describe("GET /game/:gameId/deploy/:terrainId", () => {
-    it("gives the preview of the deploy built from the game, the terrain, the current player and the unit in the query", async () => {
+    it("gives the preview of the deploy built from the game, the terrain and the unit in the query", async () => {
       const objects = startObjects();
       const { service, asked, previewed } = createStubDeployService();
-      const first = objects.load<PlayerObject>(Scope.Player, { id: "player-1", gameId: "game-1" })!;
 
       const res = await request(createApp(service, objects)).get(`${path}?unit=infantry`);
 
       expect(res.status).toBe(200);
       expect(asked[0].unitDefinition).toEqual({ scope: "unit", name: "infantry" });
-      expect(asked[0].player).toEqual(first);
       expect(previewed).toEqual(asked);
-      expect(res.body.player).toEqual({ ...first, funds: first.funds - 1 });
+      expect(res.body).toEqual({ definition: DEPLOY_ACTION, unitId: "unit-2" });
     });
 
     it("executes nothing", async () => {
@@ -181,7 +180,7 @@ describe("deployRouter", () => {
   });
 
   describe("the player", () => {
-    it("is refused with 404 when no player has the turn", async () => {
+    it("is left to the deploy service: the router asks it even when no player has the turn", async () => {
       const objects = startObjects();
       const game = objects.load<GameObject>(Scope.Game, { id: "game-1" })!;
       objects.save<GameObject>(Scope.Game, { ...game, playerTurn: 5 });
@@ -189,28 +188,20 @@ describe("deployRouter", () => {
 
       const res = await request(createApp(service, objects)).post(path).send({ unit: "tank" });
 
-      expect(res.status).toBe(404);
-      expect(res.body).toEqual({ error: "No player has the turn in game game-1" });
-      expect(asked).toEqual([]);
+      expect(res.status).toBe(200);
+      expect(asked).toHaveLength(1);
+      expect(asked[0]).not.toHaveProperty("player");
     });
 
-    it("is not one of another game's players", async () => {
+    it("gives the deploy service the game, so that it can tell whose turn it is", async () => {
       const objects = startObjects();
-      for (const id of ["player-1", "player-2"]) {
-        objects.delete(Scope.Player, { id, gameId: "game-1" });
-      }
-      objects.save<PlayerObject>(Scope.Player, {
-        identifier: { id: "stranger", gameId: "game-2" },
-        definition: { scope: "player", name: "orange-star" },
-        order: 0,
-        funds: 100,
-      });
-      const { service } = createStubDeployService();
+      const game = objects.load<GameObject>(Scope.Game, { id: "game-1" })!;
+      objects.save<GameObject>(Scope.Game, { ...game, playerTurn: 1 });
+      const { service, asked } = createStubDeployService();
 
-      const res = await request(createApp(service, objects)).post(path).send({ unit: "tank" });
+      await request(createApp(service, objects)).post(path).send({ unit: "tank" });
 
-      expect(res.status).toBe(404);
-      expect(res.body.error).toBe("No player has the turn in game game-1");
+      expect(asked[0].game.playerTurn).toBe(1);
     });
   });
 

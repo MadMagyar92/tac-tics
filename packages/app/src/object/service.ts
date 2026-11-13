@@ -1,5 +1,6 @@
 import type { BaseObject, Id, ObjectHandler, ObjectService } from "@tac-tics/api";
 import { loadAppConfigFile } from "../app";
+import { MapDefinitionHandler } from "../definition";
 import { GameObjectHandler } from "./game";
 import { OffenseObjectHandler } from "./offense";
 import { PlayerObjectHandler } from "./player";
@@ -11,11 +12,12 @@ export class ObjectServiceImpl implements ObjectService {
 
     constructor(appConfigPath: string) {
         const appConfig = loadAppConfigFile(appConfigPath);
+        const games = new GameObjectHandler(appConfigPath, appConfig);
         this.handlers = [
-            new GameObjectHandler(appConfigPath, appConfig),
+            games,
             new OffenseObjectHandler(appConfigPath, appConfig),
             new PlayerObjectHandler(appConfigPath, appConfig),
-            new TerrainObjectHandler(appConfigPath, appConfig),
+            new TerrainObjectHandler(appConfigPath, appConfig, games, new MapDefinitionHandler(appConfigPath, appConfig)),
             new UnitObjectHandler(appConfigPath, appConfig),
         ];
 

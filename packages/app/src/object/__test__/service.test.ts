@@ -65,12 +65,21 @@ describe("ObjectServiceImpl", () => {
             expect(service.load<UnitObject>("unit", identifier)!.health).toBe(100);
         });
 
-        it.each(scopes)("gives all the %s objects of its file, by their identifiers, with loadAll", (scope) => {
+        it.each(scopes.filter((scope) => scope !== "terrain"))("gives all the %s objects of its file, by their identifiers, with loadAll", (scope) => {
             const service = new ObjectServiceImpl(realAppConfig);
             const objects = readObjects(objectFile(dirname(realAppConfig), scope));
             const all = service.loadAll(scope);
             expect([...all.values()]).toEqual(objects);
             expect([...all.keys()]).toEqual(objects.map((object) => object.identifier));
+        });
+
+        it("gives the terrain objects of its file with loadAll, then the default terrain of every other square of the map", () => {
+            const service = new ObjectServiceImpl(realAppConfig);
+            const objects = readObjects(objectFile(dirname(realAppConfig), "terrain"));
+            const all = [...service.loadAll("terrain").values()];
+            expect(all).toHaveLength(150);
+            expect(all.slice(0, objects.length)).toEqual(objects);
+            expect(service.load("terrain", { id: "sea-1", gameId: "game-1" } as Id)?.definition).toEqual({ scope: "terrain", name: "sea" });
         });
 
         it.each(["movement", "weather", "", "constructor", "__proto__"])("gives no objects with loadAll for the scope %j", (scope) => {
@@ -93,7 +102,7 @@ describe("ObjectServiceImpl", () => {
             service.save<UnitObject>("unit", { ...tank, identifier: { id: "unit-2", gameId: "game-1" } });
             expect(service.loadAll("unit").size).toBe(2);
             expect(service.load<UnitObject>("unit", { id: "unit-2", gameId: "game-1" })?.definition).toEqual(tank.definition);
-            expect(service.loadAll("terrain").size).toBe(600);
+            expect(service.loadAll("terrain").size).toBe(150);
         });
 
         it("refuses to save an object under a scope that is not its own", () => {
@@ -127,7 +136,7 @@ describe("ObjectServiceImpl", () => {
         it("keeps the state of each scope apart from the others", () => {
             const service = new ObjectServiceImpl(realAppConfig);
             service.delete("unit", { id: "unit-1", gameId: "game-1" } as Id);
-            expect(service.loadAll("terrain").size).toBe(600);
+            expect(service.loadAll("terrain").size).toBe(150);
             expect(service.load("game", { id: "game-1" })).toBeDefined();
         });
 

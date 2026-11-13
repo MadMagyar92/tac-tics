@@ -1,0 +1,7 @@
+[
+  {
+    "definition": { "scope": "map", "name": "spann-island" },
+    "size": { "x": 15, "y": 10 },
+    "defaultTerrain": { "scope": "terrain", "name": "sea" }
+  }
+]

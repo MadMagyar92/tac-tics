@@ -1,5 +1,6 @@
 export { MemoryDefinitionHandler, sameKey } from "./app";
 export { GameDefinitionHandler } from "./game";
+export { MapDefinitionHandler } from "./map";
 export { MovementDefinitionHandler } from "./movement";
 export { OffenseDefinitionHandler } from "./offense";
 export { PlayerDefinitionHandler } from "./player";

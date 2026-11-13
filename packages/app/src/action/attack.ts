@@ -1,6 +1,8 @@
 import {
   type ActionService,
-  type AttackAction,
+  type AttackActionInput,
+  type AttackActionOutput,
+  type AttackInstance,
   type DefinitionService,
   type ObjectService,
   type OffenseDefinition,
@@ -12,40 +14,39 @@ import { canAttack, getAttackDamage } from "./validate";
 
 export const ATTACK_ACTION = { scope: "action", name: "attack" };
 
-type Attack = {
-  definition: OffenseDefinition;
-  offense: OffenseObject;
-  damage: number;
-};
-
-export class AttackActionService implements ActionService<AttackAction> {
+export class AttackActionService implements ActionService<AttackActionInput, AttackActionOutput> {
   constructor(
     private definitionService: DefinitionService,
     private objectService: ObjectService,
   ) {}
 
-  canExecute(action: AttackAction): boolean {
-    return this._plan(action) !== undefined;
+  canExecute(input: AttackActionInput): boolean {
+    return this._plan(input) !== undefined;
   }
 
-  preview(action: AttackAction): AttackAction {
-    return this._act(action, true);
+  preview(input: AttackActionInput): AttackActionOutput | undefined {
+    return this._act(input, false);
   }
 
-  execute(action: AttackAction): AttackAction {
-    return this._act(action, false);
+  execute(input: AttackActionInput): AttackActionOutput | undefined {
+    return this._act(input, true);
   }
 
-  private _act(action: AttackAction, preview: boolean): AttackAction {
-    const attack = this._plan(action);
+  private _act(input: AttackActionInput, commit: boolean): AttackActionOutput | undefined {
+    const attack = this._plan(input);
     if (!attack) {
-      return action;
+      return undefined;
     }
 
-    return preview ? this._preview(action, attack) : this._commit(action, attack);
+    const result = this._preview(attack);
+    if (commit) {
+      this._commit(result);
+    }
+    return { definition: input.definition, damage: result.damage, offenseId: result.offense.identifier.id };
   }
 
-  private _plan({ game, unit, target }: AttackAction): Attack | undefined {
+  private _plan(input: AttackActionInput): AttackInstance | undefined {
+    const { game, unit, target } = input;
     if (unit.identifier.gameId !== game.identifier.id || target.identifier.gameId !== game.identifier.id) {
       return undefined;
     }
@@ -59,30 +60,38 @@ export class AttackActionService implements ActionService<AttackAction> {
       if (!offense) {
         return undefined;
       }
-      const definition = this.definitionService.get<OffenseDefinition>(offense.definition);
-      if (!definition) {
+      const offenseDefinition = this.definitionService.get<OffenseDefinition>(offense.definition);
+      if (!offenseDefinition) {
         return undefined;
       }
 
-      if (canAttack(unit, target, offense, definition)) {
-        return { definition, offense, damage: getAttackDamage(definition, target) };
+      if (canAttack(unit, target, offense, offenseDefinition)) {
+        return { input, offense, offenseDefinition, damage: getAttackDamage(offenseDefinition, target) };
       }
     }
     return undefined;
   }
 
-  private _commit(action: AttackAction, attack: Attack): AttackAction {
-    const result = this._preview(action, attack);
-    if (attack.definition.ammoMax >= 0) {
-      this.objectService.save<OffenseObject>(Scope.Offense, { ...attack.offense, ammo: attack.offense.ammo - 1 });
-    }
+  private _preview(attack: AttackInstance): AttackInstance {
+    const { input, offense, offenseDefinition, damage } = attack;
+    const { unit, target } = input;
+    return {
+      ...attack,
+      input: { ...input, unit: { ...unit, acted: true }, target: { ...target, health: Math.max(0, target.health - damage) } },
+      offense: offenseDefinition.ammoMax >= 0 ? { ...offense, ammo: offense.ammo - 1 } : offense,
+    };
+  }
 
-    if (result.target.health <= 0) {
-      this._deleteUnit(result.target);
-    } else {
-      this.objectService.save<UnitObject>(Scope.Unit, result.target);
+  private _commit({ input: { unit, target }, offense, offenseDefinition }: AttackInstance): void {
+    if (offenseDefinition.ammoMax >= 0) {
+      this.objectService.save<OffenseObject>(Scope.Offense, offense);
     }
-    return result;
+    this.objectService.save<UnitObject>(Scope.Unit, unit);
+    if (target.health <= 0) {
+      this._deleteUnit(target);
+    } else {
+      this.objectService.save<UnitObject>(Scope.Unit, target);
+    }
   }
 
   private _deleteUnit(unit: UnitObject): void {
@@ -90,10 +99,5 @@ export class AttackActionService implements ActionService<AttackAction> {
     for (const id of unit.offenseIds) {
       this.objectService.delete<OffenseObject>(Scope.Offense, { id, gameId: unit.identifier.gameId, unitId: unit.identifier.id });
     }
-  }
-
-  private _preview(action: AttackAction, attack: Attack): AttackAction {
-    const { target } = action;
-    return { ...action, target: { ...target, health: Math.max(0, target.health - attack.damage) } };
   }
 };

@@ -1,5 +1,5 @@
 import type {
-  AttackAction,
+  AttackActionInput,
   BaseObject,
   Definition,
   DefinitionKey,
@@ -182,12 +182,15 @@ const attacker = (kind: string, options: UnitOptions = {}) => unit("attacker", k
 /** The target (player p2) is one square to the right of the attacker unless said otherwise. */
 const target = (definition: string, options: UnitOptions = {}) => unit("target", definition, options);
 
-const attack = (from: UnitObject, to: UnitObject, gameId = "g1"): AttackAction => ({
+const attack = (from: UnitObject, to: UnitObject, gameId = "g1"): AttackActionInput => ({
   definition: key("action", "attack"),
   game: game(gameId),
   unit: from,
   target: to,
 });
+
+/** The saved units that are the target, leaving out the attacker. */
+const savedTargets = (savedUnits: UnitObject[]) => savedUnits.filter((unit) => unit.identifier.id === "target");
 
 describe("ATTACK_ACTION", () => {
   it("is the action named attack", () => {
@@ -399,24 +402,18 @@ describe("AttackActionService", () => {
 
     it("changes nothing and saves nothing", () => {
       const { service, saves } = createWorld();
-      const action = attack(attacker("tank"), target("recon"));
-      const before = structuredClone(action);
-      service.canExecute(action);
-      expect(action).toEqual(before);
+      const actionInput = attack(attacker("tank"), target("recon"));
+      const before = structuredClone(actionInput);
+      service.canExecute(actionInput);
+      expect(actionInput).toEqual(before);
       expect(saves).toEqual([]);
     });
   });
 
   describe("preview", () => {
-    it("gives the action with the damage taken off the target's health", () => {
+    it("gives the output of the attack", () => {
       const { service } = createWorld();
-      const action = attack(attacker("tank"), target("recon", { health: 100 }));
-      expect(service.preview(action)).toEqual({ ...action, target: { ...action.target, health: 15 } }); // cannon: 85
-    });
-
-    it("never takes the target's health below zero", () => {
-      const { service } = createWorld();
-      expect(service.preview(attack(attacker("tank"), target("recon", { health: 30 }))).target.health).toBe(0);
+      expect(service.preview(attack(attacker("tank"), target("recon")))).toEqual({ definition: key("action", "attack"), damage: 85, offenseId: "cannon" });
     });
 
     it.each([
@@ -427,11 +424,11 @@ describe("AttackActionService", () => {
       ["the offense that reaches a close target", {}, () => attack(attacker("mixed"), target("infantry", { x: 1 }))],
       ["an entry that does 1 damage", {}, () => attack(attacker("pinprick"), target("infantry"))],
       ["a target with little health left", {}, () => attack(attacker("tank"), target("recon", { health: 30 }))],
-    ])("gives the action that execute gives, for %s", (_name, ammo, build) => {
+    ])("gives the output that execute gives, for %s", (_name, ammo, build) => {
       expect(createWorld(ammo).service.preview(build())).toEqual(createWorld(ammo).service.execute(build()));
     });
 
-    it("saves nothing, neither the offense nor the target, and spends no ammo", () => {
+    it("saves nothing, neither the offense, the attacker nor the target, and spends no ammo", () => {
       const { service, saved, savedUnits, saves, stored } = createWorld();
       service.preview(attack(attacker("tank"), target("recon")));
       expect(saves).toEqual([]);
@@ -442,7 +439,7 @@ describe("AttackActionService", () => {
 
     it("saves nothing even for an offense whose capacity is zero", () => {
       const { service, saves } = createWorld({ empty: 1 });
-      expect(service.preview(attack(attacker("empty"), target("infantry"))).target.health).toBe(70);
+      service.preview(attack(attacker("empty"), target("infantry")));
       expect(saves).toEqual([]);
     });
 
@@ -452,22 +449,28 @@ describe("AttackActionService", () => {
       expect(loaded.map((id) => id.id)).toEqual(["cannon"]);
     });
 
-    it("gives the same action every time, since nothing is spent", () => {
+    it("gives the same output every time, since nothing is spent", () => {
       const { service } = createWorld({ gun: 1 });
-      const action = attack(attacker("artillery"), target("infantry", { x: 2 }));
-      const first = service.preview(action);
-      expect(service.preview(action)).toEqual(first);
-      expect(service.canExecute(action)).toBe(true);
-      expect(service.execute(action)).toEqual(first);
-      expect(service.canExecute(action)).toBe(false);
+      const actionInput = attack(attacker("artillery"), target("infantry", { x: 2 }));
+      const first = service.preview(actionInput);
+      expect(service.preview(actionInput)).toEqual(first);
+      expect(service.canExecute(actionInput)).toBe(true);
+      expect(service.execute(actionInput)).toEqual(first);
+      expect(service.canExecute(actionInput)).toBe(false);
     });
 
     it("does not change the action it was given", () => {
       const { service } = createWorld();
-      const action = attack(attacker("tank"), target("recon"));
-      const before = structuredClone(action);
-      service.preview(action);
-      expect(action).toEqual(before);
+      const actionInput = attack(attacker("tank"), target("recon"));
+      const before = structuredClone(actionInput);
+      service.preview(actionInput);
+      expect(actionInput).toEqual(before);
+    });
+
+    it("does not delete a target the damage takes to zero health", () => {
+      const { service, calls } = createWorld();
+      service.preview(attack(attacker("tank"), target("recon", { health: 30, offense: ["rifle"] })));
+      expect(calls).toEqual([]);
     });
 
     it.each([
@@ -476,43 +479,57 @@ describe("AttackActionService", () => {
       ["the target is out of range", () => attack(attacker("infantry"), target("infantry", { x: 5 }))],
       ["the offense has no ammo", () => attack(attacker("artillery"), target("infantry", { x: 2 }))],
       ["no offense has an entry for the target", () => attack(attacker("unarmed"), target("infantry"))],
-    ])("gives the action as it is when %s", (_reason, build) => {
+      ["the attacker has already acted", () => attack({ ...attacker("infantry"), acted: true }, target("infantry"))],
+    ])("gives nothing when %s", (_reason, build) => {
       const { service, saves } = createWorld({ gun: 0 });
-      const action = build();
-      expect(service.canExecute(action)).toBe(false);
-      expect(service.preview(action)).toBe(action);
+      const actionInput = build();
+      expect(service.canExecute(actionInput)).toBe(false);
+      expect(service.preview(actionInput)).toBeUndefined();
       expect(saves).toEqual([]);
     });
   });
 
   describe("execute", () => {
-    it("subtracts the damage from the target's health", () => {
+    it("gives the output of the attack", () => {
       const { service } = createWorld();
-      const result = service.execute(attack(attacker("tank"), target("recon", { health: 100 })));
-      expect(result.target.health).toBe(15); // cannon: 85
+      expect(service.execute(attack(attacker("tank"), target("recon")))).toEqual({ definition: key("action", "attack"), damage: 85, offenseId: "cannon" });
     });
 
-    it("saves the target, with the health it ends up with", () => {
+    it("saves the target, with the damage taken off its health", () => {
       const { service, savedUnits } = createWorld();
-      const result = service.execute(attack(attacker("tank"), target("recon", { health: 100 })));
-      expect(savedUnits).toHaveLength(1);
-      expect(savedUnits[0]).toBe(result.target);
-      expect(savedUnits[0].identifier).toEqual({ id: "target", gameId: "g1" });
-      expect(savedUnits[0].health).toBe(15);
+      service.execute(attack(attacker("tank"), target("recon", { health: 100 })));
+      const [saved] = savedTargets(savedUnits);
+      expect(saved.identifier).toEqual({ id: "target", gameId: "g1" });
+      expect(saved.health).toBe(15); // cannon: 85
     });
 
-    it("saves the target after the offense it spent a round of", () => {
-      const { service, saves } = createWorld();
+    it("leaves the rest of the target as it was", () => {
+      const { service, savedUnits } = createWorld();
+      const victim = target("recon");
+      service.execute(attack(attacker("tank"), victim));
+      expect(savedTargets(savedUnits)).toEqual([{ ...victim, health: 15 }]);
+    });
+
+    it("saves the attacker marked as acted, and otherwise as it was", () => {
+      const { service, savedUnits } = createWorld();
+      const from = attacker("tank");
+      service.execute(attack(from, target("recon")));
+      expect(savedUnits[0]).toEqual({ ...from, acted: true });
+    });
+
+    it("saves the offense it spent a round of, then the attacker, then the target", () => {
+      const { service, savedUnits, saves } = createWorld();
       service.execute(attack(attacker("tank"), target("recon")));
-      expect(saves).toEqual(["offense", "unit"]);
+      expect(saves).toEqual(["offense", "unit", "unit"]);
+      expect(savedUnits.map((unit) => unit.identifier.id)).toEqual(["attacker", "target"]);
     });
 
-    it("saves the target alone when the offense has unlimited ammo", () => {
+    it("saves the attacker and the target alone when the offense has unlimited ammo", () => {
       const { service, saves, saved, savedUnits } = createWorld();
       service.execute(attack(attacker("infantry"), target("infantry")));
-      expect(saves).toEqual(["unit"]);
+      expect(saves).toEqual(["unit", "unit"]);
       expect(saved).toEqual([]);
-      expect(savedUnits.map((unit) => unit.health)).toEqual([45]);
+      expect(savedTargets(savedUnits).map((unit) => unit.health)).toEqual([45]);
     });
 
     it("does not delete a target that has health left, or its offenses", () => {
@@ -523,27 +540,25 @@ describe("AttackActionService", () => {
       expect(deletedOffenses).toEqual([]);
     });
 
-    it.each([1, 30, 84, 85, 86, 100, 500])("saves or deletes a target of %i health according to the health the action gives it", (health) => {
+    it.each([1, 30, 84, 85, 86, 100, 500])("saves or deletes a target of %i health according to the health the damage leaves it", (health) => {
       const { service, savedUnits, deletedUnits } = createWorld();
-      const result = service.execute(attack(attacker("tank"), target("recon", { health })));
-      if (result.target.health <= 0) {
-        expect(deletedUnits).toEqual([result.target.identifier]);
-        expect(savedUnits).toEqual([]);
+      service.execute(attack(attacker("tank"), target("recon", { health })));
+      const left = Math.max(0, health - 85);
+      if (left <= 0) {
+        expect(deletedUnits).toEqual([{ id: "target", gameId: "g1" }]);
+        expect(savedTargets(savedUnits)).toEqual([]);
       } else {
-        expect(savedUnits).toHaveLength(1);
-        expect(savedUnits[0]).toBe(result.target);
+        expect(savedTargets(savedUnits).map((unit) => unit.health)).toEqual([left]);
         expect(deletedUnits).toEqual([]);
       }
-      expect(result.target.health).toBe(Math.max(0, health - 85));
     });
 
     describe("a target the damage takes to zero health or below", () => {
       it("is deleted, by its identifier, and not saved", () => {
-        const { service, savedUnits, deletedUnits, calls } = createWorld();
+        const { service, savedUnits, deletedUnits } = createWorld();
         service.execute(attack(attacker("tank"), target("recon", { health: 30 })));
         expect(deletedUnits).toEqual([{ id: "target", gameId: "g1" }]);
-        expect(savedUnits).toEqual([]);
-        expect(calls).not.toContain("save unit");
+        expect(savedTargets(savedUnits)).toEqual([]);
       });
 
       it("is deleted when the damage just equals its health, with its offenses", () => {
@@ -551,7 +566,7 @@ describe("AttackActionService", () => {
         service.execute(attack(attacker("tank"), target("recon", { health: 85, offense: ["rifle"] })));
         expect(deletedUnits).toEqual([{ id: "target", gameId: "g1" }]);
         expect(deletedOffenses).toEqual([{ id: "rifle", gameId: "g1", unitId: "target" }]);
-        expect(savedUnits).toEqual([]);
+        expect(savedTargets(savedUnits)).toEqual([]);
       });
 
       it("is deleted when the damage is one more than its health", () => {
@@ -560,21 +575,16 @@ describe("AttackActionService", () => {
         expect(deletedUnits).toHaveLength(1);
       });
 
-      it("is still given with zero health in the action", () => {
-        const { service } = createWorld();
-        expect(service.execute(attack(attacker("tank"), target("recon", { health: 30 }))).target.health).toBe(0);
-      });
-
-      it("is deleted after the round the offense spent is saved", () => {
+      it("is deleted after the round the offense spent and the attacker are saved", () => {
         const { service, calls } = createWorld();
         service.execute(attack(attacker("tank"), target("recon", { health: 30 })));
-        expect(calls).toEqual(["save offense", "delete unit"]);
+        expect(calls).toEqual(["save offense", "save unit", "delete unit"]);
       });
 
-      it("is the only thing saved or deleted when the offense has unlimited ammo", () => {
+      it("is deleted after the attacker is saved when the offense has unlimited ammo", () => {
         const { service, calls } = createWorld();
         service.execute(attack(attacker("infantry"), target("infantry", { health: 50 })));
-        expect(calls).toEqual(["delete unit"]);
+        expect(calls).toEqual(["save unit", "delete unit"]);
       });
 
       it("takes its offenses with it, in the order it lists them, after the unit", () => {
@@ -584,7 +594,7 @@ describe("AttackActionService", () => {
           { id: "rifle", gameId: "g1", unitId: "target" },
           { id: "gun", gameId: "g1", unitId: "target" },
         ]);
-        expect(calls).toEqual(["save offense", "delete unit", "delete offense", "delete offense"]);
+        expect(calls).toEqual(["save offense", "save unit", "delete unit", "delete offense", "delete offense"]);
       });
 
       it("takes only its own offenses, not the attacker's", () => {
@@ -600,19 +610,6 @@ describe("AttackActionService", () => {
         service.execute(attack(attacker("tank"), target("recon", { health: 30, offense: [] })));
         expect(deletedOffenses).toEqual([]);
       });
-
-      it("is not deleted by a preview", () => {
-        const { service, calls } = createWorld();
-        const result = service.preview(attack(attacker("tank"), target("recon", { health: 30, offense: ["rifle"] })));
-        expect(result.target.health).toBe(0);
-        expect(calls).toEqual([]);
-      });
-    });
-
-    it("does not save the attacker", () => {
-      const { service, savedUnits } = createWorld();
-      service.execute(attack(attacker("tank"), target("recon")));
-      expect(savedUnits.map((unit) => unit.identifier.id)).toEqual(["target"]);
     });
 
     it("saves the offense object that was used with one round fewer", () => {
@@ -623,13 +620,9 @@ describe("AttackActionService", () => {
     });
 
     it("subtracts from the target's current health", () => {
-      const { service } = createWorld();
-      expect(service.execute(attack(attacker("tank"), target("recon", { health: 90 }))).target.health).toBe(5);
-    });
-
-    it("never takes the target's health below zero", () => {
-      const { service } = createWorld();
-      expect(service.execute(attack(attacker("tank"), target("recon", { health: 30 }))).target.health).toBe(0);
+      const { service, savedUnits } = createWorld();
+      service.execute(attack(attacker("tank"), target("recon", { health: 90 })));
+      expect(savedTargets(savedUnits)[0].health).toBe(5);
     });
 
     it("spends ammo only on the offense that was used", () => {
@@ -639,76 +632,88 @@ describe("AttackActionService", () => {
     });
 
     it("takes 1 off the health for an entry that does 1 damage", () => {
-      const { service } = createWorld();
-      expect(service.execute(attack(attacker("pinprick"), target("infantry", { health: 100 }))).target.health).toBe(99);
+      const { service, savedUnits } = createWorld();
+      service.execute(attack(attacker("pinprick"), target("infantry", { health: 100 })));
+      expect(savedTargets(savedUnits)[0].health).toBe(99);
     });
 
     it("spends a round whenever the capacity is not negative, even for a capacity of zero", () => {
-      const { service, saved } = createWorld({ empty: 1 }); // a round is stored although the capacity is 0
-      const result = service.execute(attack(attacker("empty"), target("infantry")));
-      expect(result.target.health).toBe(70);
+      const { service, saved, savedUnits } = createWorld({ empty: 1 }); // a round is stored although the capacity is 0
+      service.execute(attack(attacker("empty"), target("infantry")));
+      expect(savedTargets(savedUnits)[0].health).toBe(70);
       expect(saved.map((object) => [object.identifier.id, object.ammo])).toEqual([["empty", 0]]);
     });
 
-    it("takes the target to exactly zero when the damage equals its health", () => {
-      const { service } = createWorld();
-      expect(service.execute(attack(attacker("tank"), target("recon", { health: 85 }))).target.health).toBe(0);
-    });
-
-    it("saves nothing for an offense with unlimited ammo", () => {
-      const { service, saved } = createWorld();
-      const result = service.execute(attack(attacker("infantry"), target("infantry")));
-      expect(result.target.health).toBe(45);
+    it("saves no offense for an offense with unlimited ammo", () => {
+      const { service, saved, savedUnits } = createWorld();
+      service.execute(attack(attacker("infantry"), target("infantry")));
+      expect(savedTargets(savedUnits)[0].health).toBe(45);
       expect(saved).toEqual([]);
     });
 
     it("falls back to the secondary offense when the primary has no ammo, and spends nothing", () => {
-      const { service, saved } = createWorld({ cannon: 0 });
-      const result = service.execute(attack(attacker("tank"), target("recon")));
-      expect(result.target.health).toBe(60); // machine gun: 40
+      const { service, saved, savedUnits } = createWorld({ cannon: 0 });
+      service.execute(attack(attacker("tank"), target("recon")));
+      expect(savedTargets(savedUnits)[0].health).toBe(60); // machine gun: 40
       expect(saved).toEqual([]);
     });
 
     it("uses the offense that reaches the target: the primary at its range, the secondary when it is too close", () => {
       const far = createWorld();
-      const farResult = far.service.execute(attack(attacker("mixed"), target("infantry", { x: 2 })));
-      expect(farResult.target.health).toBe(10); // artillery: 90
+      far.service.execute(attack(attacker("mixed"), target("infantry", { x: 2 })));
+      expect(savedTargets(far.savedUnits)[0].health).toBe(10); // artillery: 90
       expect(far.saved.map((object) => [object.identifier.id, object.ammo])).toEqual([["gun", 8]]);
 
       const near = createWorld();
-      const nearResult = near.service.execute(attack(attacker("mixed"), target("infantry", { x: 1 })));
-      expect(nearResult.target.health).toBe(25); // machine gun: 75
+      near.service.execute(attack(attacker("mixed"), target("infantry", { x: 1 })));
+      expect(savedTargets(near.savedUnits)[0].health).toBe(25); // machine gun: 75
       expect(near.saved).toEqual([]);
     });
 
     it("does damage with the offense after one whose entry does no damage", () => {
+      const { service, savedUnits } = createWorld();
+      service.execute(attack(attacker("harmless-then-armed"), target("infantry")));
+      expect(savedTargets(savedUnits)[0].health).toBe(25); // the toy's 0 is skipped; machine gun: 75
+    });
+
+    it("cannot attack with the attacker again once it has acted", () => {
+      const { service, savedUnits } = createWorld();
+      service.execute(attack(attacker("tank"), target("recon")));
+      expect(service.canExecute(attack(savedUnits[0], target("recon")))).toBe(false);
+    });
+
+    it("gives the damage of the offense that reaches the target, even when it is more than the target's health", () => {
       const { service } = createWorld();
-      const result = service.execute(attack(attacker("harmless-then-armed"), target("infantry")));
-      expect(result.target.health).toBe(25); // the toy's 0 is skipped; machine gun: 75
+      expect(service.execute(attack(attacker("tank"), target("recon", { health: 30 })))?.damage).toBe(85);
+      expect(service.execute(attack(attacker("mixed"), target("infantry", { x: 1 })))?.damage).toBe(75); // machine gun
+    });
+
+    it.each([
+      ["the primary offense, when it reaches the target", {}, () => attack(attacker("mixed"), target("infantry", { x: 2 })), "gun"],
+      ["the secondary offense, when the primary cannot reach", {}, () => attack(attacker("mixed"), target("infantry", { x: 1 })), "mg"],
+      ["the secondary offense, when the primary has no ammo", { cannon: 0 }, () => attack(attacker("tank"), target("recon")), "mg"],
+      ["the offense after one that does no damage", {}, () => attack(attacker("harmless-then-armed"), target("infantry")), "mg"],
+    ])("gives the id of %s", (_name, ammo, build, offenseId) => {
+      expect(createWorld(ammo).service.preview(build())?.offenseId).toBe(offenseId);
+      expect(createWorld(ammo).service.execute(build())?.offenseId).toBe(offenseId);
     });
 
     it("uses up the ammo for the next attack: the spent round is seen when the offense is loaded again", () => {
       const { service } = createWorld({ gun: 1 });
-      const action = attack(attacker("artillery"), target("infantry", { x: 2 }));
-      expect(service.canExecute(action)).toBe(true);
-      service.execute(action);
-      expect(service.canExecute(action)).toBe(false);
-    });
-
-    it("returns the same action with only the target's health changed", () => {
-      const { service } = createWorld();
-      const action = attack(attacker("tank"), target("recon"));
-      expect(service.execute(action)).toEqual({ ...action, target: { ...action.target, health: 15 } });
+      const actionInput = attack(attacker("artillery"), target("infantry", { x: 2 }));
+      expect(service.canExecute(actionInput)).toBe(true);
+      service.execute(actionInput);
+      expect(service.canExecute(actionInput)).toBe(false);
     });
 
     it("does not change the action it was given or the offense object it loaded", () => {
       const { service, stored } = createWorld();
-      const action = attack(attacker("tank"), target("recon"));
-      const before = structuredClone(action);
+      const actionInput = attack(attacker("tank"), target("recon"));
+      const before = structuredClone(actionInput);
       const cannonBefore = stored.get("g1:attacker:cannon");
       const cannonAmmoBefore = cannonBefore?.ammo;
-      service.execute(action);
-      expect(action).toEqual(before);
+      service.execute(actionInput);
+      expect(actionInput).toEqual(before);
       expect(cannonBefore?.ammo).toBe(cannonAmmoBefore);
     });
 
@@ -718,11 +723,12 @@ describe("AttackActionService", () => {
       ["the target is out of range", () => attack(attacker("infantry"), target("infantry", { x: 5 }))],
       ["the offense has no ammo", () => attack(attacker("artillery"), target("infantry", { x: 2 }))],
       ["no offense has an entry for the target", () => attack(attacker("unarmed"), target("infantry"))],
-    ])("returns the action as it is and saves and deletes nothing when %s", (_reason, build) => {
+      ["the attacker has already acted", () => attack({ ...attacker("infantry"), acted: true }, target("infantry"))],
+    ])("gives nothing and saves and deletes nothing when %s", (_reason, build) => {
       const { service, calls } = createWorld({ gun: 0 });
-      const action = build();
-      expect(service.canExecute(action)).toBe(false);
-      expect(service.execute(action)).toBe(action);
+      const actionInput = build();
+      expect(service.canExecute(actionInput)).toBe(false);
+      expect(service.execute(actionInput)).toBeUndefined();
       expect(calls).toEqual([]);
     });
   });

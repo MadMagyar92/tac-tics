@@ -1,7 +1,9 @@
 import {
   type ActionService,
   type DefinitionService,
-  type MoveAction,
+  type MoveActionInput,
+  type MoveActionOutput,
+  type MoveInstance,
   type MovementDefinition,
   type ObjectService,
   Scope,
@@ -12,38 +14,39 @@ import { canMove, getMoveCost } from "./validate";
 
 export const MOVE_ACTION = { scope: "action", name: "move" };
 
-type Move = {
-  cost: number;
-};
-
-export class MoveActionService implements ActionService<MoveAction> {
+export class MoveActionService implements ActionService<MoveActionInput, MoveActionOutput> {
   constructor(
     private definitionService: DefinitionService,
     private objectService: ObjectService,
   ) {}
 
-  canExecute(action: MoveAction): boolean {
-    return this._plan(action) !== undefined;
+  canExecute(input: MoveActionInput): boolean {
+    return this._plan(input) !== undefined;
   }
 
-  preview(action: MoveAction): MoveAction {
-    return this._act(action, true);
+  preview(input: MoveActionInput): MoveActionOutput | undefined {
+    return this._act(input, false);
   }
 
-  execute(action: MoveAction): MoveAction {
-    return this._act(action, false);
+  execute(input: MoveActionInput): MoveActionOutput | undefined {
+    return this._act(input, true);
   }
 
-  private _act(action: MoveAction, preview: boolean): MoveAction {
-    const move = this._plan(action);
+  private _act(input: MoveActionInput, commit: boolean): MoveActionOutput | undefined {
+    const move = this._plan(input);
     if (!move) {
-      return action;
+      return undefined;
     }
 
-    return preview ? this._preview(action, move) : this._commit(action, move);
+    const result = this._preview(move);
+    if (commit) {
+      this._commit(result);
+    }
+    return { definition: input.definition, cost: result.cost, terrainId: result.input.target.identifier.id };
   }
 
-  private _plan({ game, unit, target }: MoveAction): Move | undefined {
+  private _plan(input: MoveActionInput): MoveInstance | undefined {
+    const { game, unit, target } = input;
     if (unit.identifier.gameId !== game.identifier.id || target.identifier.gameId !== game.identifier.id) {
       return undefined;
     }
@@ -61,17 +64,16 @@ export class MoveActionService implements ActionService<MoveAction> {
       return undefined;
     }
 
-    return { cost: getMoveCost(movement, target) };
+    return { input, cost: getMoveCost(movement, target) };
   }
 
-  private _commit(action: MoveAction, move: Move): MoveAction {
-    const result = this._preview(action, move);
-    this.objectService.save<UnitObject>(Scope.Unit, result.unit);
-    return result;
+  private _preview(move: MoveInstance): MoveInstance {
+    const { input, cost } = move;
+    const { unit, target } = input;
+    return { ...move, input: { ...input, unit: { ...unit, position: { ...target.position }, fuel: unit.fuel - cost } } };
   }
 
-  private _preview(action: MoveAction, move: Move): MoveAction {
-    const { unit, target } = action;
-    return { ...action, unit: { ...unit, position: { ...target.position }, fuel: unit.fuel - move.cost } };
+  private _commit({ input: { unit } }: MoveInstance): void {
+    this.objectService.save<UnitObject>(Scope.Unit, unit);
   }
 };

@@ -5,7 +5,7 @@ import type {
   DefinitionService,
   GameObject,
   Id,
-  MoveAction,
+  MoveActionInput,
   MovementDefinition,
   ObjectService,
   TerrainObject,
@@ -79,7 +79,7 @@ function createWorld() {
   return { service: new MoveActionService(definitionService, objectService), requested, saves, savedUnits };
 }
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0 });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
 
 type UnitOptions = { fuel?: number; x?: number; y?: number; gameId?: string };
 
@@ -102,7 +102,7 @@ const terrain = (name: string, x: number, y: number, gameId = "g1"): TerrainObje
   playerId: undefined,
 });
 
-const move = (who: UnitObject, to: TerrainObject, gameId = "g1"): MoveAction => ({
+const move = (who: UnitObject, to: TerrainObject, gameId = "g1"): MoveActionInput => ({
   definition: key("action", "move"),
   game: game(gameId),
   unit: who,
@@ -207,47 +207,22 @@ describe("MoveActionService", () => {
 
     it("changes nothing and saves nothing", () => {
       const { service, saves } = createWorld();
-      const action = move(unit("infantry"), terrain("plain", 1, 0));
-      const before = structuredClone(action);
-      service.canExecute(action);
-      expect(action).toEqual(before);
+      const actionInput = move(unit("infantry"), terrain("plain", 1, 0));
+      const before = structuredClone(actionInput);
+      service.canExecute(actionInput);
+      expect(actionInput).toEqual(before);
       expect(saves).toEqual([]);
     });
   });
 
   describe("preview", () => {
-    it("gives the action with the unit on the terrain's position and the cost taken off its fuel", () => {
-      const { service } = createWorld();
-      const action = move(unit("infantry", { fuel: 10 }), terrain("woods", 1, 0));
-      const result = service.preview(action);
-      expect(result.unit.position).toEqual({ x: 1, y: 0 });
-      expect(result.unit.fuel).toBe(8); // the woods cost 2
+    it("gives the output of the move", () => {
+      const output = createWorld().service.preview(move(unit("infantry"), terrain("plain", 1, 0)));
+      expect(output).toEqual({ definition: key("action", "move"), cost: 1, terrainId: "plain-1-0" });
     });
 
-    it.each([["plain", 9], ["woods", 8], ["mountain", 7]])("takes the cost of the %s off the fuel: 10 fuel leaves %i", (name, left) => {
-      expect(createWorld().service.preview(move(unit("infantry", { fuel: 10 }), terrain(name, 0, 1))).unit.fuel).toBe(left);
-    });
-
-    it("leaves the rest of the unit, and the rest of the action, as they were", () => {
-      const { service } = createWorld();
-      const action = move(unit("infantry"), terrain("plain", 1, 0));
-      const result = service.preview(action);
-      expect(result).toEqual({ ...action, unit: { ...action.unit, position: { x: 1, y: 0 }, fuel: 9 } });
-      expect(result.target).toBe(action.target);
-      expect(result.game).toBe(action.game);
-    });
-
-    it("can use all the fuel there is", () => {
-      expect(createWorld().service.preview(move(unit("infantry", { fuel: 2 }), terrain("woods", 1, 0))).unit.fuel).toBe(0);
-    });
-
-    it("gives the unit its own position, not the terrain's", () => {
-      const { service } = createWorld();
-      const next = terrain("plain", 1, 0);
-      const result = service.preview(move(unit("infantry"), next));
-      expect(result.unit.position).not.toBe(next.position);
-      result.unit.position.x = 99;
-      expect(next.position).toEqual({ x: 1, y: 0 });
+    it.each([["plain", 1], ["woods", 2], ["mountain", 3]])("gives the cost of the %s, %i", (name, cost) => {
+      expect(createWorld().service.preview(move(unit("infantry"), terrain(name, 0, 1)))?.cost).toBe(cost);
     });
 
     it("saves nothing", () => {
@@ -256,20 +231,20 @@ describe("MoveActionService", () => {
       expect(saves).toEqual([]);
     });
 
-    it("gives the same action every time, since nothing is spent", () => {
+    it("gives the same output every time, since nothing is spent", () => {
       const { service } = createWorld();
-      const action = move(unit("infantry", { fuel: 1 }), terrain("plain", 1, 0));
-      const first = service.preview(action);
-      expect(service.preview(action)).toEqual(first);
-      expect(service.canExecute(action)).toBe(true);
+      const actionInput = move(unit("infantry", { fuel: 1 }), terrain("plain", 1, 0));
+      const first = service.preview(actionInput);
+      expect(service.preview(actionInput)).toEqual(first);
+      expect(service.canExecute(actionInput)).toBe(true);
     });
 
     it("does not change the action it was given", () => {
       const { service } = createWorld();
-      const action = move(unit("infantry"), terrain("plain", 1, 0));
-      const before = structuredClone(action);
-      service.preview(action);
-      expect(action).toEqual(before);
+      const actionInput = move(unit("infantry"), terrain("plain", 1, 0));
+      const before = structuredClone(actionInput);
+      service.preview(actionInput);
+      expect(actionInput).toEqual(before);
     });
 
     it.each([
@@ -279,36 +254,69 @@ describe("MoveActionService", () => {
       ["the movement cannot enter the terrain", () => move(unit("tank"), terrain("mountain", 1, 0))],
       ["the unit is in another game", () => move(unit("infantry", { gameId: "g2" }), terrain("plain", 1, 0))],
       ["the unit is not defined", () => move(unit("ghost"), terrain("plain", 1, 0))],
-    ])("gives the action as it is when %s", (_reason, build) => {
+    ])("gives nothing when %s", (_reason, build) => {
       const { service, saves } = createWorld();
-      const action = build();
-      expect(service.canExecute(action)).toBe(false);
-      expect(service.preview(action)).toBe(action);
+      const actionInput = build();
+      expect(service.canExecute(actionInput)).toBe(false);
+      expect(service.preview(actionInput)).toBeUndefined();
       expect(saves).toEqual([]);
     });
   });
 
   describe("execute", () => {
-    it("moves the unit onto the terrain and takes the cost off its fuel", () => {
-      const result = createWorld().service.execute(move(unit("infantry", { fuel: 10 }), terrain("mountain", 0, -1)));
-      expect(result.unit.position).toEqual({ x: 0, y: -1 });
-      expect(result.unit.fuel).toBe(7);
+    it("gives the output of the move", () => {
+      const output = createWorld().service.execute(move(unit("infantry"), terrain("plain", 1, 0)));
+      expect(output).toEqual({ definition: key("action", "move"), cost: 1, terrainId: "plain-1-0" });
     });
 
     it("gives what preview gives", () => {
-      const action = () => move(unit("tank", { fuel: 7, x: 2, y: 3 }), terrain("woods", 3, 3));
-      expect(createWorld().service.execute(action())).toEqual(createWorld().service.preview(action()));
+      const actionInput = () => move(unit("tank", { fuel: 7, x: 2, y: 3 }), terrain("woods", 3, 3));
+      expect(createWorld().service.execute(actionInput())).toEqual(createWorld().service.preview(actionInput()));
     });
 
-    it("saves the unit, as it ends up", () => {
+    it("saves the unit on the terrain's position, with the cost taken off its fuel", () => {
       const { service, saves, savedUnits } = createWorld();
-      const result = service.execute(move(unit("infantry"), terrain("woods", 1, 0)));
+      service.execute(move(unit("infantry", { fuel: 10 }), terrain("woods", 1, 0)));
       expect(saves).toEqual(["unit"]);
       expect(savedUnits).toHaveLength(1);
-      expect(savedUnits[0]).toBe(result.unit);
       expect(savedUnits[0].identifier).toEqual({ id: "mover", gameId: "g1" });
       expect(savedUnits[0].position).toEqual({ x: 1, y: 0 });
-      expect(savedUnits[0].fuel).toBe(8);
+      expect(savedUnits[0].fuel).toBe(8); // the woods cost 2
+    });
+
+    it.each([["plain", 9], ["woods", 8], ["mountain", 7]])("takes the cost of the %s off the fuel: 10 fuel leaves %i", (name, left) => {
+      const { service, savedUnits } = createWorld();
+      service.execute(move(unit("infantry", { fuel: 10 }), terrain(name, 0, 1)));
+      expect(savedUnits[0].fuel).toBe(left);
+    });
+
+    it("leaves whether the unit has moved to the multi-move service", () => {
+      const { service, savedUnits } = createWorld();
+      service.execute(move(unit("infantry"), terrain("plain", 1, 0)));
+      service.execute(move({ ...unit("infantry"), moved: true }, terrain("plain", 1, 0)));
+      expect(savedUnits.map((saved) => saved.moved)).toEqual([false, true]);
+    });
+
+    it("leaves the rest of the unit as it was", () => {
+      const { service, savedUnits } = createWorld();
+      const mover = unit("infantry");
+      service.execute(move(mover, terrain("plain", 1, 0)));
+      expect(savedUnits[0]).toEqual({ ...mover, position: { x: 1, y: 0 }, fuel: 9 });
+    });
+
+    it("can use all the fuel there is", () => {
+      const { service, savedUnits } = createWorld();
+      service.execute(move(unit("infantry", { fuel: 2 }), terrain("woods", 1, 0)));
+      expect(savedUnits[0].fuel).toBe(0);
+    });
+
+    it("gives the unit its own position, not the terrain's", () => {
+      const { service, savedUnits } = createWorld();
+      const next = terrain("plain", 1, 0);
+      service.execute(move(unit("infantry"), next));
+      expect(savedUnits[0].position).not.toBe(next.position);
+      savedUnits[0].position.x = 99;
+      expect(next.position).toEqual({ x: 1, y: 0 });
     });
 
     it("saves nothing else: not the terrain", () => {
@@ -319,29 +327,29 @@ describe("MoveActionService", () => {
 
     it("does not change the action it was given", () => {
       const { service } = createWorld();
-      const action = move(unit("infantry"), terrain("plain", 1, 0));
-      const before = structuredClone(action);
-      service.execute(action);
-      expect(action).toEqual(before);
+      const actionInput = move(unit("infantry"), terrain("plain", 1, 0));
+      const before = structuredClone(actionInput);
+      service.execute(actionInput);
+      expect(actionInput).toEqual(before);
     });
 
     it("lets the unit go on from where it got to, with the fuel it has left", () => {
-      const { service } = createWorld();
-      const first = service.execute(move(unit("infantry", { fuel: 3 }), terrain("woods", 1, 0)));
-      expect(first.unit.fuel).toBe(1);
+      const { service, savedUnits } = createWorld();
+      service.execute(move(unit("infantry", { fuel: 3 }), terrain("woods", 1, 0)));
+      expect(savedUnits[0].fuel).toBe(1);
 
-      const second = service.execute(move(first.unit, terrain("plain", 2, 0)));
-      expect(second.unit.position).toEqual({ x: 2, y: 0 });
-      expect(second.unit.fuel).toBe(0);
+      service.execute(move(savedUnits[0], terrain("plain", 2, 0)));
+      expect(savedUnits[1].position).toEqual({ x: 2, y: 0 });
+      expect(savedUnits[1].fuel).toBe(0);
 
-      const third = move(second.unit, terrain("plain", 3, 0));
+      const third = move(savedUnits[1], terrain("plain", 3, 0));
       expect(service.canExecute(third)).toBe(false);
     });
 
     it("cannot go back to where it came from when the fuel is spent", () => {
-      const { service } = createWorld();
-      const there = service.execute(move(unit("infantry", { fuel: 1 }), terrain("plain", 1, 0)));
-      expect(service.canExecute(move(there.unit, terrain("plain", 0, 0)))).toBe(false);
+      const { service, savedUnits } = createWorld();
+      service.execute(move(unit("infantry", { fuel: 1 }), terrain("plain", 1, 0)));
+      expect(service.canExecute(move(savedUnits[0], terrain("plain", 0, 0)))).toBe(false);
     });
 
     it.each([
@@ -351,11 +359,11 @@ describe("MoveActionService", () => {
       ["the movement cannot enter the terrain", () => move(unit("tank"), terrain("mountain", 1, 0))],
       ["the terrain is in another game", () => move(unit("infantry"), terrain("plain", 1, 0, "g2"))],
       ["the unit's movement is not defined", () => move(unit("lost"), terrain("plain", 1, 0))],
-    ])("returns the action as it is and saves nothing when %s", (_reason, build) => {
+    ])("gives nothing and saves nothing when %s", (_reason, build) => {
       const { service, saves } = createWorld();
-      const action = build();
-      expect(service.canExecute(action)).toBe(false);
-      expect(service.execute(action)).toBe(action);
+      const actionInput = build();
+      expect(service.canExecute(actionInput)).toBe(false);
+      expect(service.execute(actionInput)).toBeUndefined();
       expect(saves).toEqual([]);
     });
   });
