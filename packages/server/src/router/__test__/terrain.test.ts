@@ -35,6 +35,7 @@ describe("GET /game/:gameId/terrain/:id", () => {
       identifier: { id: "terrain-1", gameId: "game-1" },
       definition: { scope: "terrain", name: "plain" },
       position: { x: 2, y: 1 },
+      health: 20,
     });
   });
 
@@ -45,6 +46,7 @@ describe("GET /game/:gameId/terrain/:id", () => {
       identifier: { id: "sea-16", gameId: "game-1" },
       definition: { scope: "terrain", name: "sea" },
       position: { x: 0, y: 1 },
+      health: 20,
     });
   });
 

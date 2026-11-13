@@ -31,6 +31,7 @@ const infantry: UnitDefinition = {
   moveMax: 3,
   movement: key("movement", "foot"),
   offenses: [],
+  actions: [],
 };
 
 const definitions: Definition[] = [foot, infantry];
@@ -39,6 +40,7 @@ const terrain = (name: string, x: number, y = 0, gameId = "g1"): TerrainObject =
   identifier: { id: `${name}-${x}-${y}`, gameId },
   definition: key("terrain", name),
   position: { x, y },
+  health: 20,
   playerId: undefined,
 });
 

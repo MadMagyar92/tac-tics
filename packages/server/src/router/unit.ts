@@ -3,6 +3,8 @@ import {
   type ActionService,
   type AttackActionInput,
   type AttackActionOutput,
+  type CaptureActionInput,
+  type CaptureActionOutput,
   type MultiMoveActionInput,
   type MultiMoveActionOutput,
   type ObjectService,
@@ -10,7 +12,7 @@ import {
   type TerrainObject,
   type UnitObject,
 } from "@tac-tics/api";
-import { ATTACK_ACTION, MOVE_ACTION } from "@tac-tics/app";
+import { ATTACK_ACTION, CAPTURE_ACTION, MOVE_ACTION } from "@tac-tics/app";
 
 /**
  * Mount this router before any router under `/game/:gameId/unit/:unitId/...`: it loads the unit into
@@ -160,6 +162,52 @@ export function moveRouter(
       return;
     }
     res.json(moveService.execute(move));
+  });
+
+  return router;
+}
+
+/**
+ * Mount this router under `/game/:gameId/unit/:unitId/capture`, after the routers that load `res.locals.game` and
+ * `res.locals.unit`. The target of the capture is the terrain of the game under the unit.
+ *
+ * - `GET /` previews the capture, if it can be made. It changes nothing.
+ * - `POST /` makes the capture and returns its output. The capture service saves what it changes.
+ */
+export function captureRouter(
+  captureService: ActionService<CaptureActionInput, CaptureActionOutput>,
+  objectService: ObjectService,
+): Router {
+  const router = Router({ mergeParams: true });
+
+  function getCaptureFromRequest(res: Response): CaptureActionInput | undefined {
+    const { game, unit } = res.locals;
+    const target = [...objectService.loadAll<TerrainObject>(Scope.Terrain).values()].find(
+      (terrain) =>
+        terrain.identifier.gameId === game.identifier.id &&
+        terrain.position.x === unit.position.x &&
+        terrain.position.y === unit.position.y,
+    );
+    const capture = target && { definition: CAPTURE_ACTION, game, unit, target };
+    return capture && captureService.canExecute(capture) ? capture : undefined;
+  }
+
+  router.get<{ gameId: string; unitId: string }>("/", (req, res) => {
+    const capture = getCaptureFromRequest(res);
+    if (!capture) {
+      res.status(404).json({ error: `Unit ${req.params.unitId} cannot capture the terrain it is on` });
+      return;
+    }
+    res.json(captureService.preview(capture));
+  });
+
+  router.post<{ gameId: string; unitId: string }>("/", (req, res) => {
+    const capture = getCaptureFromRequest(res);
+    if (!capture) {
+      res.status(409).json({ error: `Unit ${req.params.unitId} cannot capture the terrain it is on` });
+      return;
+    }
+    res.json(captureService.execute(capture));
   });
 
   return router;

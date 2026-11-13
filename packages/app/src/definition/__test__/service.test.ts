@@ -37,7 +37,7 @@ describe("DefinitionServiceImpl", () => {
             const service = new DefinitionServiceImpl(realAppConfig);
             expect(service.get({ scope: "game", name: "2-player" })).toEqual({ definition: { scope: "game", name: "2-player" }, turnsMax: 100, playersMax: 2 });
             expect(service.get({ scope: "player", name: "orange-star" })).toEqual({ definition: { scope: "player", name: "orange-star" }, fundsMax: 999999 });
-            expect(service.get({ scope: "terrain", name: "mountain" })).toEqual({ definition: { scope: "terrain", name: "mountain" }, defense: 4 });
+            expect(service.get({ scope: "terrain", name: "mountain" })).toEqual({ definition: { scope: "terrain", name: "mountain" }, defense: 4, capturable: false });
             expect(service.get({ scope: "unit", name: "tank" })).toEqual({
                 definition: { scope: "unit", name: "tank" },
                 fundsCost: 7000,
@@ -49,6 +49,7 @@ describe("DefinitionServiceImpl", () => {
                     { scope: "offense", name: "tank1" },
                     { scope: "offense", name: "tank2" },
                 ],
+                actions: [{ scope: "action", name: "attack" }],
             });
             expect(service.get<Definition & { cost: { terrain: { name: string }; cost: number }[] }>({ scope: "movement", name: "foot" })!.cost.find((c) => c.terrain.name === "mountain")).toEqual({
                 terrain: { scope: "terrain", name: "mountain" },

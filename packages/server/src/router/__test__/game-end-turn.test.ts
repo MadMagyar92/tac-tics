@@ -1,0 +1,95 @@
+import express from "express";
+import request from "supertest";
+import { describe, expect, it } from "vitest";
+import type { ActionService, EndTurnActionInput, EndTurnActionOutput, GameObject } from "@tac-tics/api";
+import { END_TURN_ACTION } from "@tac-tics/app";
+import { endTurnRouter } from "../game";
+
+const game = (id = "g1"): GameObject => ({
+  identifier: { id },
+  definition: { scope: "game", name: "2-player" },
+  turn: 0,
+  playerTurn: 0,
+  mapDefinition: { scope: "map", name: "m1" },
+});
+
+/** Stands in for `gameRouter`: it loads `res.locals.game` from the path, then hands over to the end-turn router. */
+function createApp(endTurnService: ActionService<EndTurnActionInput, EndTurnActionOutput>) {
+  return express().use(
+    "/game/:gameId/end-turn",
+    (req, res, next) => {
+      res.locals.game = game((req.params as Record<string, string>).gameId);
+      next();
+    },
+    endTurnRouter(endTurnService),
+  );
+}
+
+/** An end-turn service that accepts what `accepts` says and always gives turn 1 and player turn 1. It remembers every call. */
+function createStubEndTurnService(accepts: () => boolean = () => true) {
+  const previewed: EndTurnActionInput[] = [];
+  const executed: EndTurnActionInput[] = [];
+  const outputOf = ({ definition }: EndTurnActionInput): EndTurnActionOutput => ({ definition, turn: 1, playerTurn: 1 });
+  const service: ActionService<EndTurnActionInput, EndTurnActionOutput> = {
+    canExecute: accepts,
+    preview(actionInput) {
+      previewed.push(actionInput);
+      return outputOf(actionInput);
+    },
+    execute(actionInput) {
+      executed.push(actionInput);
+      return outputOf(actionInput);
+    },
+  };
+  return { service, previewed, executed };
+}
+
+const path = "/game/g1/end-turn";
+
+describe("endTurnRouter", () => {
+  describe("GET /game/:gameId/end-turn", () => {
+    it("previews the end of the turn of the request's game, and executes nothing", async () => {
+      const { service, previewed, executed } = createStubEndTurnService();
+
+      const res = await request(createApp(service)).get(path);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ definition: END_TURN_ACTION, turn: 1, playerTurn: 1 });
+      expect(previewed).toEqual([{ definition: END_TURN_ACTION, game: game() }]);
+      expect(executed).toEqual([]);
+    });
+
+    it("returns 404 and previews nothing when canExecute does not accept the end of the turn", async () => {
+      const { service, previewed } = createStubEndTurnService(() => false);
+
+      const res = await request(createApp(service)).get(path);
+
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ error: "The turn of game g1 cannot be ended" });
+      expect(previewed).toEqual([]);
+    });
+  });
+
+  describe("POST /game/:gameId/end-turn", () => {
+    it("executes the end of the turn of the request's game, and gives its output", async () => {
+      const { service, previewed, executed } = createStubEndTurnService();
+
+      const res = await request(createApp(service)).post(path);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ definition: END_TURN_ACTION, turn: 1, playerTurn: 1 });
+      expect(executed).toEqual([{ definition: END_TURN_ACTION, game: game() }]);
+      expect(previewed).toEqual([]);
+    });
+
+    it("returns 409 and executes nothing when canExecute does not accept the end of the turn", async () => {
+      const { service, executed } = createStubEndTurnService(() => false);
+
+      const res = await request(createApp(service)).post(path);
+
+      expect(res.status).toBe(409);
+      expect(res.body).toEqual({ error: "The turn of game g1 cannot be ended" });
+      expect(executed).toEqual([]);
+    });
+  });
+});

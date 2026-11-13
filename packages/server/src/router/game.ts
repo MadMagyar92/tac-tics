@@ -3,13 +3,15 @@ import {
   type ActionService,
   type DeployActionInput,
   type DeployActionOutput,
+  type EndTurnActionInput,
+  type EndTurnActionOutput,
   type GameObject,
   type ObjectService,
   Scope,
   type TerrainObject,
   type UnitObject,
 } from "@tac-tics/api";
-import { DEPLOY_ACTION, isNonEmptyString } from "@tac-tics/app";
+import { DEPLOY_ACTION, END_TURN_ACTION, isNonEmptyString } from "@tac-tics/app";
 
 /**
  * Mount this router before any router under `/game/:gameId/...`: it loads the game into
@@ -101,6 +103,39 @@ export function deployRouter(
     }
     const output = deployService.execute(deploy);
     res.json(output && objectService.load<UnitObject>(Scope.Unit, { id: output.unitId, gameId: deploy.game.identifier.id }));
+  });
+
+  return router;
+}
+
+/**
+ * Mount this router under `/game/:gameId/end-turn`, after `gameRouter`. The end-turn service hands the turn to the
+ * next player of the game.
+ *
+ * - `GET /` previews the end of the turn, if it can be done. It changes nothing.
+ * - `POST /` ends the turn and returns its output. The end-turn service saves what it changes.
+ */
+export function endTurnRouter(endTurnService: ActionService<EndTurnActionInput, EndTurnActionOutput>): Router {
+  const router = Router({ mergeParams: true });
+
+  const getEndTurnFromRequest = (res: Response): EndTurnActionInput => ({ definition: END_TURN_ACTION, game: res.locals.game });
+
+  router.get<{ gameId: string }>("/", (req, res) => {
+    const endTurn = getEndTurnFromRequest(res);
+    if (!endTurnService.canExecute(endTurn)) {
+      res.status(404).json({ error: `The turn of game ${req.params.gameId} cannot be ended` });
+      return;
+    }
+    res.json(endTurnService.preview(endTurn));
+  });
+
+  router.post<{ gameId: string }>("/", (req, res) => {
+    const endTurn = getEndTurnFromRequest(res);
+    if (!endTurnService.canExecute(endTurn)) {
+      res.status(409).json({ error: `The turn of game ${req.params.gameId} cannot be ended` });
+      return;
+    }
+    res.json(endTurnService.execute(endTurn));
   });
 
   return router;

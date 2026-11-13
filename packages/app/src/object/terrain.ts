@@ -86,6 +86,7 @@ export class TerrainObjectHandler extends MemoryObjectHandler<GameReferenceId, T
             identifier: { id: getVirtualId(position, map), gameId: identifier.id },
             definition: { ...map.defaultTerrain },
             position,
+            health: 20,
             playerId: undefined,
         };
     }

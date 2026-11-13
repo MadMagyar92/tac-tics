@@ -6,5 +6,6 @@ export type TerrainReferenceId = GameReferenceId & {
 };
 
 export type TerrainObject = UiBaseObject<GameReferenceId> & {
+  health: number;
   playerId: string | undefined;
 };

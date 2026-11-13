@@ -8,6 +8,7 @@ const square = (name: string, x: number, y: number): TerrainObject => ({
   identifier: { id: `terrain-${y * 10 + x + 1}`, gameId: "game-1" },
   definition: { scope: "terrain", name },
   position: { x, y },
+  health: 20,
   playerId: undefined,
 });
 

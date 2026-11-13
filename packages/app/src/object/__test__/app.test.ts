@@ -385,6 +385,7 @@ describe("TerrainObjectHandler with the games of the repo's config", () => {
         identifier: { id: `sea-${n}`, gameId: "game-1" },
         definition: { scope: "terrain", name: "sea" },
         position: { x: (n - 1) % 15, y: Math.floor((n - 1) / 15) },
+        health: 20,
         playerId: undefined,
     });
 

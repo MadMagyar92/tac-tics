@@ -1,4 +1,5 @@
 import type {
+  DefinitionKey,
   GameObject,
   MovementDefinition,
   OffenseDefinition,
@@ -70,4 +71,28 @@ export function canDeploy(game: GameObject, player: PlayerObject, terrain: Terra
     return false;
   }
   return true;
+};
+
+export function hasAction(actions: DefinitionKey[], action: DefinitionKey): boolean {
+  return actions.some((key) => sameKey(key, action));
+};
+
+export function canCapture(unit: UnitObject, target: TerrainObject, capturable: boolean): boolean {
+  if (unit.acted) {
+    return false;
+  }
+  if (!capturable) {
+    return false;
+  }
+  if (unit.position.x !== target.position.x || unit.position.y !== target.position.y) {
+    return false;
+  }
+  if (unit.playerId === target.playerId) {
+    return false;
+  }
+  return true;
+};
+
+export function getCaptureAmount(health: number): number {
+  return Math.ceil(health / 10);
 };

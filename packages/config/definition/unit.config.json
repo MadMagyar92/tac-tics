@@ -6,7 +6,8 @@
     "fuelMax": 99,
     "moveMax": 3,
     "movement": { "scope": "movement", "name": "foot" },
-    "offenses": [{ "scope": "offense", "name": "infantry" }]
+    "offenses": [{ "scope": "offense", "name": "infantry" }],
+    "actions": [{ "scope": "action", "name": "attack" }, { "scope": "action", "name": "capture" }]
   },
   {
     "definition": { "scope": "unit", "name": "mech" },
@@ -15,7 +16,8 @@
     "fuelMax": 70,
     "moveMax": 2,
     "movement": { "scope": "movement", "name": "mech" },
-    "offenses": [{ "scope": "offense", "name": "mech1" }, { "scope": "offense", "name": "mech2" }]
+    "offenses": [{ "scope": "offense", "name": "mech1" }, { "scope": "offense", "name": "mech2" }],
+    "actions": [{ "scope": "action", "name": "attack" }, { "scope": "action", "name": "capture" }]
   },
   {
     "definition": { "scope": "unit", "name": "recon" },
@@ -24,7 +26,8 @@
     "fuelMax": 80,
     "moveMax": 8,
     "movement": { "scope": "movement", "name": "tire" },
-    "offenses": [{ "scope": "offense", "name": "recon" }]
+    "offenses": [{ "scope": "offense", "name": "recon" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "apc" },
@@ -33,7 +36,8 @@
     "fuelMax": 70,
     "moveMax": 6,
     "movement": { "scope": "movement", "name": "tread" },
-    "offenses": []
+    "offenses": [],
+    "actions": []
   },
   {
     "definition": { "scope": "unit", "name": "anti-air" },
@@ -42,7 +46,8 @@
     "fuelMax": 60,
     "moveMax": 6,
     "movement": { "scope": "movement", "name": "tread" },
-    "offenses": [{ "scope": "offense", "name": "anti-air" }]
+    "offenses": [{ "scope": "offense", "name": "anti-air" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "tank" },
@@ -51,7 +56,8 @@
     "fuelMax": 60,
     "moveMax": 6,
     "movement": { "scope": "movement", "name": "tread" },
-    "offenses": [{ "scope": "offense", "name": "tank1" }, { "scope": "offense", "name": "tank2" }]
+    "offenses": [{ "scope": "offense", "name": "tank1" }, { "scope": "offense", "name": "tank2" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "mid-tank" },
@@ -60,7 +66,8 @@
     "fuelMax": 50,
     "moveMax": 5,
     "movement": { "scope": "movement", "name": "tread" },
-    "offenses": [{ "scope": "offense", "name": "mid-tank1" }, { "scope": "offense", "name": "mid-tank2" }]
+    "offenses": [{ "scope": "offense", "name": "mid-tank1" }, { "scope": "offense", "name": "mid-tank2" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "artillery" },
@@ -69,7 +76,8 @@
     "fuelMax": 50,
     "moveMax": 5,
     "movement": { "scope": "movement", "name": "tread" },
-    "offenses": [{ "scope": "offense", "name": "artillery" }]
+    "offenses": [{ "scope": "offense", "name": "artillery" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "rockets" },
@@ -78,7 +86,8 @@
     "fuelMax": 50,
     "moveMax": 5,
     "movement": { "scope": "movement", "name": "tire" },
-    "offenses": [{ "scope": "offense", "name": "rockets" }]
+    "offenses": [{ "scope": "offense", "name": "rockets" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "missile" },
@@ -87,7 +96,8 @@
     "fuelMax": 50,
     "moveMax": 4,
     "movement": { "scope": "movement", "name": "tire" },
-    "offenses": [{ "scope": "offense", "name": "missile" }]
+    "offenses": [{ "scope": "offense", "name": "missile" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "t-copter" },
@@ -96,7 +106,8 @@
     "fuelMax": 99,
     "moveMax": 6,
     "movement": { "scope": "movement", "name": "air" },
-    "offenses": []
+    "offenses": [],
+    "actions": []
   },
   {
     "definition": { "scope": "unit", "name": "b-copter" },
@@ -105,7 +116,8 @@
     "fuelMax": 99,
     "moveMax": 6,
     "movement": { "scope": "movement", "name": "air" },
-    "offenses": [{ "scope": "offense", "name": "b-copter1" }, { "scope": "offense", "name": "b-copter2" }]
+    "offenses": [{ "scope": "offense", "name": "b-copter1" }, { "scope": "offense", "name": "b-copter2" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "fighter" },
@@ -114,7 +126,8 @@
     "fuelMax": 99,
     "moveMax": 9,
     "movement": { "scope": "movement", "name": "air" },
-    "offenses": [{ "scope": "offense", "name": "fighter" }]
+    "offenses": [{ "scope": "offense", "name": "fighter" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "bomber" },
@@ -123,7 +136,8 @@
     "fuelMax": 99,
     "moveMax": 7,
     "movement": { "scope": "movement", "name": "air" },
-    "offenses": [{ "scope": "offense", "name": "bomber" }]
+    "offenses": [{ "scope": "offense", "name": "bomber" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "lander" },
@@ -132,7 +146,8 @@
     "fuelMax": 99,
     "moveMax": 7,
     "movement": { "scope": "movement", "name": "transport" },
-    "offenses": []
+    "offenses": [],
+    "actions": []
   },
   {
     "definition": { "scope": "unit", "name": "cruiser" },
@@ -141,7 +156,8 @@
     "fuelMax": 99,
     "moveMax": 7,
     "movement": { "scope": "movement", "name": "sea" },
-    "offenses": [{ "scope": "offense", "name": "cruiser1" }, { "scope": "offense", "name": "cruiser2" }]
+    "offenses": [{ "scope": "offense", "name": "cruiser1" }, { "scope": "offense", "name": "cruiser2" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "sub" },
@@ -150,7 +166,8 @@
     "fuelMax": 60,
     "moveMax": 6,
     "movement": { "scope": "movement", "name": "sea" },
-    "offenses": [{ "scope": "offense", "name": "sub" }]
+    "offenses": [{ "scope": "offense", "name": "sub" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   },
   {
     "definition": { "scope": "unit", "name": "battleship" },
@@ -159,6 +176,7 @@
     "fuelMax": 99,
     "moveMax": 6,
     "movement": { "scope": "movement", "name": "sea" },
-    "offenses": [{ "scope": "offense", "name": "battleship" }]
+    "offenses": [{ "scope": "offense", "name": "battleship" }],
+    "actions": [{ "scope": "action", "name": "attack" }]
   }
 ]

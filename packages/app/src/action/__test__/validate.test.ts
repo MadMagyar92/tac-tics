@@ -10,7 +10,7 @@ import type {
   UnitObject,
 } from "@tac-tics/api";
 import { describe, expect, it } from "vitest";
-import { canAttack, canDeploy, canMove, getAttackDamage, getMoveCost, hasUnit } from "../validate";
+import { canAttack, canCapture, canDeploy, canMove, getAttackDamage, getCaptureAmount, getMoveCost, hasAction, hasUnit } from "../validate";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
@@ -166,6 +166,7 @@ const terrain = (name: string, x: number, y: number): TerrainObject => ({
   identifier: { id: `${name}-${x}-${y}`, gameId: "g1" },
   definition: key("terrain", name),
   position: { x, y },
+  health: 20,
   playerId: undefined,
 });
 
@@ -182,6 +183,7 @@ const kind = (moveMax: number): UnitDefinition => ({
   moveMax,
   movement: key("movement", "walk"),
   offenses: [],
+  actions: [],
 });
 
 const walker = (x: number, y: number, fuel = 10): UnitObject => ({ ...unit("walker", "walker", x, y), fuel });
@@ -297,6 +299,7 @@ const tile = (x: number, y: number, playerId: string | undefined = undefined, ga
   identifier: { id: `tile-${x}-${y}`, gameId },
   definition: key("terrain", "base"),
   position: { x, y },
+  health: 20,
   playerId,
 });
 
@@ -417,5 +420,62 @@ describe("canDeploy", () => {
     const before = JSON.stringify([game, first, base, definition, units]);
     canDeploy(game, first, base, definition, units);
     expect(JSON.stringify([game, first, base, definition, units])).toBe(before);
+  });
+});
+
+describe("hasAction", () => {
+  it("is true when the action is among the actions", () => {
+    expect(hasAction([key("action", "attack"), key("action", "capture")], key("action", "capture"))).toBe(true);
+  });
+
+  it.each([
+    ["no actions", []],
+    ["only other actions", [key("action", "attack")]],
+    ["an action of the same name in another scope", [key("unit", "capture")]],
+  ])("is false with %s", (_name, actions) => {
+    expect(hasAction(actions, key("action", "capture"))).toBe(false);
+  });
+});
+
+const capturer = (x: number, y: number): UnitObject => ({ ...unit("capturer", "infantry", x, y), playerId: "p1" });
+
+describe("canCapture", () => {
+  it("is true for a unit that has not acted, on terrain that can be captured and that its player does not hold", () => {
+    expect(canCapture(capturer(1, 1), tile(1, 1), true)).toBe(true);
+    expect(canCapture(capturer(1, 1), tile(1, 1, "p2"), true)).toBe(true);
+  });
+
+  it("is false once the unit has acted", () => {
+    expect(canCapture({ ...capturer(1, 1), acted: true }, tile(1, 1), true)).toBe(false);
+  });
+
+  it("does not look at whether the unit has moved", () => {
+    expect(canCapture({ ...capturer(1, 1), moved: true }, tile(1, 1), true)).toBe(true);
+  });
+
+  it("is false for terrain that cannot be captured", () => {
+    expect(canCapture(capturer(1, 1), tile(1, 1), false)).toBe(false);
+  });
+
+  it.each([[0, 1], [1, 0], [2, 1], [1, 2], [2, 2]])("is false when the unit is at (%i, %i), not on the terrain at (1, 1)", (x, y) => {
+    expect(canCapture(capturer(x, y), tile(1, 1), true)).toBe(false);
+  });
+
+  it("is false for terrain its player already holds", () => {
+    expect(canCapture(capturer(1, 1), tile(1, 1, "p1"), true)).toBe(false);
+  });
+
+  it("changes nothing it was given", () => {
+    const unit = capturer(1, 1);
+    const terrain = tile(1, 1);
+    const before = JSON.stringify([unit, terrain]);
+    canCapture(unit, terrain, true);
+    expect(JSON.stringify([unit, terrain])).toBe(before);
+  });
+});
+
+describe("getCaptureAmount", () => {
+  it.each([[100, 10], [91, 10], [90, 9], [45, 5], [11, 2], [10, 1], [1, 1]])("is a tenth of %i health, rounded up: %i", (health, amount) => {
+    expect(getCaptureAmount(health)).toBe(amount);
   });
 });

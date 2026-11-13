@@ -35,6 +35,7 @@ const kind = (name: string, fundsCost: number, fuelMax: number, offenses: string
   moveMax: 3,
   movement: key("movement", "foot"),
   offenses: offenses.map((offense) => key("offense", offense)),
+  actions: [],
 });
 
 const definitions: Definition[] = [
@@ -114,6 +115,7 @@ const terrain = (x: number, y: number, playerId: string | null = "p1", gameId = 
   identifier: { id: `base-${x}-${y}`, gameId },
   definition: key("terrain", "base"),
   position: { x, y },
+  health: 20,
   playerId: playerId ?? undefined,
 });
 

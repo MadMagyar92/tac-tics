@@ -220,6 +220,7 @@ describe("deployRouter", () => {
         identifier: { id: "elsewhere", gameId: "game-2" },
         definition: { scope: "terrain", name: "base" },
         position: { x: 0, y: 0 },
+        health: 20,
         playerId: "player-1",
       });
       const { service } = createStubDeployService();

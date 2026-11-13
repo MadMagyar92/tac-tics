@@ -30,6 +30,7 @@ const kind = (name: string, moveMax: number, walks: string): UnitDefinition => (
   moveMax,
   movement: key("movement", walks),
   offenses: [],
+  actions: [],
 });
 
 const definitions: Definition[] = [
@@ -99,6 +100,7 @@ const terrain = (name: string, x: number, y: number, gameId = "g1"): TerrainObje
   identifier: { id: `${name}-${x}-${y}`, gameId },
   definition: key("terrain", name),
   position: { x, y },
+  health: 20,
   playerId: undefined,
 });
 

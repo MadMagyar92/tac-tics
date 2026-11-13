@@ -119,6 +119,7 @@ describe("createApp with the repo's config", () => {
         identifier: { id: "sea-150", gameId: "game-1" },
         definition: { scope: "terrain", name: "sea" },
         position: { x: 14, y: 9 },
+        health: 20,
       });
     });
 
@@ -328,6 +329,67 @@ describe("createApp with units to attack", () => {
     await request(app).post(attackPath("enemy-recon"));
     expect(await healthOf(app, "enemy-recon")).toBe(15);
     expect(await healthOf(createApp({ appConfigPath: appConfig }), "enemy-recon")).toBe(100);
+  });
+});
+
+describe("createApp with a unit on a city", () => {
+  const infantry = {
+    identifier: { id: "infantry-1", gameId: "game-1" },
+    definition: { scope: "unit", name: "infantry" },
+    position: { x: 9, y: 2 }, // the city terrain-20
+    moved: false,
+    acted: false,
+    health: 100,
+    fuel: 99,
+    playerId: "player-1",
+    offenseIds: [],
+  };
+
+  const start = () => {
+    const { directory, appConfig } = copyConfig();
+    addObjects(directory, "unit", [infantry]);
+    return createApp({ appConfigPath: appConfig });
+  };
+
+  it("takes a tenth of the unit's health off the city, marks the unit as acted, and refuses a second capture", async () => {
+    const app = start();
+    const capture = { scope: "action", name: "capture" };
+
+    const first = await request(app).post("/game/game-1/unit/infantry-1/capture");
+    expect(first.body).toEqual({ definition: capture, health: 10, captured: false });
+    expect((await request(app).get("/game/game-1/terrain/terrain-20")).body).toMatchObject({ health: 10 });
+    expect((await request(app).get("/game/game-1/unit/infantry-1")).body.acted).toBe(true);
+    expect((await request(app).post("/game/game-1/unit/infantry-1/capture")).status).toBe(409);
+  });
+
+  it("refuses a unit that cannot capture, or is not on terrain that can be captured", async () => {
+    const app = start();
+    expect((await request(app).get("/game/game-1/unit/unit-1/capture")).status).toBe(404);
+    expect((await request(app).post("/game/game-1/unit/unit-1/capture")).status).toBe(409);
+  });
+
+  it("hands the turn to the next player, then to the first of the next turn", async () => {
+    const app = start();
+    const endTurn = { scope: "action", name: "end-turn" };
+
+    expect((await request(app).get("/game/game-1/end-turn")).body).toEqual({ definition: endTurn, turn: 0, playerTurn: 1 });
+    expect((await request(app).post("/game/game-1/end-turn")).body).toEqual({ definition: endTurn, turn: 0, playerTurn: 1 });
+    expect((await request(app).post("/game/game-1/end-turn")).body).toEqual({ definition: endTurn, turn: 1, playerTurn: 0 });
+    expect((await request(app).get("/game/game-1")).body).toMatchObject({ turn: 1, playerTurn: 0 });
+  });
+
+  it("makes the units of the player who has the turn next ready again", async () => {
+    const { directory, appConfig } = copyConfig();
+    addObjects(directory, "unit", [{ ...infantry, playerId: "player-2", moved: true, acted: true }]);
+    const app = createApp({ appConfigPath: appConfig });
+
+    await request(app).post("/game/game-1/end-turn");
+
+    expect((await request(app).get("/game/game-1/unit/infantry-1")).body).toMatchObject({ moved: false, acted: false });
+  });
+
+  it("returns 404 for the end of the turn of an unknown game", async () => {
+    expect((await request(start()).post("/game/nope/end-turn")).status).toBe(404);
   });
 });
 

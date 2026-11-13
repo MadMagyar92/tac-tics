@@ -43,7 +43,7 @@ function createStubMoveService(accepts: (move: MultiMoveActionInput) => boolean 
 }
 
 function terrainIn(id: string, gameId: string): TerrainObject {
-  return { identifier: { id, gameId }, definition: { scope: Scope.Terrain, name: "plain" }, position: { x: 0, y: 0 }, playerId: undefined };
+  return { identifier: { id, gameId }, definition: { scope: Scope.Terrain, name: "plain" }, position: { x: 0, y: 0 }, health: 20, playerId: undefined };
 }
 
 const onlyTerrain = (...ids: string[]) => (move: MultiMoveActionInput) => ids.includes(move.path[0].identifier.id);

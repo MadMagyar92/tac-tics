@@ -1,58 +1,72 @@
 [
   {
     "definition": { "scope": "terrain", "name": "airport" },
-    "defense": 3
+    "defense": 3,
+    "capturable": true
   },
   {
     "definition": { "scope": "terrain", "name": "base" },
-    "defense": 3
+    "defense": 3,
+    "capturable": true
   },
   {
     "definition": { "scope": "terrain", "name": "bridge" },
-    "defense": 0
+    "defense": 0,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "city" },
-    "defense": 3
+    "defense": 3,
+    "capturable": true
   },
   {
     "definition": { "scope": "terrain", "name": "headquarters" },
-    "defense": 4
+    "defense": 4,
+    "capturable": true
   },
   {
     "definition": { "scope": "terrain", "name": "mountain" },
-    "defense": 4
+    "defense": 4,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "plain" },
-    "defense": 1
+    "defense": 1,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "port" },
-    "defense": 3
+    "defense": 3,
+    "capturable": true
   },
   {
     "definition": { "scope": "terrain", "name": "reef" },
-    "defense": 1
+    "defense": 1,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "river" },
-    "defense": 0
+    "defense": 0,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "road" },
-    "defense": 0
+    "defense": 0,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "sea" },
-    "defense": 0
+    "defense": 0,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "shoal" },
-    "defense": 0
+    "defense": 0,
+    "capturable": false
   },
   {
     "definition": { "scope": "terrain", "name": "woods" },
-    "defense": 2
+    "defense": 2,
+    "capturable": false
   }
 ]
