@@ -1,18 +1,24 @@
-import { DefinitionKey, UnitDefinition } from "../definition";
-import { OffenseObject, PlayerObject, UnitObject } from "../object";
-import { ActionInstance, ActionOutput, TerrainActionInput } from "./app";
+import { DefinitionKey } from "../definition";
+import { MovementObject, OffenseObject, PlayerObject, UnitObject } from "../object";
+import { ActionOutput, ActionPlan, ActionResult, TerrainActionInput } from "./app";
 
 export type DeployActionInput = TerrainActionInput & {
-  unitDefinition: DefinitionKey;
+  target: DefinitionKey;
 };
 
-export type DeployActionOutput = ActionOutput & {
-  unitId: string;
-};
-
-export type DeployInstance = ActionInstance<DeployActionInput> & {
+export type DeployActionPlan = ActionPlan & {
   player: PlayerObject;
   unit: UnitObject;
-  unitDefinition: UnitDefinition;
+  movement: MovementObject;
+  offenses: OffenseObject[];
+  cost: number;
+};
+
+export type DeployActionResult = ActionResult & {
+  player: PlayerObject;
+  unit: UnitObject;
+  movement: MovementObject;
   offenses: OffenseObject[];
 };
+
+export type DeployActionOutput = ActionOutput & DeployActionResult;

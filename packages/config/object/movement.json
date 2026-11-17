@@ -1,0 +1,7 @@
+[
+  {
+    "identifier": { "id": "movement-1", "gameId": "game-1", "unitId": "unit-1" },
+    "definition": { "scope": "movement", "name": "tread" },
+    "fuel": 60
+  }
+]

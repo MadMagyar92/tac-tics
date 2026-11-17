@@ -1,12 +1,12 @@
 import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { type ActionService, type GameObject, type MultiMoveActionInput, type MultiMoveActionOutput, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
+import { type ActionService, type GameObject, type MovementObject, type MultiMoveActionInput, type MultiMoveActionOutput, type MultiMoveActionPlan, type MultiMoveActionResult, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { MOVE_ACTION, ObjectServiceImpl } from "@tac-tics/app";
-import { realAppConfig } from "../../../test/config";
+import { createStubActionService, realAppConfig } from "../../../test/config";
 import { moveRouter } from "../unit";
 
-function createApp(moveService: ActionService<MultiMoveActionInput, MultiMoveActionOutput>, objectService: ObjectServiceImpl) {
+function createApp(moveService: ActionService<MultiMoveActionInput, MultiMoveActionPlan, MultiMoveActionResult, MultiMoveActionOutput>, objectService: ObjectServiceImpl) {
   return express().use(
     "/game/:gameId/unit/:unitId/move",
     (req, res, next) => {
@@ -19,26 +19,34 @@ function createApp(moveService: ActionService<MultiMoveActionInput, MultiMoveAct
   );
 }
 
-/** A move service that accepts what `accepts` says, and gives a cost of 1 and the terrain it was asked to move onto. */
+/** The movement of `unit` that the stub move service gives, with 59 fuel. */
+const movementOf = ({ identifier, movementId }: UnitObject): MovementObject => ({
+  identifier: { id: movementId, gameId: identifier.gameId, unitId: identifier.id },
+  definition: { scope: Scope.Movement, name: "tread" },
+  fuel: 59,
+});
+
+/** A move service that accepts what `accepts` says, and gives the unit on the first terrain it was asked to move onto, and its movement, not interrupted. */
 function createStubMoveService(accepts: (move: MultiMoveActionInput) => boolean = () => true) {
   const asked: MultiMoveActionInput[] = [];
   const previewed: MultiMoveActionInput[] = [];
   const executed: MultiMoveActionInput[] = [];
-  const outputOf = ({ definition, path }: MultiMoveActionInput): MultiMoveActionOutput => ({ definition, cost: 1, terrainId: path[0].identifier.id });
-  const service: ActionService<MultiMoveActionInput, MultiMoveActionOutput> = {
-    canExecute(move) {
+  const resultOf = ({ unit, targets }: MultiMoveActionInput): MultiMoveActionResult => ({ unit: { ...unit, position: { ...targets[0].position } }, movement: movementOf(unit), interrupted: false });
+  const outputOf = (move: MultiMoveActionInput): MultiMoveActionOutput => ({ definition: move.definition, ...resultOf(move) });
+  const service = createStubActionService<MultiMoveActionInput, MultiMoveActionPlan, MultiMoveActionResult, MultiMoveActionOutput>({
+    canPlan(move) {
       asked.push(move);
       return accepts(move);
     },
     preview(move) {
       previewed.push(move);
-      return outputOf(move);
+      return resultOf(move);
     },
     execute(move) {
       executed.push(move);
       return outputOf(move);
     },
-  };
+  });
   return { service, asked, previewed, executed };
 }
 
@@ -46,11 +54,11 @@ function terrainIn(id: string, gameId: string): TerrainObject {
   return { identifier: { id, gameId }, definition: { scope: Scope.Terrain, name: "plain" }, position: { x: 0, y: 0 }, health: 20, playerId: undefined };
 }
 
-const onlyTerrain = (...ids: string[]) => (move: MultiMoveActionInput) => ids.includes(move.path[0].identifier.id);
+const onlyTerrain = (...ids: string[]) => (move: MultiMoveActionInput) => ids.includes(move.targets[0].identifier.id);
 
 describe("moveRouter", () => {
   describe("GET /game/:gameId/unit/:unitId/move", () => {
-    it("lists a move for each terrain in the game that canExecute accepts, built from the request's game and unit", async () => {
+    it("lists a move for each terrain in the game that plan accepts, built from the request's game and unit", async () => {
       const objects = new ObjectServiceImpl(realAppConfig);
       const { service } = createStubMoveService(onlyTerrain("terrain-65", "terrain-34"));
       const tank = objects.load<UnitObject>(Scope.Unit, { id: "unit-1", gameId: "game-1" })!;
@@ -58,7 +66,7 @@ describe("moveRouter", () => {
       const res = await request(createApp(service, objects)).get("/game/game-1/unit/unit-1/move");
 
       expect(res.status).toBe(200);
-      expect(res.body.map((move: MultiMoveActionInput) => move.path[0].identifier.id)).toEqual(["terrain-34", "terrain-65"]);
+      expect(res.body.map((move: MultiMoveActionInput) => move.targets[0].identifier.id)).toEqual(["terrain-34", "terrain-65"]);
       for (const move of res.body) {
         expect(move.definition).toEqual(MOVE_ACTION);
         expect(move.game.identifier).toEqual({ id: "game-1" });
@@ -66,14 +74,14 @@ describe("moveRouter", () => {
       }
     });
 
-    it("lists none when canExecute accepts none", async () => {
+    it("lists none when plan accepts none", async () => {
       const { service } = createStubMoveService(() => false);
       const res = await request(createApp(service, new ObjectServiceImpl(realAppConfig))).get("/game/game-1/unit/unit-1/move");
       expect(res.status).toBe(200);
       expect(res.body).toEqual([]);
     });
 
-    it("asks canExecute about every terrain of the game, and none of another game", async () => {
+    it("asks plan about every terrain of the game, and none of another game", async () => {
       const objects = new ObjectServiceImpl(realAppConfig);
       objects.save<TerrainObject>(Scope.Terrain, terrainIn("elsewhere", "game-2"));
       const { service, asked } = createStubMoveService();
@@ -81,10 +89,10 @@ describe("moveRouter", () => {
       await request(createApp(service, objects)).get("/game/game-1/unit/unit-1/move");
 
       expect(asked).toHaveLength(150);
-      expect(asked.map((move) => move.path[0].identifier.gameId)).toEqual(Array(150).fill("game-1"));
+      expect(asked.map((move) => move.targets[0].identifier.gameId)).toEqual(Array(150).fill("game-1"));
     });
 
-    it("changes nothing: it only asks canExecute", async () => {
+    it("changes nothing: it only asks plan", async () => {
       const { service, previewed, executed } = createStubMoveService();
       await request(createApp(service, new ObjectServiceImpl(realAppConfig))).get("/game/game-1/unit/unit-1/move");
       expect(previewed).toEqual([]);
@@ -93,7 +101,7 @@ describe("moveRouter", () => {
   });
 
   describe("GET /game/:gameId/unit/:unitId/move/:terrainId", () => {
-    it("gives the preview of the move built from the request's game, unit and terrain", async () => {
+    it("gives the result of previewing the move built from the request's game, unit and terrain", async () => {
       const objects = new ObjectServiceImpl(realAppConfig);
       const { service, asked, previewed } = createStubMoveService();
       const tank = objects.load<UnitObject>(Scope.Unit, { id: "unit-1", gameId: "game-1" })!;
@@ -101,9 +109,9 @@ describe("moveRouter", () => {
 
       const res = await request(createApp(service, objects)).get("/game/game-1/unit/unit-1/move/terrain-65");
 
-      const move = { definition: MOVE_ACTION, game: objects.load(Scope.Game, { id: "game-1" }), unit: tank, path: [terrain] };
+      const move = { definition: MOVE_ACTION, game: objects.load(Scope.Game, { id: "game-1" }), unit: tank, targets: [terrain] };
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({ definition: MOVE_ACTION, cost: 1, terrainId: "terrain-65" });
+      expect(res.body).toEqual({ unit: { ...tank, position: terrain.position }, movement: movementOf(tank), interrupted: false });
       expect(asked).toEqual([move]);
       expect(previewed).toEqual([move]);
     });
@@ -114,7 +122,7 @@ describe("moveRouter", () => {
       expect(executed).toEqual([]);
     });
 
-    it("returns 404 and previews nothing when canExecute does not accept the move", async () => {
+    it("returns 404 and previews nothing when plan does not accept the move", async () => {
       const { service, previewed } = createStubMoveService(() => false);
       const res = await request(createApp(service, new ObjectServiceImpl(realAppConfig))).get("/game/game-1/unit/unit-1/move/terrain-65");
       expect(res.status).toBe(404);
@@ -149,8 +157,8 @@ describe("moveRouter", () => {
 
       expect(res.status).toBe(200);
       expect(executed).toHaveLength(1);
-      expect(executed[0].path[0].identifier.id).toBe("terrain-65");
-      expect(res.body).toEqual({ definition: MOVE_ACTION, cost: 1, terrainId: "terrain-65" });
+      expect(executed[0].targets[0].identifier.id).toBe("terrain-65");
+      expect(res.body).toEqual({ definition: MOVE_ACTION, unit: { ...executed[0].unit, position: executed[0].targets[0].position }, movement: movementOf(executed[0].unit), interrupted: false });
     });
 
     it("previews nothing", async () => {
@@ -169,7 +177,7 @@ describe("moveRouter", () => {
       expect(objects.load<UnitObject>(Scope.Unit, { id: "unit-1", gameId: "game-1" })).toEqual(before);
     });
 
-    it("returns 409 and executes nothing when canExecute does not accept the move", async () => {
+    it("returns 409 and executes nothing when plan does not accept the move", async () => {
       const { service, executed } = createStubMoveService(() => false);
       const res = await request(createApp(service, new ObjectServiceImpl(realAppConfig))).post("/game/game-1/unit/unit-1/move/terrain-65");
       expect(res.status).toBe(409);

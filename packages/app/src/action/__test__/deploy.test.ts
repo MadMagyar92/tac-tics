@@ -6,6 +6,7 @@ import type {
   DeployActionInput,
   GameObject,
   Id,
+  MovementObject,
   ObjectService,
   OffenseDefinition,
   OffenseObject,
@@ -40,7 +41,7 @@ const kind = (name: string, fundsCost: number, fuelMax: number, offenses: string
 
 const definitions: Definition[] = [
   offenseDefinition("cannon", 9),
-  offenseDefinition("machine-gun", -1),
+  offenseDefinition("machine-gun", 99),
   offenseDefinition("empty", 0),
   kind("tank", 7000, 60, ["cannon", "machine-gun"]),
   kind("infantry", 1000, 99, ["machine-gun"]),
@@ -126,8 +127,8 @@ const existing = (id: string, x: number, y: number, gameId = "g1", playerId = "p
   moved: false,
   acted: false,
   health: 100,
-  fuel: 80,
   playerId,
+  movementId: "movement-1",
   offenseIds: [],
 });
 
@@ -137,12 +138,12 @@ const deploy = ({ gameTurn = 0, gameId = "g1", where = terrain(3, 4), what = key
   definition: DEPLOY_ACTION,
   game: game(gameTurn, gameId),
   terrain: where,
-  unitDefinition: what,
+  target: what,
 });
 
 /** The unit that `world` saves when it carries out `actionInput`. */
 const deployed = (world: ReturnType<typeof createWorld>, actionInput: DeployActionInput): UnitObject => {
-  world.service.execute(actionInput);
+  world.service.execute(world.service.plan(actionInput)!);
   return world.saved("unit")[0] as UnitObject;
 };
 
@@ -156,117 +157,117 @@ describe("DEPLOY_ACTION", () => {
 });
 
 describe("DeployActionService", () => {
-  describe("canExecute", () => {
+  describe("plan", () => {
     it("is true for the player whose turn it is, on a terrain the player controls, with the funds, and no unit there", () => {
-      expect(createWorld().service.canExecute(deploy())).toBe(true);
+      expect(createWorld().service.plan(deploy())).toBeDefined();
     });
 
     describe("the turn", () => {
       it("is false when it is the turn of another player than the one who controls the terrain", () => {
-        expect(createWorld().service.canExecute(deploy({ gameTurn: 1 }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ gameTurn: 1 }))).toBeUndefined();
       });
 
       it("is true for the player of the second turn, on their turn", () => {
-        expect(createWorld().service.canExecute(deploy({ gameTurn: 1, where: terrain(3, 4, "p2") }))).toBe(true);
+        expect(createWorld().service.plan(deploy({ gameTurn: 1, where: terrain(3, 4, "p2") }))).toBeDefined();
       });
 
       it("is false when no player has the turn", () => {
-        expect(createWorld().service.canExecute(deploy({ gameTurn: 5 }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ gameTurn: 5 }))).toBeUndefined();
       });
 
       it("is false when there are no players", () => {
-        expect(createWorld([], []).service.canExecute(deploy())).toBe(false);
+        expect(createWorld([], []).service.plan(deploy())).toBeUndefined();
       });
 
       it("is false when the player whose turn it is is in another game", () => {
-        expect(createWorld([], [player("p1", 0, 10000, "g2")]).service.canExecute(deploy())).toBe(false);
+        expect(createWorld([], [player("p1", 0, 10000, "g2")]).service.plan(deploy())).toBeUndefined();
       });
 
       it("does not take the player of another game who has the same turn", () => {
-        expect(createWorld([], [player("p9", 0, 0, "g2"), player("p1", 0, 10000)]).service.canExecute(deploy())).toBe(true);
+        expect(createWorld([], [player("p9", 0, 0, "g2"), player("p1", 0, 10000)]).service.plan(deploy())).toBeDefined();
       });
     });
 
     describe("the control of the terrain", () => {
       it("is false for a terrain another player controls", () => {
-        expect(createWorld().service.canExecute(deploy({ where: terrain(3, 4, "p2") }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ where: terrain(3, 4, "p2") }))).toBeUndefined();
       });
 
       it("is false for a terrain nobody controls", () => {
-        expect(createWorld().service.canExecute(deploy({ where: terrain(3, 4, null) }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ where: terrain(3, 4, null) }))).toBeUndefined();
       });
     });
 
     describe("the funds", () => {
       it.each([[7000, true], [7001, true], [10000, true], [6999, false], [0, false]])("with %i funds, a tank that costs 7000 is %s", (funds, allowed) => {
-        expect(withFunds(funds).service.canExecute(deploy())).toBe(allowed);
+        expect(withFunds(funds).service.plan(deploy()) !== undefined).toBe(allowed);
       });
 
       it("is true for a unit that costs nothing, with no funds", () => {
-        expect(withFunds(0).service.canExecute(deploy({ what: key("unit", "free") }))).toBe(true);
+        expect(withFunds(0).service.plan(deploy({ what: key("unit", "free") }))).toBeDefined();
       });
     });
 
     describe("the units there are", () => {
       it("is false when a unit is on the terrain", () => {
-        expect(createWorld([existing("unit-1", 3, 4)]).service.canExecute(deploy())).toBe(false);
+        expect(createWorld([existing("unit-1", 3, 4)]).service.plan(deploy())).toBeUndefined();
       });
 
       it("is false when a unit of the same player is on the terrain", () => {
-        expect(createWorld([existing("unit-1", 3, 4, "g1", "p1")]).service.canExecute(deploy())).toBe(false);
+        expect(createWorld([existing("unit-1", 3, 4, "g1", "p1")]).service.plan(deploy())).toBeUndefined();
       });
 
       it("is true when the units are on other squares", () => {
-        expect(createWorld([existing("unit-1", 3, 5), existing("unit-2", 4, 4), existing("unit-3", 0, 0)]).service.canExecute(deploy())).toBe(true);
+        expect(createWorld([existing("unit-1", 3, 5), existing("unit-2", 4, 4), existing("unit-3", 0, 0)]).service.plan(deploy())).toBeDefined();
       });
 
       it("is true when the unit on that square is in another game", () => {
-        expect(createWorld([existing("unit-1", 3, 4, "g2")]).service.canExecute(deploy())).toBe(true);
+        expect(createWorld([existing("unit-1", 3, 4, "g2")]).service.plan(deploy())).toBeDefined();
       });
     });
 
     describe("the game", () => {
       it("is false when the terrain is in another game", () => {
-        expect(createWorld().service.canExecute(deploy({ where: terrain(3, 4, "p1", "g2") }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ where: terrain(3, 4, "p1", "g2") }))).toBeUndefined();
       });
 
       it("is false when the action is for another game than the terrain is in", () => {
-        expect(createWorld().service.canExecute(deploy({ gameId: "g2" }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ gameId: "g2" }))).toBeUndefined();
       });
     });
 
     describe("what is deployed", () => {
       it("is false for a unit that is not defined", () => {
-        expect(createWorld().service.canExecute(deploy({ what: key("unit", "ghost") }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ what: key("unit", "ghost") }))).toBeUndefined();
       });
 
       it.each([["an offense", key("offense", "cannon")], ["a terrain", key("terrain", "base")]])("is false for the definition of %s, which is not a unit", (_name, what) => {
         const { service, requested } = createWorld();
-        expect(service.canExecute(deploy({ what }))).toBe(false);
+        expect(service.plan(deploy({ what }))).toBeUndefined();
         expect(requested).toEqual([]);
       });
 
       it("is false for a unit one of whose offenses is not defined", () => {
-        expect(createWorld().service.canExecute(deploy({ what: key("unit", "artillery") }))).toBe(false);
+        expect(createWorld().service.plan(deploy({ what: key("unit", "artillery") }))).toBeUndefined();
       });
     });
 
     describe("lookups", () => {
       it("asks for the unit, then for each of its offenses in order", () => {
         const { service, requested } = createWorld();
-        service.canExecute(deploy());
+        service.plan(deploy());
         expect(requested).toEqual([key("unit", "tank"), key("offense", "cannon"), key("offense", "machine-gun")]);
       });
 
       it("asks for no offense when the player cannot deploy", () => {
         const { service, requested } = withFunds(0);
-        service.canExecute(deploy());
+        service.plan(deploy());
         expect(requested).toEqual([key("unit", "tank")]);
       });
 
       it("asks for nothing when the game is not the one of the terrain", () => {
         const { service, requested } = createWorld();
-        service.canExecute(deploy({ gameId: "g2" }));
+        service.plan(deploy({ gameId: "g2" }));
         expect(requested).toEqual([]);
       });
     });
@@ -275,41 +276,46 @@ describe("DeployActionService", () => {
       const { service, saves } = createWorld();
       const actionInput = deploy();
       const before = structuredClone(actionInput);
-      service.canExecute(actionInput);
+      service.plan(actionInput);
       expect(actionInput).toEqual(before);
       expect(saves).toEqual([]);
     });
   });
 
   describe("preview", () => {
-    it("gives the output of the deploy, when it can be carried out", () => {
-      expect(createWorld().service.preview(deploy())).toEqual({ definition: DEPLOY_ACTION, unitId: "unit-1" });
+    it("gives the result of the deploy, when it can be carried out: the new unit, its movement, its offenses, and the player with the unit's cost spent", () => {
+      expect(createWorld().service.preview(createWorld().service.plan(deploy())!)).toMatchObject({
+        player: { identifier: { id: "p1" }, funds: 3000 }, // a tank costs 7000
+        unit: { identifier: { id: "unit-1" }, definition: { scope: "unit", name: "tank" } },
+        movement: { identifier: { unitId: "unit-1" } },
+        offenses: [{ identifier: { unitId: "unit-1" } }, { identifier: { unitId: "unit-1" } }],
+      });
     });
 
     it("spends no funds: it saves no player", () => {
       const { service, saved } = createWorld();
-      service.preview(deploy());
+      service.preview(service.plan(deploy())!);
       expect(saved("player")).toEqual([]);
     });
 
     it("saves nothing", () => {
       const { service, saves } = createWorld();
-      service.preview(deploy());
+      service.preview(service.plan(deploy())!);
       expect(saves).toEqual([]);
     });
 
     it("does not change the action it was given", () => {
       const actionInput = deploy();
       const before = structuredClone(actionInput);
-      createWorld().service.preview(actionInput);
+      createWorld().service.preview(createWorld().service.plan(actionInput)!);
       expect(actionInput).toEqual(before);
     });
 
-    it("gives the same output every time, since nothing is spent", () => {
+    it("gives the same result every time, since nothing is spent", () => {
       const { service } = withFunds(7000);
       const actionInput = deploy();
-      expect(service.preview(actionInput)).toEqual(service.preview(actionInput));
-      expect(service.canExecute(actionInput)).toBe(true);
+      expect(service.preview(service.plan(actionInput)!)).toEqual(service.preview(service.plan(actionInput)!));
+      expect(service.plan(actionInput)).toBeDefined();
     });
 
     it.each([
@@ -322,39 +328,42 @@ describe("DeployActionService", () => {
       ["the player whose turn it is is in another game", () => ({ world: createWorld([], [player("p1", 0, 10000, "g2")]), actionInput: deploy() })],
     ])("gives nothing when %s", (_reason, build) => {
       const { world: { service, saves }, actionInput } = build();
-      expect(service.canExecute(actionInput)).toBe(false);
-      expect(service.preview(actionInput)).toBeUndefined();
+      expect(service.plan(actionInput)).toBeUndefined();
       expect(saves).toEqual([]);
     });
 
     it("gives nothing when a unit is on the terrain", () => {
       const { service } = createWorld([existing("unit-1", 3, 4)]);
-      expect(service.preview(deploy())).toBeUndefined();
     });
   });
 
   describe("execute", () => {
-    it("gives what preview gives", () => {
+    it("gives what committing the preview gives", () => {
       const actionInput = () => deploy({ what: key("unit", "infantry") });
       const existingUnits = () => [existing("unit-1", 0, 0)];
-      expect(withFunds(2500, existingUnits()).service.execute(actionInput())).toEqual(withFunds(2500, existingUnits()).service.preview(actionInput()));
+      const { service } = withFunds(2500, existingUnits());
+      expect(withFunds(2500, existingUnits()).service.execute(withFunds(2500, existingUnits()).service.plan(actionInput())!)).toEqual(service.commit(service.preview(service.plan(actionInput())!)));
     });
 
-    it("gives the output of the deploy", () => {
-      expect(createWorld().service.execute(deploy())).toEqual({ definition: DEPLOY_ACTION, unitId: "unit-1" });
+    it("gives the output of the deploy: its result, with the definition of the deploy", () => {
+      expect(createWorld().service.execute(createWorld().service.plan(deploy())!)).toMatchObject({
+        definition: DEPLOY_ACTION,
+        player: { identifier: { id: "p1" }, funds: 3000 }, // a tank costs 7000
+        unit: { identifier: { id: "unit-1" } },
+      });
     });
 
-    it("gives the id of the unit it saved", () => {
+    it("gives the unit it saved", () => {
       const { service, saved } = createWorld([existing("unit-4", 0, 0)]);
-      const output = service.execute(deploy());
-      expect(output?.unitId).toBe("unit-5");
+      const output = service.execute(service.plan(deploy())!);
+      expect(output.unit).toEqual(saved("unit")[0]);
       expect((saved("unit")[0] as UnitObject).identifier.id).toBe("unit-5");
     });
 
     describe("the new unit", () => {
       it("is saved, once", () => {
         const { service, saved } = createWorld();
-        service.execute(deploy());
+        service.execute(service.plan(deploy())!);
         expect(saved("unit")).toHaveLength(1);
       });
 
@@ -371,7 +380,7 @@ describe("DeployActionService", () => {
         expect(deployed(createWorld([], [player("p9", 0, 10000, "g2"), player("p1", 0)]), deploy()).playerId).toBe("p1");
       });
 
-      it("is of the kind asked for, with the fuel and health a new unit has", () => {
+      it("is of the kind asked for, with the health a new unit has", () => {
         expect(deployed(createWorld(), deploy())).toEqual({
           identifier: { id: "unit-1", gameId: "g1" },
           definition: key("unit", "tank"),
@@ -379,14 +388,10 @@ describe("DeployActionService", () => {
           moved: false,
           acted: false,
           health: 100,
-          fuel: 60,
           playerId: "p1",
+          movementId: "movement-1",
           offenseIds: ["offense-1", "offense-2"],
         });
-      });
-
-      it.each([["infantry", 99], ["recon", 80], ["tank", 60]])("has the full tank of a %s: %i fuel", (name, fuel) => {
-        expect(deployed(createWorld(), deploy({ what: key("unit", name) })).fuel).toBe(fuel);
       });
 
       it("has an offense for each offense of its kind, and none for a kind with none", () => {
@@ -434,18 +439,40 @@ describe("DeployActionService", () => {
       });
     });
 
+    it("saves a movement object of the movement of the kind, with a full tank, for the new unit", () => {
+      const { service, saved } = createWorld();
+      service.execute(service.plan(deploy())!);
+      expect(saved("movement")).toEqual([
+        { identifier: { id: "movement-1", gameId: "g1", unitId: "unit-1" }, definition: key("movement", "foot"), fuel: 60 },
+      ] satisfies MovementObject[]);
+    });
+
+    it.each([["infantry", 99], ["recon", 80], ["tank", 60]])("saves the movement of a %s with its full tank: %i fuel", (name, fuel) => {
+      const { service, saved } = createWorld();
+      service.execute(service.plan(deploy({ what: key("unit", name) }))!);
+      expect((saved("movement") as MovementObject[]).map((movement) => movement.fuel)).toEqual([fuel]);
+    });
+
+    it("gives the movement object the id that the unit holds, and the unit's id", () => {
+      const { service, saved } = createWorld([existing("unit-4", 0, 0)]);
+      service.execute(service.plan(deploy())!);
+      const [unit] = saved("unit") as UnitObject[];
+      const [movement] = saved("movement") as MovementObject[];
+      expect(movement.identifier).toEqual({ id: unit.movementId, gameId: "g1", unitId: unit.identifier.id });
+    });
+
     it("saves an offense object for each offense of the kind, full, for the new unit", () => {
       const { service, saved } = createWorld();
-      service.execute(deploy());
+      service.execute(service.plan(deploy())!);
       expect(saved("offense")).toEqual([
         { identifier: { id: "offense-1", gameId: "g1", unitId: "unit-1" }, definition: key("offense", "cannon"), ammo: 9 },
-        { identifier: { id: "offense-2", gameId: "g1", unitId: "unit-1" }, definition: key("offense", "machine-gun"), ammo: -1 },
+        { identifier: { id: "offense-2", gameId: "g1", unitId: "unit-1" }, definition: key("offense", "machine-gun"), ammo: 99 },
       ] satisfies OffenseObject[]);
     });
 
     it("gives the offense objects the ids that the unit lists, and the unit's id", () => {
       const { service, saved } = createWorld();
-      service.execute(deploy({ what: key("unit", "tank") }));
+      service.execute(service.plan(deploy({ what: key("unit", "tank") }))!);
       const [unit] = saved("unit") as UnitObject[];
       const offenses = saved("offense") as OffenseObject[];
       expect(offenses.map((offense) => offense.identifier.id)).toEqual(unit.offenseIds);
@@ -454,49 +481,49 @@ describe("DeployActionService", () => {
 
     it("saves an offense with a capacity of zero with no rounds", () => {
       const { service, saved } = createWorld();
-      service.execute(deploy({ what: key("unit", "zero") }));
+      service.execute(service.plan(deploy({ what: key("unit", "zero") }))!);
       expect((saved("offense") as OffenseObject[]).map((offense) => offense.ammo)).toEqual([0]);
     });
 
     it("saves no offense objects for a kind with no offenses", () => {
       const { service, saved } = createWorld();
-      service.execute(deploy({ what: key("unit", "recon") }));
+      service.execute(service.plan(deploy({ what: key("unit", "recon") }))!);
       expect(saved("offense")).toEqual([]);
     });
 
     it("saves the player whose turn it is, with the funds that are left", () => {
       const { service, saved } = createWorld();
-      service.execute(deploy());
+      service.execute(service.plan(deploy())!);
       expect(saved("player")).toEqual([{ ...player("p1", 0, 10000), funds: 3000 }]); // a tank costs 7000
     });
 
     it("saves the player of the second turn, and not the first, on their turn", () => {
       const { service, saved } = createWorld();
-      service.execute(deploy({ gameTurn: 1, where: terrain(3, 4, "p2") }));
+      service.execute(service.plan(deploy({ gameTurn: 1, where: terrain(3, 4, "p2") }))!);
       expect(saved("player")).toEqual([{ ...player("p2", 1, 10000), funds: 3000 }]);
     });
 
     it("can use all the funds there are", () => {
       const { service, saved } = withFunds(7000);
-      service.execute(deploy());
+      service.execute(service.plan(deploy())!);
       expect((saved("player")[0] as PlayerObject).funds).toBe(0);
     });
 
     it("leaves the funds of the other player as they were", () => {
       const { service, saved } = createWorld();
-      service.execute(deploy());
+      service.execute(service.plan(deploy())!);
       expect((saved("player") as PlayerObject[]).map((saved) => saved.identifier.id)).toEqual(["p1"]);
     });
 
-    it("saves the unit, then its offenses, then the player", () => {
+    it("saves the unit, then its movement, then its offenses, then the player", () => {
       const { service, saves } = createWorld();
-      service.execute(deploy());
-      expect(saves.map((save) => save.scope)).toEqual(["unit", "offense", "offense", "player"]);
+      service.execute(service.plan(deploy())!);
+      expect(saves.map((save) => save.scope)).toEqual(["unit", "movement", "offense", "offense", "player"]);
     });
 
     it("does not save the terrain", () => {
       const { service, saves } = createWorld();
-      service.execute(deploy());
+      service.execute(service.plan(deploy())!);
       expect(saves.map((save) => save.scope)).not.toContain("terrain");
     });
 
@@ -504,32 +531,31 @@ describe("DeployActionService", () => {
       const { service } = createWorld();
       const actionInput = deploy();
       const before = structuredClone(actionInput);
-      service.execute(actionInput);
+      service.execute(service.plan(actionInput)!);
       expect(actionInput).toEqual(before);
     });
 
     it("keeps a square from being deployed on twice: the new unit is there", () => {
       const { service, saved } = withFunds(20000);
-      service.execute(deploy());
+      service.execute(service.plan(deploy())!);
       expect(saved("unit")).toHaveLength(1);
       const again = deploy();
-      expect(service.canExecute(again)).toBe(false);
-      expect(service.execute(again)).toBeUndefined();
+      expect(service.plan(again)).toBeUndefined();
     });
 
     it("gives the next unit the next id, and takes the funds that are left", () => {
       const { service, saved } = withFunds(9000);
-      service.execute(deploy({ where: terrain(1, 1), what: key("unit", "infantry") }));
-      service.execute(deploy({ where: terrain(2, 1), what: key("unit", "infantry") }));
+      service.execute(service.plan(deploy({ where: terrain(1, 1), what: key("unit", "infantry") }))!);
+      service.execute(service.plan(deploy({ where: terrain(2, 1), what: key("unit", "infantry") }))!);
       expect((saved("unit") as UnitObject[]).map((unit) => unit.identifier.id)).toEqual(["unit-1", "unit-2"]);
       expect((saved("player") as PlayerObject[]).map((player) => player.funds)).toEqual([8000, 7000]);
     });
 
     it("stops when the funds run out", () => {
       const { service, saved } = withFunds(1500);
-      service.execute(deploy({ where: terrain(1, 1), what: key("unit", "infantry") }));
+      service.execute(service.plan(deploy({ where: terrain(1, 1), what: key("unit", "infantry") }))!);
       expect((saved("player")[0] as PlayerObject).funds).toBe(500);
-      expect(service.canExecute(deploy({ where: terrain(2, 1), what: key("unit", "infantry") }))).toBe(false);
+      expect(service.plan(deploy({ where: terrain(2, 1), what: key("unit", "infantry") }))).toBeUndefined();
     });
 
     it.each([
@@ -541,14 +567,12 @@ describe("DeployActionService", () => {
       ["a unit of the kind has an offense that is not defined", () => ({ world: createWorld(), actionInput: deploy({ what: key("unit", "artillery") }) })],
     ])("gives nothing and saves nothing when %s", (_reason, build) => {
       const { world: { service, saves }, actionInput } = build();
-      expect(service.canExecute(actionInput)).toBe(false);
-      expect(service.execute(actionInput)).toBeUndefined();
+      expect(service.plan(actionInput)).toBeUndefined();
       expect(saves).toEqual([]);
     });
 
     it("saves nothing when a unit is on the terrain", () => {
       const { service, saves } = createWorld([existing("unit-1", 3, 4)]);
-      expect(service.execute(deploy())).toBeUndefined();
       expect(saves).toEqual([]);
     });
   });

@@ -7,6 +7,6 @@
   {
     "identifier": { "id": "offense-2", "gameId": "game-1", "unitId": "unit-1" },
     "definition": { "scope": "offense", "name": "tank2" },
-    "ammo": -1
+    "ammo": 99
   }
 ]

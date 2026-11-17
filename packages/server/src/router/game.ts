@@ -3,8 +3,12 @@ import {
   type ActionService,
   type DeployActionInput,
   type DeployActionOutput,
+  type DeployActionPlan,
+  type DeployActionResult,
   type EndTurnActionInput,
   type EndTurnActionOutput,
+  type EndTurnActionPlan,
+  type EndTurnActionResult,
   type GameObject,
   type ObjectService,
   Scope,
@@ -48,11 +52,11 @@ export function gameRouter(objectService: ObjectService): Router {
  * `res.locals.terrain`. The kind of unit is the `unit` of the JSON body, or of the query string for a `GET`; the deploy
  * service deploys it for the player whose turn it is.
  *
- * - `GET /:terrainId` previews the deploy of the unit on that terrain, if it can be done. It changes nothing.
+ * - `GET /:terrainId` previews the deploy of the unit on that terrain, if it can be done, and returns the objects it would change. It changes nothing.
  * - `POST /:terrainId` deploys the unit and returns the new unit, loaded by the id the deploy service gives. The deploy service saves what it changes.
  */
 export function deployRouter(
-  deployService: ActionService<DeployActionInput, DeployActionOutput>,
+  deployService: ActionService<DeployActionInput, DeployActionPlan, DeployActionResult, DeployActionOutput>,
   objectService: ObjectService,
 ): Router {
   const router = Router({ mergeParams: true });
@@ -66,7 +70,7 @@ export function deployRouter(
     }
 
     const { game, terrain } = res.locals;
-    return { definition: DEPLOY_ACTION, game, terrain, unitDefinition: { scope: Scope.Unit, name } };
+    return { definition: DEPLOY_ACTION, game, terrain, target: { scope: Scope.Unit, name } };
   }
 
   router.param("terrainId", (req, res, next, terrainId: string) => {
@@ -81,28 +85,30 @@ export function deployRouter(
   });
 
   router.get<{ gameId: string; terrainId: string }>("/:terrainId", (req, res) => {
-    const deploy = getDeployFromRequest(req, res);
-    if (!deploy) {
+    const input = getDeployFromRequest(req, res);
+    if (!input) {
       return;
     }
-    if (!deployService.canExecute(deploy)) {
-      res.status(404).json({ error: `Unit ${deploy.unitDefinition.name} cannot be deployed on terrain ${req.params.terrainId}` });
+    const deploy = deployService.plan(input);
+    if (!deploy) {
+      res.status(404).json({ error: `Unit ${input.target.name} cannot be deployed on terrain ${req.params.terrainId}` });
       return;
     }
     res.json(deployService.preview(deploy));
   });
 
   router.post<{ gameId: string; terrainId: string }>("/:terrainId", (req, res) => {
-    const deploy = getDeployFromRequest(req, res);
-    if (!deploy) {
+    const input = getDeployFromRequest(req, res);
+    if (!input) {
       return;
     }
-    if (!deployService.canExecute(deploy)) {
-      res.status(409).json({ error: `Unit ${deploy.unitDefinition.name} cannot be deployed on terrain ${req.params.terrainId}` });
+    const deploy = deployService.plan(input);
+    if (!deploy) {
+      res.status(409).json({ error: `Unit ${input.target.name} cannot be deployed on terrain ${req.params.terrainId}` });
       return;
     }
     const output = deployService.execute(deploy);
-    res.json(output && objectService.load<UnitObject>(Scope.Unit, { id: output.unitId, gameId: deploy.game.identifier.id }));
+    res.json(objectService.load<UnitObject>(Scope.Unit, { id: output.unit.identifier.id, gameId: input.game.identifier.id }));
   });
 
   return router;
@@ -112,17 +118,17 @@ export function deployRouter(
  * Mount this router under `/game/:gameId/end-turn`, after `gameRouter`. The end-turn service hands the turn to the
  * next player of the game.
  *
- * - `GET /` previews the end of the turn, if it can be done. It changes nothing.
+ * - `GET /` previews the end of the turn, if it can be done, and returns the objects it would change. It changes nothing.
  * - `POST /` ends the turn and returns its output. The end-turn service saves what it changes.
  */
-export function endTurnRouter(endTurnService: ActionService<EndTurnActionInput, EndTurnActionOutput>): Router {
+export function endTurnRouter(endTurnService: ActionService<EndTurnActionInput, EndTurnActionPlan, EndTurnActionResult, EndTurnActionOutput>): Router {
   const router = Router({ mergeParams: true });
 
-  const getEndTurnFromRequest = (res: Response): EndTurnActionInput => ({ definition: END_TURN_ACTION, game: res.locals.game });
+  const getEndTurnFromRequest = (res: Response) => endTurnService.plan({ definition: END_TURN_ACTION, game: res.locals.game });
 
   router.get<{ gameId: string }>("/", (req, res) => {
     const endTurn = getEndTurnFromRequest(res);
-    if (!endTurnService.canExecute(endTurn)) {
+    if (!endTurn) {
       res.status(404).json({ error: `The turn of game ${req.params.gameId} cannot be ended` });
       return;
     }
@@ -131,7 +137,7 @@ export function endTurnRouter(endTurnService: ActionService<EndTurnActionInput, 
 
   router.post<{ gameId: string }>("/", (req, res) => {
     const endTurn = getEndTurnFromRequest(res);
-    if (!endTurnService.canExecute(endTurn)) {
+    if (!endTurn) {
       res.status(409).json({ error: `The turn of game ${req.params.gameId} cannot be ended` });
       return;
     }

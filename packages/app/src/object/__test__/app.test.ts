@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { cleanUp, copyConfig, scopeItem } from "../../../test/config";
 import { loadAppConfigFile } from "../../app";
 import { MapDefinitionHandler } from "../../definition";
-import { GameObjectHandler, type MemoryObjectHandler, OffenseObjectHandler, PlayerObjectHandler, TerrainObjectHandler, UnitObjectHandler } from "..";
+import { GameObjectHandler, type MemoryObjectHandler, MovementObjectHandler, OffenseObjectHandler, PlayerObjectHandler, TerrainObjectHandler, UnitObjectHandler } from "..";
 
 afterEach(cleanUp);
 
@@ -21,6 +21,7 @@ const createTerrain = (appConfig: string, games: "none" | "real" = "none"): Terr
 
 const services: { name: string; scope: string; file: string; create: (appConfig: string) => AnyService }[] = [
     { name: "GameObjectHandler", scope: "game", file: "object/game.json", create: (appConfig) => new GameObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
+    { name: "MovementObjectHandler", scope: "movement", file: "object/movement.json", create: (appConfig) => new MovementObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "OffenseObjectHandler", scope: "offense", file: "object/offense.json", create: (appConfig) => new OffenseObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "PlayerObjectHandler", scope: "player", file: "object/player.json", create: (appConfig) => new PlayerObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "TerrainObjectHandler", scope: "terrain", file: "object/terrain.json", create: (appConfig) => createTerrain(appConfig) },
@@ -52,7 +53,7 @@ describe.each(services)("$name", ({ scope, file, create }) => {
             const { service } = start();
             expect(service.accept(scope)).toBe(true);
             for (const other of services.map((s) => s.scope).filter((name) => name !== scope)) expect(service.accept(other), other).toBe(false);
-            for (const name of ["", `${scope}s`, scope.toUpperCase(), "movement", "action"]) expect(service.accept(name), name).toBe(false);
+            for (const name of ["", `${scope}s`, scope.toUpperCase(), "map", "action"]) expect(service.accept(name), name).toBe(false);
         });
 
         it("knows its scope", () => {
@@ -353,6 +354,17 @@ describe("telling objects apart", () => {
         expect(service.load(ofOtherUnit.identifier)).toEqual(ofOtherUnit);
     });
 
+    it("holds a movement of one unit apart from the movement with that id of another unit of the same game", () => {
+        const { service, items } = start((appConfig) => new MovementObjectHandler(appConfig, loadAppConfigFile(appConfig)), "object/movement.json");
+        const ofOtherUnit = { ...items[0], identifier: { ...items[0].identifier, unitId: "another-unit" }, note: "other" };
+
+        service.save(ofOtherUnit);
+
+        expect(values(service)).toHaveLength(items.length + 1);
+        expect(service.load(items[0].identifier)).toEqual(items[0]);
+        expect(service.load(ofOtherUnit.identifier)).toEqual(ofOtherUnit);
+    });
+
     it("holds a game by its id alone", () => {
         const { service, items } = start((appConfig) => new GameObjectHandler(appConfig, loadAppConfigFile(appConfig)), "object/game.json");
         service.save({ ...items[0], note: "changed" });
@@ -378,7 +390,7 @@ describe("TerrainObjectHandler with the games of the repo's config", () => {
     const start = () => {
         const copy = copyConfig();
         const path = join(copy.directory, "object/terrain.json");
-        return { ...copy, path, items: readItems(path), service: createTerrain(copy.appConfig, "real") };
+        return { ...copy, path, items: readItems(path) as TerrainObject[], service: createTerrain(copy.appConfig, "real") };
     };
 
     const sea = (n: number): TerrainObject => ({

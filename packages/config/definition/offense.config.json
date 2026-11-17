@@ -1,7 +1,7 @@
 [
   {
     "definition": { "scope": "offense", "name": "infantry" },
-    "ammoMax": -1,
+    "ammoMax": 99,
     "rangeMin": 1,
     "rangeMax": 1,
     "damage": [
@@ -37,7 +37,7 @@
   },
   {
     "definition": { "scope": "offense", "name": "mech2" },
-    "ammoMax": -1,
+    "ammoMax": 99,
     "rangeMin": 1,
     "rangeMax": 1,
     "damage": [
@@ -57,7 +57,7 @@
   },
   {
     "definition": { "scope": "offense", "name": "recon" },
-    "ammoMax": -1,
+    "ammoMax": 99,
     "rangeMin": 1,
     "rangeMax": 1,
     "damage": [
@@ -119,7 +119,7 @@
   },
   {
     "definition": { "scope": "offense", "name": "tank2" },
-    "ammoMax": -1,
+    "ammoMax": 99,
     "rangeMin": 1,
     "rangeMax": 1,
     "damage": [
@@ -159,7 +159,7 @@
   },
   {
     "definition": { "scope": "offense", "name": "mid-tank2" },
-    "ammoMax": -1,
+    "ammoMax": 99,
     "rangeMin": 1,
     "rangeMax": 1,
     "damage": [
@@ -255,7 +255,7 @@
   },
   {
     "definition": { "scope": "offense", "name": "b-copter2" },
-    "ammoMax": -1,
+    "ammoMax": 99,
     "rangeMin": 1,
     "rangeMax": 1,
     "damage": [
@@ -316,7 +316,7 @@
   },
   {
     "definition": { "scope": "offense", "name": "cruiser2" },
-    "ammoMax": -1,
+    "ammoMax": 99,
     "rangeMin": 1,
     "rangeMax": 1,
     "damage": [

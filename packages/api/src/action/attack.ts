@@ -1,18 +1,21 @@
-import { OffenseDefinition } from "../definition";
 import { OffenseObject, UnitObject } from "../object";
-import { ActionInstance, ActionOutput, UnitActionInput } from "./app";
+import { ActionOutput, ActionPlan, ActionResult, UnitActionInput } from "./app";
 
 export type AttackActionInput = UnitActionInput & {
   target: UnitObject;
 };
 
-export type AttackActionOutput = ActionOutput & {
+export type AttackActionPlan = ActionPlan & {
+  unit: UnitObject;
+  target: UnitObject;
+  offense: OffenseObject;
   damage: number;
-  offenseId: string;
 };
 
-export type AttackInstance = ActionInstance<AttackActionInput> & {
+export type AttackActionResult = ActionResult & {
+  unit: UnitObject;
+  target: UnitObject;
   offense: OffenseObject;
-  offenseDefinition: OffenseDefinition;
-  damage: number;
 };
+
+export type AttackActionOutput = ActionOutput & AttackActionResult;

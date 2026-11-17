@@ -6,8 +6,8 @@
     "moved": false,
     "acted": false,
     "health": 100,
-    "fuel": 60,
     "playerId": "player-1",
+    "movementId": "movement-1",
     "offenseIds": ["offense-1", "offense-2"]
   }
 ]

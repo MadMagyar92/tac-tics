@@ -10,7 +10,7 @@ afterEach(cleanUp);
 const write = (file: string, value: unknown) => writeFileSync(file, JSON.stringify(value));
 
 describe("ObjectServiceImpl", () => {
-    const scopes = ["game", "offense", "player", "terrain", "unit"];
+    const scopes = ["game", "movement", "offense", "player", "terrain", "unit"];
     const objectFile = (directory: string, scope: string) => join(directory, "object", `${scope}.json`);
     const readObjects = (file: string) => JSON.parse(readFileSync(file, "utf8")) as BaseObject<Id>[];
 
@@ -54,7 +54,7 @@ describe("ObjectServiceImpl", () => {
             expect(service.load("player", { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
         });
 
-        it.each(["movement", "weather", "", "constructor", "toString", "__proto__"])("gives nothing for the scope %j, which has no objects", (scope) => {
+        it.each(["map", "weather", "", "constructor", "toString", "__proto__"])("gives nothing for the scope %j, which has no objects", (scope) => {
             expect(new ObjectServiceImpl(realAppConfig).load(scope, { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
         });
 
@@ -82,7 +82,7 @@ describe("ObjectServiceImpl", () => {
             expect(service.load("terrain", { id: "sea-1", gameId: "game-1" } as Id)?.definition).toEqual({ scope: "terrain", name: "sea" });
         });
 
-        it.each(["movement", "weather", "", "constructor", "__proto__"])("gives no objects with loadAll for the scope %j", (scope) => {
+        it.each(["map", "weather", "", "constructor", "__proto__"])("gives no objects with loadAll for the scope %j", (scope) => {
             expect(new ObjectServiceImpl(realAppConfig).loadAll(scope).size).toBe(0);
         });
 
@@ -111,7 +111,7 @@ describe("ObjectServiceImpl", () => {
             expect(() => service.save<UnitObject>("terrain", tank)).toThrow('The terrain objects cannot hold the object "unit-1"');
         });
 
-        it.each(["movement", "weather", ""])("refuses to save under the scope %j, which has no objects", (scope) => {
+        it.each(["map", "weather", ""])("refuses to save under the scope %j, which has no objects", (scope) => {
             const service = new ObjectServiceImpl(realAppConfig);
             const tank = service.load<UnitObject>("unit", { id: "unit-1", gameId: "game-1" })!;
             expect(() => service.save<UnitObject>(scope, tank)).toThrow(`No object handler accepts the scope "${scope}"`);
@@ -128,7 +128,7 @@ describe("ObjectServiceImpl", () => {
 
         it("gives nothing when it deletes from a scope without objects, or an object it does not hold", () => {
             const service = new ObjectServiceImpl(realAppConfig);
-            expect(service.delete("movement", { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
+            expect(service.delete("map", { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
             expect(service.delete("unit", { id: "nope", gameId: "game-1" } as Id)).toBeUndefined();
             expect(service.loadAll("unit").size).toBe(1);
         });
@@ -160,7 +160,7 @@ describe("ObjectServiceImpl", () => {
         it("accepts a scope that has no objects to load, such as one that only has definitions", () => {
             const { appConfig } = copyConfig();
             const config = JSON.parse(readFileSync(appConfig, "utf8"));
-            expect(scopeItem(config, "movement").object).toBeUndefined();
+            expect(scopeItem(config, "map").object).toBeUndefined();
             expect(() => new ObjectServiceImpl(appConfig)).not.toThrow();
         });
     });

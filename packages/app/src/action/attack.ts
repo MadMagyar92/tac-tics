@@ -1,52 +1,32 @@
 import {
-  type ActionService,
   type AttackActionInput,
   type AttackActionOutput,
-  type AttackInstance,
+  type AttackActionPlan,
+  type AttackActionResult,
+  BaseActionService,
   type DefinitionService,
+  type MovementObject,
   type ObjectService,
   type OffenseDefinition,
   type OffenseObject,
   Scope,
   type UnitObject,
 } from "@tac-tics/api";
-import { canAttack, getAttackDamage } from "./validate";
+import { getAttackDamage } from "./getters";
+import { canAttack } from "./validators";
 
 export const ATTACK_ACTION = { scope: "action", name: "attack" };
 
-export class AttackActionService implements ActionService<AttackActionInput, AttackActionOutput> {
+export class AttackActionService extends BaseActionService<AttackActionInput, AttackActionPlan, AttackActionResult, AttackActionOutput> {
   constructor(
     private definitionService: DefinitionService,
     private objectService: ObjectService,
-  ) {}
-
-  canExecute(input: AttackActionInput): boolean {
-    return this._plan(input) !== undefined;
+  ) {
+    super();
   }
 
-  preview(input: AttackActionInput): AttackActionOutput | undefined {
-    return this._act(input, false);
-  }
-
-  execute(input: AttackActionInput): AttackActionOutput | undefined {
-    return this._act(input, true);
-  }
-
-  private _act(input: AttackActionInput, commit: boolean): AttackActionOutput | undefined {
-    const attack = this._plan(input);
-    if (!attack) {
-      return undefined;
-    }
-
-    const result = this._preview(attack);
-    if (commit) {
-      this._commit(result);
-    }
-    return { definition: input.definition, damage: result.damage, offenseId: result.offense.identifier.id };
-  }
-
-  private _plan(input: AttackActionInput): AttackInstance | undefined {
-    const { game, unit, target } = input;
+  plan(input: AttackActionInput): AttackActionPlan | undefined {
+    const { definition, game, unit, target } = input;
     if (unit.identifier.gameId !== game.identifier.id || target.identifier.gameId !== game.identifier.id) {
       return undefined;
     }
@@ -66,36 +46,34 @@ export class AttackActionService implements ActionService<AttackActionInput, Att
       }
 
       if (canAttack(unit, target, offense, offenseDefinition)) {
-        return { input, offense, offenseDefinition, damage: getAttackDamage(offenseDefinition, target) };
+        return { definition, unit, target, offense, damage: getAttackDamage(offenseDefinition, target) ?? 0 };
       }
     }
     return undefined;
   }
 
-  private _preview(attack: AttackInstance): AttackInstance {
-    const { input, offense, offenseDefinition, damage } = attack;
-    const { unit, target } = input;
+  preview({ unit, target, offense, damage }: AttackActionPlan): AttackActionResult {
     return {
-      ...attack,
-      input: { ...input, unit: { ...unit, acted: true }, target: { ...target, health: Math.max(0, target.health - damage) } },
-      offense: offenseDefinition.ammoMax >= 0 ? { ...offense, ammo: offense.ammo - 1 } : offense,
+      unit: { ...unit, acted: true },
+      target: { ...target, health: target.health - damage },
+      offense: { ...offense, ammo: offense.ammo - 1 },
     };
   }
 
-  private _commit({ input: { unit, target }, offense, offenseDefinition }: AttackInstance): void {
-    if (offenseDefinition.ammoMax >= 0) {
-      this.objectService.save<OffenseObject>(Scope.Offense, offense);
-    }
+  commit({ unit, target, offense }: AttackActionResult): AttackActionOutput {
+    this.objectService.save<OffenseObject>(Scope.Offense, offense);
     this.objectService.save<UnitObject>(Scope.Unit, unit);
     if (target.health <= 0) {
-      this._deleteUnit(target);
+      this._delete(target);
     } else {
       this.objectService.save<UnitObject>(Scope.Unit, target);
     }
+    return { definition: ATTACK_ACTION, unit, target, offense };
   }
 
-  private _deleteUnit(unit: UnitObject): void {
+  private _delete(unit: UnitObject): void {
     this.objectService.delete<UnitObject>(Scope.Unit, unit.identifier);
+    this.objectService.delete<MovementObject>(Scope.Movement, { id: unit.movementId, gameId: unit.identifier.gameId, unitId: unit.identifier.id });
     for (const id of unit.offenseIds) {
       this.objectService.delete<OffenseObject>(Scope.Offense, { id, gameId: unit.identifier.gameId, unitId: unit.identifier.id });
     }

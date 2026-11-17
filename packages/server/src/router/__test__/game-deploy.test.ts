@@ -1,12 +1,12 @@
 import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { type ActionService, type DeployActionInput, type DeployActionOutput, type GameObject, type PlayerObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
+import { type ActionService, type DeployActionInput, type DeployActionOutput, type DeployActionPlan, type DeployActionResult, type GameObject, type MovementObject, type PlayerObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { DEPLOY_ACTION, ObjectServiceImpl } from "@tac-tics/app";
-import { realAppConfig } from "../../../test/config";
+import { createStubActionService, realAppConfig } from "../../../test/config";
 import { deployRouter } from "../game";
 
-function createApp(deployService: ActionService<DeployActionInput, DeployActionOutput>, objectService: ObjectServiceImpl) {
+function createApp(deployService: ActionService<DeployActionInput, DeployActionPlan, DeployActionResult, DeployActionOutput>, objectService: ObjectServiceImpl) {
   return express().use(
     "/game/:gameId/deploy",
     (req, res, next) => {
@@ -18,37 +18,48 @@ function createApp(deployService: ActionService<DeployActionInput, DeployActionO
   );
 }
 
-/** A deploy service that accepts what `accepts` says, gives unit-2 as the new unit's id, and saves that unit on the terrain to `objects`, if it is given them, when it executes. */
+/** A deploy service that accepts what `accepts` says, previews unit-2 on the terrain for player-1, gives unit-2 as the new unit's id, and saves that unit on the terrain to `objects`, if it is given them, when it executes. */
 function createStubDeployService(accepts: (deploy: DeployActionInput) => boolean = () => true, objects?: ObjectServiceImpl) {
   const asked: DeployActionInput[] = [];
   const previewed: DeployActionInput[] = [];
   const executed: DeployActionInput[] = [];
-  const unitOf = ({ game, terrain, unitDefinition }: DeployActionInput): UnitObject => ({
+  const unitOf = ({ game, terrain, target }: DeployActionInput): UnitObject => ({
     identifier: { id: "unit-2", gameId: game.identifier.id },
-    definition: unitDefinition,
+    definition: target,
     position: { ...terrain.position },
     moved: false,
     acted: false,
     health: 100,
-    fuel: 1,
     playerId: "player-1",
+    movementId: "movement-1",
     offenseIds: [],
   });
-  const service: ActionService<DeployActionInput, DeployActionOutput> = {
-    canExecute(deploy) {
+  const movementOf = ({ game }: DeployActionInput): MovementObject => ({
+    identifier: { id: "movement-1", gameId: game.identifier.id, unitId: "unit-2" },
+    definition: { scope: "movement", name: "foot" },
+    fuel: 1,
+  });
+  const playerOf = ({ game }: DeployActionInput): PlayerObject => ({
+    identifier: { id: "player-1", gameId: game.identifier.id },
+    definition: { scope: "player", name: "orange-star" },
+    order: 0,
+    funds: 0,
+  });
+  const service = createStubActionService<DeployActionInput, DeployActionPlan, DeployActionResult, DeployActionOutput>({
+    canPlan(deploy) {
       asked.push(deploy);
       return accepts(deploy);
     },
     preview(deploy) {
       previewed.push(deploy);
-      return { definition: deploy.definition, unitId: "unit-2" };
+      return { player: playerOf(deploy), unit: unitOf(deploy), movement: movementOf(deploy), offenses: [] };
     },
     execute(deploy) {
       executed.push(deploy);
       objects?.save<UnitObject>(Scope.Unit, unitOf(deploy));
-      return { definition: deploy.definition, unitId: "unit-2" };
+      return { definition: deploy.definition, player: playerOf(deploy), unit: unitOf(deploy), movement: movementOf(deploy), offenses: [] };
     },
-  };
+  });
   return { service, asked, previewed, executed };
 }
 
@@ -71,7 +82,7 @@ describe("deployRouter", () => {
           definition: DEPLOY_ACTION,
           game: objects.load<GameObject>(Scope.Game, { id: "game-1" }),
           terrain: objects.load<TerrainObject>(Scope.Terrain, { id: "terrain-2", gameId: "game-1" }),
-          unitDefinition: { scope: "unit", name: "tank" },
+          target: { scope: "unit", name: "tank" },
         },
       ]);
     });
@@ -106,7 +117,7 @@ describe("deployRouter", () => {
       expect(objects.loadAll<UnitObject>(Scope.Unit)).toEqual(units);
     });
 
-    it("returns 409 and executes nothing when canExecute does not accept the deploy", async () => {
+    it("returns 409 and executes nothing when plan does not accept the deploy", async () => {
       const { service, executed } = createStubDeployService(() => false);
       const res = await request(createApp(service, startObjects())).post(path).send({ unit: "tank" });
       expect(res.status).toBe(409);
@@ -116,16 +127,17 @@ describe("deployRouter", () => {
   });
 
   describe("GET /game/:gameId/deploy/:terrainId", () => {
-    it("gives the preview of the deploy built from the game, the terrain and the unit in the query", async () => {
+    it("gives the result of previewing the deploy built from the game, the terrain and the unit in the query", async () => {
       const objects = startObjects();
       const { service, asked, previewed } = createStubDeployService();
 
       const res = await request(createApp(service, objects)).get(`${path}?unit=infantry`);
 
       expect(res.status).toBe(200);
-      expect(asked[0].unitDefinition).toEqual({ scope: "unit", name: "infantry" });
+      expect(asked[0].target).toEqual({ scope: "unit", name: "infantry" });
       expect(previewed).toEqual(asked);
-      expect(res.body).toEqual({ definition: DEPLOY_ACTION, unitId: "unit-2" });
+      expect(res.body.unit).toMatchObject({ identifier: { id: "unit-2", gameId: "game-1" }, definition: { scope: "unit", name: "infantry" } });
+      expect(res.body.offenses).toEqual([]);
     });
 
     it("executes nothing", async () => {
@@ -141,7 +153,7 @@ describe("deployRouter", () => {
       expect(asked).toEqual([]);
     });
 
-    it("returns 404 and previews nothing when canExecute does not accept the deploy", async () => {
+    it("returns 404 and previews nothing when plan does not accept the deploy", async () => {
       const { service, previewed } = createStubDeployService(() => false);
       const res = await request(createApp(service, startObjects())).get(`${path}?unit=tank`);
       expect(res.status).toBe(404);

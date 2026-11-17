@@ -13,8 +13,8 @@ const unit = (id: string, gameId: string, name: string): UnitObject => ({
   moved: false,
   acted: false,
   health: 100,
-  fuel: 99,
   playerId: "player-1",
+  movementId: "movement-1",
   offenseIds: [],
 });
 

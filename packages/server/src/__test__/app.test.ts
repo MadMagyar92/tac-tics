@@ -174,8 +174,8 @@ describe("createApp with units to attack", () => {
     moved: false,
     acted: false,
     health: 100,
-    fuel: 99,
     playerId,
+    movementId: "movement-1",
     offenseIds: [],
   });
 
@@ -238,7 +238,7 @@ describe("createApp with units to attack", () => {
     const { app } = start();
     const res = await request(app).post(attackPath("enemy-recon"));
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ definition: attack, damage: 85, offenseId: "offense-1" }); // the tank cannon
+    expect(res.body).toMatchObject({ definition: attack, target: { identifier: { id: "enemy-recon" }, health: 15 }, offense: { identifier: { id: "offense-1" } } }); // the tank cannon
     expect(await healthOf(app, "enemy-recon")).toBe(15);
   });
 
@@ -246,27 +246,31 @@ describe("createApp with units to attack", () => {
     const { app } = start();
     const res = await request(app).post(attackPath("enemy-infantry"));
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ definition: attack, damage: 75, offenseId: "offense-2" }); // the machine gun
+    expect(res.body).toMatchObject({ definition: attack, target: { identifier: { id: "enemy-infantry" }, health: 25 }, offense: { identifier: { id: "offense-2" } } }); // the machine gun
     expect(await healthOf(app, "enemy-infantry")).toBe(25);
   });
 
-  it("removes a unit the damage takes below zero health, giving the whole damage", async () => {
+  it("removes a unit the damage takes below zero health, taking the whole damage off its health", async () => {
     const { directory, appConfig } = copyConfig();
     addObjects(directory, "unit", [{ ...unit("wounded-recon", "recon", 4, 2), health: 30 }]);
     const app = createApp({ appConfigPath: appConfig });
     const res = await request(app).post(attackPath("wounded-recon"));
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ definition: attack, damage: 85, offenseId: "offense-1" });
+    expect(res.body).toMatchObject({ definition: attack, target: { identifier: { id: "wounded-recon" }, health: -55 }, offense: { identifier: { id: "offense-1" } } });
     expect((await request(app).get("/game/game-1/unit/wounded-recon")).status).toBe(404);
     expect((await request(app).post(attackPath("wounded-recon"))).status).toBe(404);
     const units = (await request(app).get("/game/game-1/unit")).body.map((unit: any) => unit.identifier.id);
     expect(units).not.toContain("wounded-recon");
   });
 
-  it("still lets the unit move once it has acted", async () => {
+  it("refuses to move the unit onto an ally", async () => {
     const { app } = start();
-    await request(app).post(attackPath("enemy-recon"));
-    expect((await request(app).post("/game/game-1/unit/unit-1/move/terrain-14")).status).toBe(200);
+    expect((await request(app).post("/game/game-1/unit/unit-1/move/terrain-2")).status).toBe(409); // the ally recon is at (3, 1)
+  });
+
+  it("refuses to move the unit onto an enemy", async () => {
+    const { app } = start();
+    expect((await request(app).post("/game/game-1/unit/unit-1/move/terrain-14")).status).toBe(409); // the enemy lander is at (2, 2)
   });
 
   it("lists no attacks, and refuses any, once the unit has acted", async () => {
@@ -282,7 +286,7 @@ describe("createApp with units to attack", () => {
     addObjects(directory, "unit", [{ ...unit("wounded-recon", "recon", 4, 2), health: 85 }]); // the tank cannon does 85
     const app = createApp({ appConfigPath: appConfig });
     const res = await request(app).post(attackPath("wounded-recon"));
-    expect(res.body).toEqual({ definition: attack, damage: 85, offenseId: "offense-1" });
+    expect(res.body).toMatchObject({ definition: attack, target: { identifier: { id: "wounded-recon" }, health: 0 }, offense: { identifier: { id: "offense-1" } } });
     expect((await request(app).get("/game/game-1/unit/wounded-recon")).status).toBe(404);
   });
 
@@ -340,8 +344,8 @@ describe("createApp with a unit on a city", () => {
     moved: false,
     acted: false,
     health: 100,
-    fuel: 99,
     playerId: "player-1",
+    movementId: "movement-1",
     offenseIds: [],
   };
 
@@ -356,7 +360,7 @@ describe("createApp with a unit on a city", () => {
     const capture = { scope: "action", name: "capture" };
 
     const first = await request(app).post("/game/game-1/unit/infantry-1/capture");
-    expect(first.body).toEqual({ definition: capture, health: 10, captured: false });
+    expect(first.body).toMatchObject({ definition: capture, unit: { identifier: { id: "infantry-1" }, acted: true }, target: { identifier: { id: "terrain-20" }, health: 10 } });
     expect((await request(app).get("/game/game-1/terrain/terrain-20")).body).toMatchObject({ health: 10 });
     expect((await request(app).get("/game/game-1/unit/infantry-1")).body.acted).toBe(true);
     expect((await request(app).post("/game/game-1/unit/infantry-1/capture")).status).toBe(409);
@@ -372,9 +376,9 @@ describe("createApp with a unit on a city", () => {
     const app = start();
     const endTurn = { scope: "action", name: "end-turn" };
 
-    expect((await request(app).get("/game/game-1/end-turn")).body).toEqual({ definition: endTurn, turn: 0, playerTurn: 1 });
-    expect((await request(app).post("/game/game-1/end-turn")).body).toEqual({ definition: endTurn, turn: 0, playerTurn: 1 });
-    expect((await request(app).post("/game/game-1/end-turn")).body).toEqual({ definition: endTurn, turn: 1, playerTurn: 0 });
+    expect((await request(app).get("/game/game-1/end-turn")).body.game).toMatchObject({ turn: 0, playerTurn: 1 });
+    expect((await request(app).post("/game/game-1/end-turn")).body).toMatchObject({ definition: endTurn, game: { turn: 0, playerTurn: 1 } });
+    expect((await request(app).post("/game/game-1/end-turn")).body).toMatchObject({ definition: endTurn, game: { turn: 1, playerTurn: 0 } });
     expect((await request(app).get("/game/game-1")).body).toMatchObject({ turn: 1, playerTurn: 0 });
   });
 
@@ -429,7 +433,7 @@ describe("createApp moving", () => {
     const { app } = start();
     const res = await request(app).get(movePath());
     expect(res.status).toBe(200);
-    expect(res.body.map((move: any) => move.path[0].identifier.id)).toEqual(["terrain-2", "terrain-14", "terrain-16", "terrain-27"]);
+    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-2", "terrain-14", "terrain-16", "terrain-27"]);
     expect(res.body[0].definition).toEqual({ scope: "action", name: "move" });
   });
 
@@ -440,7 +444,7 @@ describe("createApp moving", () => {
       }),
     );
     const res = await request(app).get(movePath());
-    expect(res.body.map((move: any) => move.path[0].identifier.id)).toEqual(["terrain-2", "terrain-14", "terrain-27"]);
+    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-2", "terrain-14", "terrain-27"]);
     expect((await request(app).post(movePath("terrain-16"))).status).toBe(409);
   });
 
@@ -448,21 +452,32 @@ describe("createApp moving", () => {
     const { app } = start();
     const res = await request(app).get(movePath("terrain-16"));
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ definition: { scope: "action", name: "move" }, cost: 1, terrainId: "terrain-16" });
+    expect(res.body).toMatchObject({ unit: { identifier: { id: "unit-1" }, position: { x: 4, y: 2 }, moved: true }, movement: { fuel: 59 } });
     expect((await tankOf(app)).position).toEqual({ x: 3, y: 2 });
-    expect((await tankOf(app)).fuel).toBe(60);
+    expect((await request(app).post(movePath("terrain-16"))).body.movement.fuel).toBe(59); // the preview spent none of the 60
   });
 
   it("makes the move: the unit is on the terrain, and the cost of it is off its fuel", async () => {
     const { app } = start();
     const res = await request(app).post(movePath("terrain-16"));
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ definition: { scope: "action", name: "move" }, cost: 1, terrainId: "terrain-16" });
     const tank = await tankOf(app);
+    const [movement] = objectsOf("movement");
+    expect(res.body).toEqual({ definition: { scope: "action", name: "move" }, unit: tank, movement: { ...movement, fuel: 59 }, interrupted: false });
     expect(tank.position).toEqual({ x: 4, y: 2 });
-    expect(tank.fuel).toBe(59);
     expect(tank.moved).toBe(true);
     expect(tank.health).toBe(100);
+  });
+
+  it("lists no moves, and refuses any, once the unit has acted", async () => {
+    const { app } = start((directory) =>
+      editObjects(directory, "unit", (units) => {
+        units[0].acted = true;
+      }),
+    );
+    expect((await request(app).get(movePath())).body).toEqual([]);
+    expect((await request(app).post(movePath("terrain-16"))).status).toBe(409);
+    expect((await tankOf(app)).position).toEqual({ x: 3, y: 2 });
   });
 
   it("lists no moves, and refuses any, once the unit has moved", async () => {
@@ -480,7 +495,7 @@ describe("createApp moving", () => {
       }),
     );
     const res = await request(app).get(movePath());
-    expect(res.body.map((move: any) => move.path[0].identifier.id)).toEqual(["terrain-14", "terrain-25"]);
+    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-14", "terrain-25"]);
     expect((await request(app).get(movePath("sea-31"))).status).toBe(404);
     expect((await request(app).post(movePath("sea-31"))).status).toBe(409);
   });
@@ -496,8 +511,8 @@ describe("createApp moving", () => {
 
   it("refuses to move a unit with no fuel left", async () => {
     const { app } = start((directory) =>
-      editObjects(directory, "unit", (units) => {
-        units[0].fuel = 0;
+      editObjects(directory, "movement", (movements) => {
+        movements[0].fuel = 0;
       }),
     );
     expect((await request(app).post(movePath("terrain-16"))).status).toBe(409);
@@ -551,8 +566,8 @@ describe("createApp deploying", () => {
       moved: false,
       acted: false,
       health: 100,
-      fuel: 99,
       playerId: "player-1",
+      movementId: "movement-1",
       offenseIds: ["offense-1"],
     });
   });
@@ -599,7 +614,7 @@ describe("createApp deploying", () => {
     const { app } = start();
     const res = await request(app).get(`${deployPath("terrain-45")}?unit=infantry`);
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ definition: { scope: "action", name: "deploy" }, unitId: "unit-2" });
+    expect(res.body).toMatchObject({ unit: { identifier: { id: "unit-2" }, definition: { scope: "unit", name: "infantry" } }, player: { identifier: { id: "player-1" }, funds: 9000 } });
     expect(await everyone(app)).toEqual(["unit-1"]);
     expect(await fundsOf(app)).toBe(10000);
   });
@@ -610,25 +625,25 @@ describe("createApp deploying", () => {
         {
           identifier: { id: "enemy-infantry", gameId: "game-1" },
           definition: { scope: "unit", name: "infantry" },
-          position: { x: 2, y: 5 },
+          position: { x: 2, y: 4 },
           moved: false,
           acted: false,
           health: 100,
-          fuel: 99,
           playerId: "player-2",
+          movementId: "movement-1",
           offenseIds: [],
         },
       ]),
     );
     await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" });
 
-    const attack = await request(app).post("/game/game-1/unit/unit-2/attack/enemy-infantry");
-    expect(attack.status).toBe(200);
-    expect((await request(app).get("/game/game-1/unit/enemy-infantry")).body.health).toBe(45); // the rifle: 55
-
     const move = await request(app).post("/game/game-1/unit/unit-2/move/terrain-47");
     expect(move.status).toBe(409); // two squares away
     expect((await request(app).post("/game/game-1/unit/unit-2/move/terrain-35")).status).toBe(200); // (1, 4) is next to (1, 5)
+
+    const attack = await request(app).post("/game/game-1/unit/unit-2/attack/enemy-infantry");
+    expect(attack.status).toBe(200); // (2, 4) is next to (1, 4)
+    expect((await request(app).get("/game/game-1/unit/enemy-infantry")).body.health).toBe(45); // the rifle: 55
   });
 
   it("deploys one unit after another with the next id, until the funds run out", async () => {

@@ -1,5 +1,6 @@
 export { MemoryObjectHandler } from "./app";
 export { GameObjectHandler } from "./game";
+export { MovementObjectHandler } from "./movement";
 export { OffenseObjectHandler } from "./offense";
 export { PlayerObjectHandler } from "./player";
 export { ObjectServiceImpl } from "./service";

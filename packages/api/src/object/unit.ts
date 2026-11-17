@@ -9,7 +9,7 @@ export type UnitObject = UiBaseObject<GameReferenceId> & {
   moved: boolean;
   acted: boolean;
   health: number;
-  fuel: number;
   playerId: string;
+  movementId: string;
   offenseIds: string[];
 };

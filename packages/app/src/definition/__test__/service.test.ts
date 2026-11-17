@@ -147,9 +147,9 @@ describe("DefinitionServiceImpl", () => {
         it("fails when the app config leaves a scope with neither a definition file nor an object file", () => {
             const { appConfig } = copyConfig();
             const config = JSON.parse(readFileSync(appConfig, "utf8"));
-            delete scopeItem(config, "movement").definition;
+            delete scopeItem(config, "map").definition;
             write(appConfig, config);
-            expect(() => new DefinitionServiceImpl(appConfig)).toThrow('scope "movement" must have a definition file or an object file');
+            expect(() => new DefinitionServiceImpl(appConfig)).toThrow('scope "map" must have a definition file or an object file');
         });
 
         it("fails when the app config maps definitions for a scope nothing handles", () => {

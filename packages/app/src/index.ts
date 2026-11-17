@@ -11,14 +11,22 @@ export {
   DeployActionService,
   END_TURN_ACTION,
   EndTurnActionService,
+  fillNewMovement,
+  fillNewOffense,
+  fillNewUnit,
   getAttackDamage,
-  getCaptureAmount,
   getMoveCost,
+  getUnitAtPosition,
   hasAction,
-  hasUnit,
+  inAttackRange,
+  inMoveRange,
   MOVE_ACTION,
   MoveActionService,
   MultiMoveActionService,
+  nextId,
+  nextMovementId,
+  nextOffenseId,
+  nextUnitId,
 } from "./action";
 export { isDefinitionKey, isId, isNonEmptyString, isPlainObject, loadAppConfigFile, loadScopeFile, saveObjectFile } from "./app";
 export {
@@ -36,6 +44,7 @@ export {
 export {
   GameObjectHandler,
   MemoryObjectHandler,
+  MovementObjectHandler,
   ObjectServiceImpl,
   OffenseObjectHandler,
   PlayerObjectHandler,

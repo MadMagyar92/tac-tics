@@ -83,8 +83,8 @@ const capturer = ({ x = 1, health = 100, acted = false, gameId = "g1", definitio
   moved: true,
   acted,
   health,
-  fuel: 99,
   playerId: "p1",
+  movementId: "movement-1",
   offenseIds: [],
 });
 
@@ -117,18 +117,18 @@ describe("CaptureActionService", () => {
   it("takes a tenth of the unit's health off the terrain's health, and leaves the terrain to whoever held it", () => {
     const { service, savedTerrains } = createWorld();
 
-    const output = service.execute(capture(capturer(), city()));
+    const output = service.execute(service.plan(capture(capturer(), city()))!);
 
-    expect(output).toEqual({ definition: CAPTURE_ACTION, health: 10, captured: false });
+    expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer(), acted: true }, target: city({ health: 10 }) });
     expect(savedTerrains).toEqual([city({ health: 10 })]);
   });
 
   it("takes less off for a damaged unit, rounding its tenth up", () => {
     const { service, savedTerrains } = createWorld();
 
-    const output = service.execute(capture(capturer({ health: 45 }), city()));
+    const output = service.execute(service.plan(capture(capturer({ health: 45 }), city()))!);
 
-    expect(output).toEqual({ definition: CAPTURE_ACTION, health: 15, captured: false });
+    expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer({ health: 45 }), acted: true }, target: city({ health: 15 }) });
     expect(savedTerrains).toEqual([city({ health: 15 })]);
   });
 
@@ -137,9 +137,9 @@ describe("CaptureActionService", () => {
     (health, unitHealth) => {
       const { service, savedTerrains } = createWorld();
 
-      const output = service.execute(capture(capturer({ health: unitHealth }), city({ health })));
+      const output = service.execute(service.plan(capture(capturer({ health: unitHealth }), city({ health })))!);
 
-      expect(output).toEqual({ definition: CAPTURE_ACTION, health: 20, captured: true });
+      expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer({ health: unitHealth }), acted: true }, target: city({ playerId: "p1" }) });
       expect(savedTerrains).toEqual([city({ playerId: "p1" })]);
     },
   );
@@ -147,8 +147,8 @@ describe("CaptureActionService", () => {
   it("captures terrain another player holds, which stays theirs until its health reaches zero", () => {
     const { service, savedTerrains } = createWorld();
 
-    service.execute(capture(capturer(), city({ playerId: "p2" })));
-    service.execute(capture(capturer(), savedTerrains[0]));
+    service.execute(service.plan(capture(capturer(), city({ playerId: "p2" })))!);
+    service.execute(service.plan(capture(capturer(), savedTerrains[0]))!);
 
     expect(savedTerrains).toEqual([city({ health: 10, playerId: "p2" }), city({ playerId: "p1" })]);
   });
@@ -156,7 +156,7 @@ describe("CaptureActionService", () => {
   it("marks the unit as acted, and changes nothing else about it", () => {
     const { service, savedUnits } = createWorld();
 
-    service.execute(capture(capturer(), city()));
+    service.execute(service.plan(capture(capturer(), city()))!);
 
     expect(savedUnits).toEqual([{ ...capturer(), acted: true }]);
   });
@@ -164,31 +164,29 @@ describe("CaptureActionService", () => {
   it("does not let the unit capture again once it has acted", () => {
     const { service, savedUnits } = createWorld();
 
-    service.execute(capture(capturer(), city()));
+    service.execute(service.plan(capture(capturer(), city()))!);
 
-    expect(service.canExecute(capture(savedUnits[0], city({ health: 10 })))).toBe(false);
+    expect(service.plan(capture(savedUnits[0], city({ health: 10 })))).toBeUndefined();
   });
 
   it("saves the terrain, then the unit", () => {
     const { service, saves } = createWorld();
-    service.execute(capture(capturer(), city()));
+    service.execute(service.plan(capture(capturer(), city()))!);
     expect(saves).toEqual(["terrain", "unit"]);
   });
 
-  it("previews what executing gives, and saves nothing", () => {
+  it("previews the unit and the terrain executing saves, and saves nothing", () => {
     const { service, saves } = createWorld();
 
-    expect(service.preview(capture(capturer(), city()))).toEqual({ definition: CAPTURE_ACTION, health: 10, captured: false });
-    expect(service.preview(capture(capturer(), city({ health: 10 })))).toEqual({ definition: CAPTURE_ACTION, health: 20, captured: true });
+    expect(service.preview(service.plan(capture(capturer(), city()))!)).toEqual({ unit: { ...capturer(), acted: true }, target: city({ health: 10 }) });
+    expect(service.preview(service.plan(capture(capturer(), city({ health: 10 })))!)).toEqual({ unit: { ...capturer(), acted: true }, target: city({ playerId: "p1" }) });
     expect(saves).toEqual([]);
   });
 
   it.each(refused)("refuses when %s, and saves nothing", (_reason, actionInput) => {
     const { service, saves } = createWorld();
 
-    expect(service.canExecute(actionInput)).toBe(false);
-    expect(service.preview(actionInput)).toBeUndefined();
-    expect(service.execute(actionInput)).toBeUndefined();
+    expect(service.plan(actionInput)).toBeUndefined();
     expect(saves).toEqual([]);
   });
 
@@ -197,7 +195,7 @@ describe("CaptureActionService", () => {
     const actionInput = capture(capturer(), city({ health: 10 }));
     const before = JSON.stringify(actionInput);
 
-    service.execute(actionInput);
+    service.execute(service.plan(actionInput)!);
 
     expect(JSON.stringify(actionInput)).toBe(before);
   });

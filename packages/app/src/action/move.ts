@@ -1,79 +1,67 @@
 import {
-  type ActionService,
+  BaseActionService,
   type DefinitionService,
   type MoveActionInput,
   type MoveActionOutput,
-  type MoveInstance,
+  type MoveActionPlan,
+  type MoveActionResult,
   type MovementDefinition,
+  type MovementObject,
   type ObjectService,
   Scope,
-  type UnitDefinition,
   type UnitObject,
 } from "@tac-tics/api";
-import { canMove, getMoveCost } from "./validate";
+import { getMoveCost, getUnitAtPosition } from "./getters";
+import { canMove } from "./validators";
 
 export const MOVE_ACTION = { scope: "action", name: "move" };
 
-export class MoveActionService implements ActionService<MoveActionInput, MoveActionOutput> {
+export class MoveActionService extends BaseActionService<MoveActionInput, MoveActionPlan, MoveActionResult, MoveActionOutput> {
   constructor(
     private definitionService: DefinitionService,
     private objectService: ObjectService,
-  ) {}
-
-  canExecute(input: MoveActionInput): boolean {
-    return this._plan(input) !== undefined;
+  ) {
+    super();
   }
 
-  preview(input: MoveActionInput): MoveActionOutput | undefined {
-    return this._act(input, false);
-  }
-
-  execute(input: MoveActionInput): MoveActionOutput | undefined {
-    return this._act(input, true);
-  }
-
-  private _act(input: MoveActionInput, commit: boolean): MoveActionOutput | undefined {
-    const move = this._plan(input);
-    if (!move) {
-      return undefined;
-    }
-
-    const result = this._preview(move);
-    if (commit) {
-      this._commit(result);
-    }
-    return { definition: input.definition, cost: result.cost, terrainId: result.input.target.identifier.id };
-  }
-
-  private _plan(input: MoveActionInput): MoveInstance | undefined {
-    const { game, unit, target } = input;
+  plan(input: MoveActionInput): MoveActionPlan | undefined {
+    const { definition, game, unit, target } = input;
     if (unit.identifier.gameId !== game.identifier.id || target.identifier.gameId !== game.identifier.id) {
       return undefined;
     }
 
-    const definition = this.definitionService.get<UnitDefinition>(unit.definition);
-    if (!definition) {
-      return undefined;
-    }
-    const movement = this.definitionService.get<MovementDefinition>(definition.movement);
+    const movement = this.objectService.load<MovementObject>(Scope.Movement, { id: unit.movementId, gameId: game.identifier.id, unitId: unit.identifier.id });
     if (!movement) {
       return undefined;
     }
-
-    if (!canMove(unit, target, definition, movement)) {
+    
+    const movementDefinition = this.definitionService.get<MovementDefinition>(movement.definition);
+    if (!movementDefinition) {
       return undefined;
     }
 
-    return { input, cost: getMoveCost(movement, target) };
+    const other = getUnitAtPosition(this.getOthersFromGame(game.identifier.id, unit.identifier.id), target.position);
+    if (!canMove(unit, target, movement, movementDefinition, other)) {
+      return undefined;
+    }
+
+    return { definition, unit, target, movement, other, cost: getMoveCost(movementDefinition, target) ?? 1 };
   }
 
-  private _preview(move: MoveInstance): MoveInstance {
-    const { input, cost } = move;
-    const { unit, target } = input;
-    return { ...move, input: { ...input, unit: { ...unit, position: { ...target.position }, fuel: unit.fuel - cost } } };
+  private getOthersFromGame(gameId: string, unitId: string): UnitObject[] {
+    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId && identifier.id !== unitId);
   }
 
-  private _commit({ input: { unit } }: MoveInstance): void {
+  preview({ unit, target, movement, other, cost }: MoveActionPlan): MoveActionResult {
+    if (other && other.playerId !== unit.playerId) {
+      return { unit, movement, interrupted: true };
+    }
+    return { unit: { ...unit, position: { ...target.position } }, movement: { ...movement, fuel: movement.fuel - cost }, interrupted: false };
+  }
+
+  commit({ unit, movement, interrupted }: MoveActionResult): MoveActionOutput {
+    this.objectService.save<MovementObject>(Scope.Movement, movement);
     this.objectService.save<UnitObject>(Scope.Unit, unit);
+    return { definition: MOVE_ACTION, unit, movement, interrupted };
   }
 };

@@ -1,5 +1,6 @@
 export { type BaseObject, type Id, type ObjectHandler, type ObjectService, type Position, type UiBaseObject } from "./app";
 export { type GameObject, type GameReferenceId } from "./game";
+export { type MovementObject } from "./movement";
 export { type OffenseObject } from "./offense";
 export { type PlayerObject } from "./player";
 export { type TerrainObject, type TerrainReferenceId } from "./terrain";
