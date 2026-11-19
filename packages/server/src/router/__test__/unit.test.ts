@@ -16,6 +16,7 @@ const unit = (id: string, gameId: string, name: string): UnitObject => ({
   playerId: "player-1",
   movementId: "movement-1",
   offenseIds: [],
+  transportIds: [],
 });
 
 /** The objects of the repo's config, whose units are just unit-1, a tank in game-1. */

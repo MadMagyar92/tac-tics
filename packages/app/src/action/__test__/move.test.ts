@@ -32,7 +32,8 @@ const infantry: UnitDefinition = {
   moveMax: 3,
   movement: key("movement", "foot"),
   offenses: [],
-  actions: [],
+  capture: undefined,
+  transport: undefined,
 };
 
 const definitions: Definition[] = [
@@ -115,6 +116,7 @@ const unit = ({ x = 0, y = 0, gameId = "g1" }: UnitOptions = {}): UnitObject => 
   health: 80,
   movementId: "walk",
   offenseIds: ["gun"],
+  transportIds: [],
   moved: false,
   acted: false,
 });
@@ -216,6 +218,16 @@ describe("MoveActionService", () => {
       ])("is true when %s", (_name, build) => {
         expect(createWorld([build()]).service.plan(move(unit(), terrain("plain", 1, 0)))).toBeDefined();
       });
+
+      it("is false when the unit is loaded in a carrier, even though it has neither moved nor acted", () => {
+        const carrier = { ...other("carrier", "p1", 0, 0), transportIds: ["mover"] };
+        expect(createWorld([carrier]).service.plan(move(unit(), terrain("plain", 1, 0)))).toBeUndefined();
+      });
+
+      it("is true when only a carrier of another game holds a unit with the unit's id", () => {
+        const carrier = { ...other("carrier", "p1", 0, 0, "g2"), transportIds: ["mover"] };
+        expect(createWorld([carrier]).service.plan(move(unit(), terrain("plain", 1, 0)))).toBeDefined();
+      });
     });
 
     describe("the movement", () => {
@@ -276,6 +288,18 @@ describe("MoveActionService", () => {
     it("holds no unit for an empty terrain, even when the unit itself is held on it", () => {
       const { service } = createWorld([unit({ x: 1, y: 0 })]);
       expect(service.plan(move(unit(), terrain("plain", 1, 0)))).toHaveProperty("other", undefined);
+    });
+
+    it("holds the carrier on the terrain, not a unit it holds there", () => {
+      const carrier = { ...other("carrier", "p1", 1, 0), transportIds: ["rider"] };
+      const { service } = createWorld([other("rider", "p1", 1, 0), carrier]);
+      expect(service.plan(move(unit(), terrain("plain", 1, 0)))?.other).toEqual(carrier);
+    });
+
+    it("holds no unit for a terrain where only the units the unit carries are held, directly or through a carrier it carries", () => {
+      const mover = { ...unit(), transportIds: ["apc"] };
+      const { service } = createWorld([{ ...mover, position: { x: 1, y: 0 } }, { ...other("apc", "p1", 1, 0), transportIds: ["rider"] }, other("rider", "p1", 1, 0)]);
+      expect(service.plan(move(mover, terrain("plain", 1, 0)))).toHaveProperty("other", undefined);
     });
   });
 

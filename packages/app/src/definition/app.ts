@@ -1,7 +1,6 @@
 import type { AppConfig, Definition, DefinitionHandler, DefinitionKey } from "@tac-tics/api";
-import { isDefinitionKey, isPlainObject, loadScopeFile } from "../app";
-
-export const sameKey = (a: DefinitionKey, b: DefinitionKey): boolean => a.scope === b.scope && a.name === b.name;
+import { loadScopeFile } from "../app";
+import { isDefinitionKey, isPlainObject } from "../common";
 
 const freeze = <T>(value: T, seen = new WeakSet<object>()): T => {
     if (typeof value === "object" && value !== null && !seen.has(value)) {

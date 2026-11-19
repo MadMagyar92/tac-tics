@@ -31,7 +31,7 @@ function createStubMoveService(accepts: (move: MultiMoveActionInput) => boolean 
   const asked: MultiMoveActionInput[] = [];
   const previewed: MultiMoveActionInput[] = [];
   const executed: MultiMoveActionInput[] = [];
-  const resultOf = ({ unit, targets }: MultiMoveActionInput): MultiMoveActionResult => ({ unit: { ...unit, position: { ...targets[0].position } }, movement: movementOf(unit), interrupted: false });
+  const resultOf = ({ unit, targets }: MultiMoveActionInput): MultiMoveActionResult => ({ unit: { ...unit, position: { ...targets[0].position } }, movement: movementOf(unit), interrupted: false, transport: undefined });
   const outputOf = (move: MultiMoveActionInput): MultiMoveActionOutput => ({ definition: move.definition, ...resultOf(move) });
   const service = createStubActionService<MultiMoveActionInput, MultiMoveActionPlan, MultiMoveActionResult, MultiMoveActionOutput>({
     canPlan(move) {

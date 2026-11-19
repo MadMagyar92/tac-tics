@@ -11,11 +11,13 @@ import type {
   MultiMoveActionPlan,
   ObjectService,
   TerrainObject,
+  TransportDefinition,
   UnitDefinition,
   UnitObject,
   UnitReferenceId,
 } from "@tac-tics/api";
 import { describe, expect, it } from "vitest";
+import { LoadActionService } from "../load";
 import { MOVE_ACTION, MoveActionService } from "../move";
 import { MultiMoveActionService } from "../move-multi";
 
@@ -34,10 +36,27 @@ const infantry: UnitDefinition = {
   moveMax: 3,
   movement: key("movement", "foot"),
   offenses: [],
-  actions: [],
+  capture: undefined,
+  transport: undefined,
 };
 
-const definitions: Definition[] = [foot, infantry];
+/** A carrier of the kind `name`, which names the transport definition of its own name. */
+const carrierDefinition = (name: string): UnitDefinition => ({ ...infantry, definition: key("unit", name), transport: key("transport", name) });
+
+const transportDefinition = (name: string, maxUnits: number, allowed: string[]): TransportDefinition => ({
+  definition: key("transport", name),
+  maxUnits,
+  allowed: allowed.map((unit) => ({ unit: key("unit", unit) })),
+});
+
+const definitions: Definition[] = [
+  foot,
+  infantry,
+  carrierDefinition("apc"),
+  carrierDefinition("lander"),
+  transportDefinition("apc", 1, ["infantry"]),
+  transportDefinition("lander", 2, ["infantry", "apc"]),
+];
 
 const terrain = (name: string, x: number, y = 0, gameId = "g1"): TerrainObject => ({
   identifier: { id: `${name}-${x}-${y}`, gameId },
@@ -57,8 +76,9 @@ const movement = (fuel = 10): MovementObject => ({
 });
 
 /**
- * A multi-move service on a real single-square move service, a definition service that knows `definitions`, and an
- * object service that holds `units` and the movement `held` of the mover, and remembers every unit and movement saved, in order.
+ * A multi-move service on a real single-square move service and load service, a definition service that knows `definitions`,
+ * and an object service that holds `units`, which a saved unit joins or replaces, and the movement `held` of the mover.
+ * It remembers every unit and movement saved, in order.
  */
 function createWorld(units: UnitObject[] = [], held: MovementObject = movement()) {
   const known = new Map(definitions.map((definition) => [`${definition.definition.scope}:${definition.definition.name}`, definition]));
@@ -68,6 +88,7 @@ function createWorld(units: UnitObject[] = [], held: MovementObject = movement()
     },
   };
 
+  const stored = [...units];
   const saves: string[] = [];
   const savedUnits: UnitObject[] = [];
   const savedMovements: MovementObject[] = [];
@@ -77,8 +98,8 @@ function createWorld(units: UnitObject[] = [], held: MovementObject = movement()
   const isHeld = ({ id, gameId, unitId }: UnitReferenceId) => id === held.identifier.id && gameId === held.identifier.gameId && unitId === held.identifier.unitId;
   const objectService: ObjectService = {
     loadAll<O extends BaseObject<Id>>(scope: string) {
-      const objects = scope === "unit" ? units : unexpected(`loadAll in the scope "${scope}"`);
-      return new Map(objects.map((object) => [object.identifier, object])) as unknown as Map<O["identifier"], O>;
+      const objects = scope === "unit" ? stored : unexpected(`loadAll in the scope "${scope}"`);
+      return new Map(objects.map((object) => [object.identifier, structuredClone(object)])) as unknown as Map<O["identifier"], O>;
     },
     load<O extends BaseObject<Id>>(scope: string, identifier: O["identifier"]) {
       if (scope !== "movement") {
@@ -93,7 +114,10 @@ function createWorld(units: UnitObject[] = [], held: MovementObject = movement()
         held = object as unknown as MovementObject;
         savedMovements.push(held);
       } else if (scope === "unit") {
-        savedUnits.push(object as unknown as UnitObject);
+        const unit = object as unknown as UnitObject;
+        savedUnits.push(unit);
+        const index = stored.findIndex(({ identifier }) => identifier.id === unit.identifier.id && identifier.gameId === unit.identifier.gameId);
+        stored.splice(index < 0 ? stored.length : index, 1, unit);
       } else {
         unexpected(`save in the scope "${scope}"`);
       }
@@ -102,14 +126,15 @@ function createWorld(units: UnitObject[] = [], held: MovementObject = movement()
   };
 
   const moveService = new MoveActionService(definitionService, objectService);
-  return { service: new MultiMoveActionService(moveService, definitionService, objectService), saves, savedUnits, savedMovements };
+  const loadService = new LoadActionService(definitionService, objectService);
+  return { service: new MultiMoveActionService(moveService, loadService, definitionService, objectService), saves, savedUnits, savedMovements };
 }
 
 const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
 
-type UnitOptions = { x?: number; y?: number; playerId?: string; gameId?: string; definition?: string };
+type UnitOptions = { x?: number; y?: number; playerId?: string; gameId?: string; definition?: string; transportIds?: string[] };
 
-const unit = (id: string, { x = 0, y = 0, playerId = "p1", gameId = "g1", definition = "infantry" }: UnitOptions = {}): UnitObject => ({
+const unit = (id: string, { x = 0, y = 0, playerId = "p1", gameId = "g1", definition = "infantry", transportIds = [] }: UnitOptions = {}): UnitObject => ({
   identifier: { id, gameId },
   definition: key("unit", definition),
   position: { x, y },
@@ -117,6 +142,7 @@ const unit = (id: string, { x = 0, y = 0, playerId = "p1", gameId = "g1", defini
   health: 100,
   movementId: "walk",
   offenseIds: [],
+  transportIds,
   moved: false,
   acted: false,
 });
@@ -124,6 +150,10 @@ const unit = (id: string, { x = 0, y = 0, playerId = "p1", gameId = "g1", defini
 const mover = (options: UnitOptions = {}) => unit("mover", options);
 const enemy = (x: number, gameId = "g1") => unit("enemy", { x, playerId: "p2", gameId });
 const ally = (x: number) => unit("ally", { x });
+/** A carrier of the kind `definition` at `x`, its id the name of its kind. */
+const carrier = (definition: string, x: number, options: UnitOptions = {}) => unit(definition, { x, definition, ...options });
+/** A unit the mover carries, left on its square at (0, 0). */
+const rider = (id = "rider", options: UnitOptions = {}) => unit(id, options);
 
 const multiMove = (who: UnitObject, targets: TerrainObject[]): MultiMoveActionInput => ({
   definition: MOVE_ACTION,
@@ -148,7 +178,8 @@ const refused: [reason: string, build: () => { world: ReturnType<typeof createWo
   ["a square is not next to the one before it", () => ({ world: createWorld(), actionInput: multiMove(mover(), [plain(1), plain(3)]) })],
   ["the whole path costs more than the move range", () => ({ world: createWorld(), actionInput: multiMove(mover(), [terrain("woods", 1), terrain("woods", 2)]) })],
   ["an enemy is on the path", () => ({ world: createWorld([enemy(2)]), actionInput: multiMove(mover(), [plain(1), plain(2)]) })],
-  ["the path ends on an ally", () => ({ world: createWorld([ally(2)]), actionInput: multiMove(mover(), [plain(1), plain(2)]) })],
+  ["the path ends on an ally that is not a carrier", () => ({ world: createWorld([ally(2)]), actionInput: multiMove(mover(), [plain(1), plain(2)]) })],
+  ["the path ends on a carrier that cannot load the unit", () => ({ world: createWorld([carrier("apc", 2, { transportIds: ["rider"] })]), actionInput: multiMove(mover(), [plain(1), plain(2)]) })],
   ["the unit runs out of fuel partway", () => ({ world: createWorld([], movement(2)), actionInput: multiMove(mover(), [plain(1), plain(2), plain(3)]) })],
   ["the unit is not defined", () => ({ world: createWorld(), actionInput: multiMove(mover({ definition: "ghost" }), [plain(1)]) })],
   ["the unit's movement is not held", () => ({ world: createWorld(), actionInput: multiMove({ ...mover(), movementId: "nowhere" }, [plain(1)]) })],
@@ -211,6 +242,7 @@ describe("MultiMoveActionService", () => {
         unit: { ...mover(), position: { x: 2, y: 0 }, moved: true },
         movement: movement(7),
         interrupted: false,
+        transport: undefined,
       });
     });
 
@@ -220,18 +252,19 @@ describe("MultiMoveActionService", () => {
         unit: { ...mover(), position: { x: 1, y: 0 }, moved: true },
         movement: movement(9),
         interrupted: true,
+        transport: undefined,
       });
     });
 
     it("finds the unit on each square by its position, whatever the order of the units the plan holds", () => {
       const { service } = createWorld();
       const plan = { ...service.plan(multiMove(mover(), [plain(1), plain(2), plain(3)]))!, others: [enemy(3), ally(1)] };
-      expect(service.preview(plan)).toEqual({ unit: { ...mover(), position: { x: 2, y: 0 }, moved: true }, movement: movement(8), interrupted: true });
+      expect(service.preview(plan)).toEqual({ unit: { ...mover(), position: { x: 2, y: 0 }, moved: true }, movement: movement(8), interrupted: true, transport: undefined });
     });
 
     it("gives the unit on its own square, as moved, with all its fuel, as interrupted, when the plan holds an enemy on the first square", () => {
       const world = createWorld();
-      expect(world.service.preview(planWithOthers(world, multiMove(mover(), [plain(1), plain(2)]), [enemy(1)]))).toEqual({ unit: { ...mover(), moved: true }, movement: movement(), interrupted: true });
+      expect(world.service.preview(planWithOthers(world, multiMove(mover(), [plain(1), plain(2)]), [enemy(1)]))).toEqual({ unit: { ...mover(), moved: true }, movement: movement(), interrupted: true, transport: undefined });
     });
 
     it.each([
@@ -268,6 +301,7 @@ describe("MultiMoveActionService", () => {
         unit: { ...mover(), position: { x: 2, y: 0 }, moved: true },
         movement: movement(8),
         interrupted: false,
+        transport: undefined,
       });
     });
 
@@ -328,6 +362,77 @@ describe("MultiMoveActionService", () => {
     it.each(refused)("gives nothing and saves nothing when %s", (_reason, build) => {
       const { world } = build();
       expect(world.saves).toEqual([]);
+    });
+  });
+
+  describe("loading", () => {
+    it("plans a path that ends on an ally carrier that can load the unit, holding the carrier with the other units on the path", () => {
+      const apc = carrier("apc", 2);
+      expect(createWorld([apc]).service.plan(multiMove(mover(), [plain(1), plain(2)]))?.others).toEqual([apc]);
+    });
+
+    it("previews the unit on the carrier's square, as moved, and the carrier with the unit added to the units it transports", () => {
+      const { service } = createWorld([carrier("apc", 2)]);
+      expect(service.preview(service.plan(multiMove(mover(), [plain(1), plain(2)]))!)).toEqual({
+        unit: { ...mover(), position: { x: 2, y: 0 }, moved: true },
+        movement: movement(8),
+        interrupted: false,
+        transport: carrier("apc", 2, { transportIds: ["mover"] }),
+      });
+    });
+
+    it("adds the unit after the units the carrier already holds", () => {
+      const { service } = createWorld([carrier("lander", 1, { transportIds: ["rider"] })]);
+      expect(service.preview(service.plan(multiMove(mover(), [plain(1)]))!).transport?.transportIds).toEqual(["rider", "mover"]);
+    });
+
+    it("loads into nothing for a path that only passes a carrier on the way", () => {
+      const { service } = createWorld([carrier("apc", 1)]);
+      expect(service.preview(service.plan(multiMove(mover(), [plain(1), plain(2)]))!).transport).toBeUndefined();
+    });
+
+    it("loads into nothing when an enemy the plan holds interrupts the move before the carrier", () => {
+      const world = createWorld([carrier("apc", 2)]);
+      expect(world.service.preview(planWithOthers(world, multiMove(mover(), [plain(1), plain(2)]), [enemy(1), carrier("apc", 2)])).transport).toBeUndefined();
+    });
+
+    it("loads into nothing when an enemy the plan holds on the next square stops the unit on a carrier's square", () => {
+      const world = createWorld([carrier("apc", 1)]);
+      const result = world.service.preview(planWithOthers(world, multiMove(mover(), [plain(1), plain(2)]), [carrier("apc", 1), enemy(2)]));
+      expect(result.unit.position).toEqual({ x: 1, y: 0 });
+      expect(result.transport).toBeUndefined();
+    });
+
+    it("saves the movement, the unit, then the carrier transporting the unit, and gives the carrier as the transport", () => {
+      const { service, saves, savedUnits } = createWorld([carrier("apc", 2)]);
+      const output = service.execute(service.plan(multiMove(mover(), [plain(1), plain(2)]))!);
+      expect(saves).toEqual(["movement", "unit", "unit"]);
+      expect(savedUnits).toEqual([{ ...mover(), position: { x: 2, y: 0 }, moved: true }, carrier("apc", 2, { transportIds: ["mover"] })]);
+      expect(output.transport).toEqual(carrier("apc", 2, { transportIds: ["mover"] }));
+    });
+
+    it("cannot move the unit once it is loaded, even when it may move again", () => {
+      const { service, savedUnits } = createWorld([carrier("apc", 1)]);
+      service.execute(service.plan(multiMove(mover(), [plain(1)]))!);
+      expect(service.plan(multiMove({ ...savedUnits[0], moved: false }, [plain(2)]))).toBeUndefined();
+    });
+
+    it("loads a unit that transports units itself, which it goes on transporting", () => {
+      const { service, savedUnits } = createWorld([rider(), carrier("lander", 1)]);
+      service.execute(service.plan(multiMove(mover({ definition: "apc", transportIds: ["rider"] }), [plain(1)]))!);
+      expect(savedUnits.map(({ identifier, transportIds }) => [identifier.id, transportIds])).toEqual([["mover", ["rider"]], ["lander", ["mover"]]]);
+    });
+  });
+
+  describe("transported units", () => {
+    it("saves only the movement and the unit when the unit carries units: they go with it, off the map", () => {
+      const { service, saves } = createWorld([rider()]);
+      service.execute(service.plan(multiMove(mover({ transportIds: ["rider"] }), [plain(1)]))!);
+      expect(saves).toEqual(["movement", "unit"]);
+    });
+
+    it("is not stopped by the units it carries, wherever they were left", () => {
+      expect(createWorld([rider("rider", { x: 1 })]).service.plan(multiMove(mover({ transportIds: ["rider"] }), [plain(1)]))).toBeDefined();
     });
   });
 });

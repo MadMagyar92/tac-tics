@@ -12,8 +12,7 @@ import {
   Scope,
   type UnitObject,
 } from "@tac-tics/api";
-import { getAttackDamage } from "./getters";
-import { canAttack } from "./validators";
+import { canAttack, getAttackDamage, isLoaded } from "../common";
 
 export const ATTACK_ACTION = { scope: "action", name: "attack" };
 
@@ -35,6 +34,11 @@ export class AttackActionService extends BaseActionService<AttackActionInput, At
       return undefined;
     }
 
+    const units = this.getUnitsFromGame(game.identifier.id);
+    if (isLoaded(units, unit.identifier.id) || isLoaded(units, target.identifier.id)) {
+      return undefined;
+    }
+
     for (const id of unit.offenseIds) {
       const offense = this.objectService.load<OffenseObject>(Scope.Offense, { id, gameId: game.identifier.id, unitId: unit.identifier.id });
       if (!offense) {
@@ -50,6 +54,10 @@ export class AttackActionService extends BaseActionService<AttackActionInput, At
       }
     }
     return undefined;
+  }
+
+  private getUnitsFromGame(gameId: string): UnitObject[] {
+    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
   }
 
   preview({ unit, target, offense, damage }: AttackActionPlan): AttackActionResult {
@@ -76,6 +84,12 @@ export class AttackActionService extends BaseActionService<AttackActionInput, At
     this.objectService.delete<MovementObject>(Scope.Movement, { id: unit.movementId, gameId: unit.identifier.gameId, unitId: unit.identifier.id });
     for (const id of unit.offenseIds) {
       this.objectService.delete<OffenseObject>(Scope.Offense, { id, gameId: unit.identifier.gameId, unitId: unit.identifier.id });
+    }
+    for (const id of unit.transportIds) {
+      const held = this.objectService.load<UnitObject>(Scope.Unit, { id, gameId: unit.identifier.gameId });
+      if (held) {
+        this._delete(held);
+      }
     }
   }
 };

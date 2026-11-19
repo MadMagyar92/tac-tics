@@ -18,6 +18,7 @@ export type MultiMoveActionResult = ActionResult & {
   unit: UnitObject;
   movement: MovementObject;
   interrupted: boolean;
+  transport: UnitObject | undefined;
 };
 
 export type MultiMoveActionOutput = MoveActionOutput & MultiMoveActionResult;

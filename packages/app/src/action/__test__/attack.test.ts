@@ -80,10 +80,10 @@ const loadouts: Record<string, string[]> = {
 const storeKey = (id: UnitReferenceId) => `${id.gameId}:${id.unitId}:${id.id}`;
 
 /**
- * A definition service and an object service, holding only offense objects, that remember what they were asked for.
+ * A definition service and an object service, holding offense objects and `units`, that remember what they were asked for.
  * Units can be saved too, but are only remembered: `savedUnits`.
  */
-function createWorld(ammo: Record<string, number> = {}) {
+function createWorld(ammo: Record<string, number> = {}, units: UnitObject[] = []) {
   const known = new Map(definitions.map((definition) => [`${definition.definition.scope}:${definition.definition.name}`, definition]));
   const requested: DefinitionKey[] = [];
   const definitionService: DefinitionService = {
@@ -119,6 +119,9 @@ function createWorld(ammo: Record<string, number> = {}) {
   };
   const objectService: ObjectService = {
     loadAll<O extends BaseObject<Id>>(scope: string) {
+      if (scope === "unit") {
+        return new Map(units.map((unit) => [unit.identifier, unit])) as unknown as Map<O["identifier"], O>;
+      }
       offenseOnly(scope);
       return new Map([...stored.values()].map((object) => [object.identifier, object])) as unknown as Map<O["identifier"], O>;
     },
@@ -136,6 +139,9 @@ function createWorld(ammo: Record<string, number> = {}) {
       return object.identifier;
     },
     load<O extends BaseObject<Id>>(scope: string, identifier: O["identifier"]) {
+      if (scope === "unit") {
+        return units.find((unit) => unit.identifier.id === identifier.id && unit.identifier.gameId === (identifier as UnitReferenceId).gameId) as unknown as O | undefined;
+      }
       offenseOnly(scope);
       loaded.push(identifier as UnitReferenceId);
       return stored.get(storeKey(identifier as UnitReferenceId)) as unknown as O | undefined;
@@ -164,12 +170,12 @@ function createWorld(ammo: Record<string, number> = {}) {
 
 const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
 
-type UnitOptions = { offense?: string[]; health?: number; gameId?: string; playerId?: string; x?: number; y?: number };
+type UnitOptions = { offense?: string[]; health?: number; gameId?: string; playerId?: string; x?: number; y?: number; transportIds?: string[] };
 
 const unit = (
   id: string,
   definition: string,
-  { offense = [], health = 100, gameId = "g1", playerId = id === "attacker" ? "p1" : "p2", x = id === "attacker" ? 0 : 1, y = 0 }: UnitOptions = {},
+  { offense = [], health = 100, gameId = "g1", playerId = id === "attacker" ? "p1" : "p2", x = id === "attacker" ? 0 : 1, y = 0, transportIds = [] }: UnitOptions = {},
 ): UnitObject => ({
   identifier: { id, gameId },
   definition: unitKey(definition),
@@ -177,6 +183,7 @@ const unit = (
   playerId,
   health,
   offenseIds: offense,
+  transportIds,
   moved: false,
   acted: false,
   movementId: "walk",
@@ -224,6 +231,28 @@ describe("AttackActionService", () => {
       it("is false when the target is not in the action's game", () => {
         const { service } = createWorld();
         expect(service.plan(attack(attacker("infantry"), target("infantry", { gameId: "g2" })))).toBeUndefined();
+      });
+    });
+
+    describe("loaded units", () => {
+      it("is false when the attacker is loaded in a carrier", () => {
+        const { service } = createWorld({}, [unit("carrier", "apc", { playerId: "p1", transportIds: ["attacker"] })]);
+        expect(service.plan(attack(attacker("infantry"), target("infantry")))).toBeUndefined();
+      });
+
+      it("is false when the target is loaded in a carrier", () => {
+        const { service } = createWorld({}, [unit("carrier", "apc", { transportIds: ["target"] })]);
+        expect(service.plan(attack(attacker("infantry"), target("infantry")))).toBeUndefined();
+      });
+
+      it("is true when only a carrier of another game holds units with their ids", () => {
+        const { service } = createWorld({}, [unit("carrier", "apc", { gameId: "g2", transportIds: ["attacker", "target"] })]);
+        expect(service.plan(attack(attacker("infantry"), target("infantry")))).toBeDefined();
+      });
+
+      it("is true when the attacker or the target carries units itself", () => {
+        const { service } = createWorld({}, [unit("rider", "infantry", { playerId: "p1" }), unit("passenger", "infantry")]);
+        expect(service.plan(attack(attacker("infantry", { transportIds: ["rider"] }), target("infantry", { transportIds: ["passenger"] })))).toBeDefined();
       });
     });
 
@@ -546,6 +575,12 @@ describe("AttackActionService", () => {
       expect(savedTargets(savedUnits).map((unit) => unit.health)).toEqual([45]);
     });
 
+    it("does not delete the units a target that has health left holds", () => {
+      const { service, deletedUnits } = createWorld({}, [unit("rider", "infantry")]);
+      service.execute(service.plan(attack(attacker("tank"), target("recon", { health: 90, transportIds: ["rider"] })))!);
+      expect(deletedUnits).toEqual([]);
+    });
+
     it("does not delete a target that has health left, its movement, or its offenses", () => {
       const { service, deletes, deletedUnits, deletedMovements, deletedOffenses } = createWorld();
       service.execute(service.plan(attack(attacker("tank"), target("recon", { health: 86, offense: ["rifle"] })))!);
@@ -630,6 +665,26 @@ describe("AttackActionService", () => {
         const { service, deletedOffenses } = createWorld();
         service.execute(service.plan(attack(attacker("tank"), target("recon", { health: 30, offense: [] })))!);
         expect(deletedOffenses).toEqual([]);
+      });
+
+      it("takes the units it transports with it, each with its movement and offenses, after itself", () => {
+        const { service, deletedUnits, deletedOffenses, calls } = createWorld({}, [unit("rider", "infantry", { offense: ["rifle"] })]);
+        service.execute(service.plan(attack(attacker("tank"), target("recon", { health: 30, transportIds: ["rider"] })))!);
+        expect(deletedUnits).toEqual([{ id: "target", gameId: "g1" }, { id: "rider", gameId: "g1" }]);
+        expect(deletedOffenses).toEqual([{ id: "rifle", gameId: "g1", unitId: "rider" }]);
+        expect(calls).toEqual(["save offense", "save unit", "delete unit", "delete movement", "delete unit", "delete movement", "delete offense"]);
+      });
+
+      it("takes the units transported by a carrier it transports, in turn", () => {
+        const { service, deletedUnits } = createWorld({}, [unit("apc", "apc", { transportIds: ["rider"] }), unit("rider", "infantry")]);
+        service.execute(service.plan(attack(attacker("tank"), target("recon", { health: 30, transportIds: ["apc"] })))!);
+        expect(deletedUnits.map(({ id }) => id)).toEqual(["target", "apc", "rider"]);
+      });
+
+      it("takes only the units of its game, and skips a transported id that no unit has", () => {
+        const { service, deletedUnits } = createWorld({}, [unit("rider", "infantry", { gameId: "g2" })]);
+        service.execute(service.plan(attack(attacker("tank"), target("recon", { health: 30, transportIds: ["rider", "ghost"] })))!);
+        expect(deletedUnits).toEqual([{ id: "target", gameId: "g1" }]);
       });
     });
 

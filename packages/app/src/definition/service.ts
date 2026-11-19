@@ -1,12 +1,14 @@
 import type { Definition, DefinitionKey, DefinitionService } from "@tac-tics/api";
 import { loadAppConfigFile } from "../app";
 import { MemoryDefinitionHandler } from "./app";
+import { CaptureDefinitionHandler } from "./capture";
 import { GameDefinitionHandler } from "./game";
 import { MapDefinitionHandler } from "./map";
 import { MovementDefinitionHandler } from "./movement";
 import { OffenseDefinitionHandler } from "./offense";
 import { PlayerDefinitionHandler } from "./player";
 import { TerrainDefinitionHandler } from "./terrain";
+import { TransportDefinitionHandler } from "./transport";
 import { UnitDefinitionHandler } from "./unit";
 
 /**
@@ -19,12 +21,14 @@ export class DefinitionServiceImpl implements DefinitionService {
     constructor(appConfigPath: string) {
         const appConfig = loadAppConfigFile(appConfigPath);
         this.handlers = [
+            new CaptureDefinitionHandler(appConfigPath, appConfig),
             new GameDefinitionHandler(appConfigPath, appConfig),
             new MapDefinitionHandler(appConfigPath, appConfig),
             new MovementDefinitionHandler(appConfigPath, appConfig),
             new OffenseDefinitionHandler(appConfigPath, appConfig),
             new PlayerDefinitionHandler(appConfigPath, appConfig),
             new TerrainDefinitionHandler(appConfigPath, appConfig),
+            new TransportDefinitionHandler(appConfigPath, appConfig),
             new UnitDefinitionHandler(appConfigPath, appConfig),
         ];
 

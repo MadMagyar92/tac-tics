@@ -17,8 +17,12 @@ import {
   Scope,
   type TerrainObject,
   type UnitObject,
+  type UnloadActionInput,
+  type UnloadActionOutput,
+  type UnloadActionPlan,
+  type UnloadActionResult,
 } from "@tac-tics/api";
-import { ATTACK_ACTION, CAPTURE_ACTION, MOVE_ACTION } from "@tac-tics/app";
+import { ATTACK_ACTION, CAPTURE_ACTION, MOVE_ACTION, UNLOAD_ACTION } from "@tac-tics/app";
 
 /**
  * Mount this router before any router under `/game/:gameId/unit/:unitId/...`: it loads the unit into
@@ -114,7 +118,7 @@ export function attackRouter(
 
 /**
  * Mount this router under `/game/:gameId/unit/:unitId/move`, after the routers that load `res.locals.game` and
- * `res.locals.unit`. It loads the terrain of `/:terrainId` into `res.locals.terrain`.
+ * `res.locals.unit`. It loads the terrain of `/:terrainId` into `res.locals.terrain`. A move onto an ally carrier loads the unit into it.
  *
  * - `GET /` lists the moves the unit can make: one for each terrain in the game that the service can plan.
  * - `GET /:terrainId` previews the move onto that terrain, if it can be made, and returns the objects it would change. It changes nothing.
@@ -212,6 +216,80 @@ export function captureRouter(
       return;
     }
     res.json(captureService.execute(capture));
+  });
+
+  return router;
+}
+
+/**
+ * Mount this router under `/game/:gameId/unit/:unitId/unload`, after the routers that load `res.locals.game` and
+ * `res.locals.unit`, the carrier. It loads the unit of `/:targetId` into `res.locals.target`, and the terrain of `/:terrainId` into `res.locals.terrain`.
+ *
+ * - `GET /` lists the unloads the carrier can make: one for each unit it transports and each terrain in the game that the service can plan.
+ * - `GET /:targetId/:terrainId` previews unloading that unit onto that terrain, if it can be done, and returns the objects it would change. It changes nothing.
+ * - `POST /:targetId/:terrainId` unloads the unit and returns its output. The unload service saves what it changes.
+ */
+export function unloadRouter(
+  unloadService: ActionService<UnloadActionInput, UnloadActionPlan, UnloadActionResult, UnloadActionOutput>,
+  objectService: ObjectService,
+): Router {
+  const router = Router({ mergeParams: true });
+
+  function getUnloadFromRequest(res: Response) {
+    const { game, unit, target, terrain } = res.locals;
+    return unloadService.plan({ definition: UNLOAD_ACTION, game, unit, target, terrain });
+  }
+
+  router.param("targetId", (req, res, next, targetId: string) => {
+    const { gameId } = req.params as unknown as { gameId: string };
+    const target = objectService.load<UnitObject>(Scope.Unit, { id: targetId, gameId });
+    if (!target) {
+      res.status(404).json({ error: `Unit ${targetId} not found in game ${gameId}` });
+      return;
+    }
+    res.locals.target = target;
+    next();
+  });
+
+  router.param("terrainId", (req, res, next, terrainId: string) => {
+    const { gameId } = req.params as unknown as { gameId: string };
+    const terrain = objectService.load<TerrainObject>(Scope.Terrain, { id: terrainId, gameId });
+    if (!terrain) {
+      res.status(404).json({ error: `Terrain ${terrainId} not found in game ${gameId}` });
+      return;
+    }
+    res.locals.terrain = terrain;
+    next();
+  });
+
+  router.get("/", (_req, res) => {
+    const { game, unit } = res.locals;
+    const targets = [...objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(
+      (target) => target.identifier.gameId === game.identifier.id && unit.transportIds.includes(target.identifier.id),
+    );
+    const terrains = [...objectService.loadAll<TerrainObject>(Scope.Terrain).values()].filter((terrain) => terrain.identifier.gameId === game.identifier.id);
+    const unloads = targets
+      .flatMap((target) => terrains.map((terrain): UnloadActionInput => ({ definition: UNLOAD_ACTION, game, unit, target, terrain })))
+      .filter((unload) => unloadService.plan(unload) !== undefined);
+    res.json(unloads);
+  });
+
+  router.get<{ gameId: string; unitId: string; targetId: string; terrainId: string }>("/:targetId/:terrainId", (req, res) => {
+    const unload = getUnloadFromRequest(res);
+    if (!unload) {
+      res.status(404).json({ error: `Unit ${req.params.targetId} cannot be unloaded by unit ${req.params.unitId} onto terrain ${req.params.terrainId}` });
+      return;
+    }
+    res.json(unloadService.preview(unload));
+  });
+
+  router.post<{ gameId: string; unitId: string; targetId: string; terrainId: string }>("/:targetId/:terrainId", (req, res) => {
+    const unload = getUnloadFromRequest(res);
+    if (!unload) {
+      res.status(409).json({ error: `Unit ${req.params.targetId} cannot be unloaded by unit ${req.params.unitId} onto terrain ${req.params.terrainId}` });
+      return;
+    }
+    res.json(unloadService.execute(unload));
   });
 
   return router;

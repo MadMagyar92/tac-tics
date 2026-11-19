@@ -11,8 +11,7 @@ import {
   Scope,
   type UnitObject,
 } from "@tac-tics/api";
-import { getMoveCost, getUnitAtPosition } from "./getters";
-import { canMove } from "./validators";
+import { canMove, getMoveCost, getUnitAtPosition, getUnitsFromTransport, isLoaded } from "../common";
 
 export const MOVE_ACTION = { scope: "action", name: "move" };
 
@@ -40,7 +39,12 @@ export class MoveActionService extends BaseActionService<MoveActionInput, MoveAc
       return undefined;
     }
 
-    const other = getUnitAtPosition(this.getOthersFromGame(game.identifier.id, unit.identifier.id), target.position);
+    const others = this.getOthersFromGame(game.identifier.id, unit.identifier.id, unit.transportIds);
+    if (isLoaded(others, unit.identifier.id)) {
+      return undefined;
+    }
+
+    const other = getUnitAtPosition(others, target.position);
     if (!canMove(unit, target, movement, movementDefinition, other)) {
       return undefined;
     }
@@ -48,8 +52,10 @@ export class MoveActionService extends BaseActionService<MoveActionInput, MoveAc
     return { definition, unit, target, movement, other, cost: getMoveCost(movementDefinition, target) ?? 1 };
   }
 
-  private getOthersFromGame(gameId: string, unitId: string): UnitObject[] {
-    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId && identifier.id !== unitId);
+  private getOthersFromGame(gameId: string, unitId: string, transportIds: string[]): UnitObject[] {
+    const units = [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
+    const transport = getUnitsFromTransport(units, transportIds).map(({ identifier }) => identifier.id);
+    return units.filter(({ identifier }) => identifier.id !== unitId && !transport.includes(identifier.id));
   }
 
   preview({ unit, target, movement, other, cost }: MoveActionPlan): MoveActionResult {

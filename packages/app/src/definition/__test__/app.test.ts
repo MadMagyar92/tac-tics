@@ -1,17 +1,18 @@
-import type { DefinitionKey, GameDefinition } from "@tac-tics/api";
+import type { GameDefinition } from "@tac-tics/api";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanUp, copyConfig, realAppConfig } from "../../../test/config";
 import { loadAppConfigFile } from "../../app";
 import {
+  CaptureDefinitionHandler,
   GameDefinitionHandler,
   MapDefinitionHandler,
   MovementDefinitionHandler,
   OffenseDefinitionHandler,
   PlayerDefinitionHandler,
-  sameKey,
   TerrainDefinitionHandler,
+  TransportDefinitionHandler,
   UnitDefinitionHandler,
 } from "..";
 
@@ -19,38 +20,15 @@ afterEach(cleanUp);
 
 const game = (name: string, playersMax = 2): GameDefinition => ({ definition: { scope: "game", name }, turnsMax: 100, playersMax });
 
-describe("sameKey", () => {
-    const key: DefinitionKey = { scope: "unit", name: "tank" };
-
-    it("is true for keys with the same scope and name", () => {
-        expect(sameKey(key, { scope: "unit", name: "tank" })).toBe(true);
-        expect(sameKey(key, key)).toBe(true);
-    });
-
-    it("is false when only the scope differs", () => {
-        expect(sameKey(key, { scope: "offense", name: "tank" })).toBe(false);
-    });
-
-    it("is false when only the name differs", () => {
-        expect(sameKey(key, { scope: "unit", name: "recon" })).toBe(false);
-    });
-
-    it("is false when both differ", () => {
-        expect(sameKey(key, { scope: "offense", name: "recon" })).toBe(false);
-    });
-
-    it("looks at the scope and the name only", () => {
-        expect(sameKey({ ...key, extra: 1 } as DefinitionKey, { ...key, extra: 2 } as DefinitionKey)).toBe(true);
-    });
-});
-
 describe.each([
+    ["capture", (appConfig: string) => new CaptureDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["game", (appConfig: string) => new GameDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["map", (appConfig: string) => new MapDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["movement", (appConfig: string) => new MovementDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["offense", (appConfig: string) => new OffenseDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["player", (appConfig: string) => new PlayerDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["terrain", (appConfig: string) => new TerrainDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
+    ["transport", (appConfig: string) => new TransportDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
     ["unit", (appConfig: string) => new UnitDefinitionHandler(appConfig, loadAppConfigFile(appConfig))],
 ])("the %s definition handler", (scope, create) => {
     const file = join(dirname(realAppConfig), "definition", `${scope}.config.json`);

@@ -35,6 +35,7 @@ const unitAt = (x: number, y: number): UnitObject => ({
   playerId: "player-1",
   movementId: "movement-1",
   offenseIds: [],
+  transportIds: [],
 });
 
 /** Stands in for the routers mounted before the capture router: it loads `res.locals.game` and gives `unit` as `res.locals.unit`. */

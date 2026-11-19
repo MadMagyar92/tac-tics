@@ -5,11 +5,13 @@ import {
   DefinitionServiceImpl,
   DeployActionService,
   EndTurnActionService,
+  LoadActionService,
   MoveActionService,
   MultiMoveActionService,
   ObjectServiceImpl,
+  UnloadActionService,
 } from "@tac-tics/app";
-import { attackRouter, captureRouter, deployRouter, endTurnRouter, gameRouter, moveRouter, playerRouter, terrainRouter, unitRouter } from "./router";
+import { attackRouter, captureRouter, deployRouter, endTurnRouter, gameRouter, moveRouter, playerRouter, terrainRouter, unitRouter, unloadRouter } from "./router";
 
 export type AppOptions = {
   appConfigPath: string;
@@ -23,7 +25,13 @@ export function createApp({ appConfigPath }: AppOptions) {
   const captureService = new CaptureActionService(definitionService, objectService);
   const deployService = new DeployActionService(definitionService, objectService);
   const endTurnService = new EndTurnActionService(objectService);
-  const moveService = new MultiMoveActionService(new MoveActionService(definitionService, objectService), definitionService, objectService);
+  const moveService = new MultiMoveActionService(
+    new MoveActionService(definitionService, objectService),
+    new LoadActionService(definitionService, objectService),
+    definitionService,
+    objectService,
+  );
+  const unloadService = new UnloadActionService(definitionService, objectService);
 
   app.use("/game", gameRouter(objectService));
   app.use("/game/:gameId/deploy", deployRouter(deployService, objectService));
@@ -34,6 +42,7 @@ export function createApp({ appConfigPath }: AppOptions) {
   app.use("/game/:gameId/unit/:unitId/attack", attackRouter(attackService, objectService));
   app.use("/game/:gameId/unit/:unitId/capture", captureRouter(captureService, objectService));
   app.use("/game/:gameId/unit/:unitId/move", moveRouter(moveService, objectService));
+  app.use("/game/:gameId/unit/:unitId/unload", unloadRouter(unloadService, objectService));
 
   return app;
 }

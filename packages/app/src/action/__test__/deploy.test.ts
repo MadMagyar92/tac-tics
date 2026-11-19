@@ -36,7 +36,8 @@ const kind = (name: string, fundsCost: number, fuelMax: number, offenses: string
   moveMax: 3,
   movement: key("movement", "foot"),
   offenses: offenses.map((offense) => key("offense", offense)),
-  actions: [],
+  capture: undefined,
+  transport: undefined,
 });
 
 const definitions: Definition[] = [
@@ -130,6 +131,7 @@ const existing = (id: string, x: number, y: number, gameId = "g1", playerId = "p
   playerId,
   movementId: "movement-1",
   offenseIds: [],
+  transportIds: [],
 });
 
 type Options = { gameTurn?: number; gameId?: string; where?: TerrainObject; what?: DefinitionKey };
@@ -391,6 +393,7 @@ describe("DeployActionService", () => {
           playerId: "p1",
           movementId: "movement-1",
           offenseIds: ["offense-1", "offense-2"],
+          transportIds: [],
         });
       });
 

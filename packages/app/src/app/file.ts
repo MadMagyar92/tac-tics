@@ -1,7 +1,7 @@
 import type { AppConfig, AppScopeConfig, BaseObject, Id } from "@tac-tics/api";
 import { readFileSync, renameSync, rmSync, writeFileSync } from "fs";
 import { dirname, resolve } from "node:path";
-import { isNonEmptyString, isPlainObject } from "./validate";
+import { isNonEmptyString, isPlainObject } from "../common";
 
 function writeJsonFile<O extends BaseObject<Id>>(path: string, values: O[]): void {
     const temporary = `${path}.${process.pid}.tmp`;

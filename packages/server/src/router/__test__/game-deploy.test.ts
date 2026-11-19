@@ -33,6 +33,7 @@ function createStubDeployService(accepts: (deploy: DeployActionInput) => boolean
     playerId: "player-1",
     movementId: "movement-1",
     offenseIds: [],
+    transportIds: [],
   });
   const movementOf = ({ game }: DeployActionInput): MovementObject => ({
     identifier: { id: "movement-1", gameId: game.identifier.id, unitId: "unit-2" },

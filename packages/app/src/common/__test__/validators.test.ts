@@ -6,7 +6,6 @@ import {
   type OffenseDefinition,
   type OffenseObject,
   type PlayerObject,
-  Scope,
   type TerrainObject,
   type UnitDefinition,
   type UnitObject,
@@ -16,17 +15,136 @@ import {
   canAttack,
   canCapture,
   canDeploy,
+  canLoad,
   canMove,
-  hasAction,
+  canUnload,
   inAttackRange,
   inMoveRange,
-  nextId,
-  nextMovementId,
-  nextOffenseId,
-  nextUnitId,
+  isDefinitionKey,
+  isId,
+  isLoaded,
+  isNonEmptyString,
+  isPlainObject,
+  sameKey,
 } from "../validators";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
+
+describe("isPlainObject", () => {
+  it.each([
+    ["an empty object", {}],
+    ["an object", { a: 1 }],
+    ["a parsed JSON object", JSON.parse('{ "a": { "b": [1] } }')],
+    ["an object with no prototype", Object.create(null)],
+    ["an instance of a class", new (class Thing {})()],
+  ])("is true for %s", (_name, value) => {
+    expect(isPlainObject(value)).toBe(true);
+  });
+
+  it.each([
+    ["null", null],
+    ["undefined", undefined],
+    ["an empty list", []],
+    ["a list", [{ a: 1 }]],
+    ["a string", "text"],
+    ["a number", 3],
+    ["zero", 0],
+    ["a boolean", false],
+    ["a function", () => ({})],
+  ])("is false for %s", (_name, value) => {
+    expect(isPlainObject(value)).toBe(false);
+  });
+
+  it("narrows the type so that its members can be read", () => {
+    const value: unknown = { a: 1 };
+    if (isPlainObject(value)) {
+      expect(value.a).toBe(1);
+    }
+  });
+});
+
+describe("isNonEmptyString", () => {
+  it.each(["a", " ", "0", "a longer text"])("is true for %j", (value) => {
+    expect(isNonEmptyString(value)).toBe(true);
+  });
+
+  it.each([["the empty string", ""], ["null", null], ["undefined", undefined], ["a number", 3], ["zero", 0], ["a list of strings", ["a"]], ["an object", { length: 1 }]])(
+    "is false for %s",
+    (_name, value) => {
+      expect(isNonEmptyString(value)).toBe(false);
+    },
+  );
+});
+
+describe("isId", () => {
+  it.each([
+    ["an identifier", { id: "a" }],
+    ["an identifier with an empty id", { id: "" }],
+    ["an identifier with more fields", { id: "a", gameId: "g", unitId: "u" }],
+  ])("is true for %s", (_name, value) => {
+    expect(isId(value)).toBe(true);
+  });
+
+  it.each([
+    ["an object with no id", {}],
+    ["an object whose id is a number", { id: 3 }],
+    ["an object whose id is null", { id: null }],
+    ["an object with only other fields", { gameId: "g" }],
+    ["a list", ["a"]],
+    ["null", null],
+    ["a string", "a"],
+  ])("is false for %s", (_name, value) => {
+    expect(isId(value)).toBe(false);
+  });
+});
+
+describe("isDefinitionKey", () => {
+  it.each([
+    ["a key", { scope: "unit", name: "tank" }],
+    ["a key with empty strings", { scope: "", name: "" }],
+    ["a key with more fields", { scope: "unit", name: "tank", extra: 1 }],
+  ])("is true for %s", (_name, value) => {
+    expect(isDefinitionKey(value)).toBe(true);
+  });
+
+  it.each([
+    ["an object with no fields", {}],
+    ["an object with only a scope", { scope: "unit" }],
+    ["an object with only a name", { name: "tank" }],
+    ["an object whose scope is a number", { scope: 1, name: "tank" }],
+    ["an object whose name is a number", { scope: "unit", name: 1 }],
+    ["a list of the two strings", ["unit", "tank"]],
+    ["null", null],
+    ["a string", "unit"],
+  ])("is false for %s", (_name, value) => {
+    expect(isDefinitionKey(value)).toBe(false);
+  });
+});
+
+describe("sameKey", () => {
+  const tank = key("unit", "tank");
+
+  it("is true for keys with the same scope and name", () => {
+    expect(sameKey(tank, { scope: "unit", name: "tank" })).toBe(true);
+    expect(sameKey(tank, tank)).toBe(true);
+  });
+
+  it("is false when only the scope differs", () => {
+    expect(sameKey(tank, { scope: "offense", name: "tank" })).toBe(false);
+  });
+
+  it("is false when only the name differs", () => {
+    expect(sameKey(tank, { scope: "unit", name: "recon" })).toBe(false);
+  });
+
+  it("is false when both differ", () => {
+    expect(sameKey(tank, { scope: "offense", name: "recon" })).toBe(false);
+  });
+
+  it("looks at the scope and the name only", () => {
+    expect(sameKey({ ...tank, extra: 1 } as DefinitionKey, { ...tank, extra: 2 } as DefinitionKey)).toBe(true);
+  });
+});
 
 const unit = (id: string, definition: string, x: number, y: number): UnitObject => ({
   identifier: { id, gameId: "g1" },
@@ -38,6 +156,7 @@ const unit = (id: string, definition: string, x: number, y: number): UnitObject 
   playerId: id === "attacker" ? "p1" : "p2",
   movementId: "walk",
   offenseIds: ["gun"],
+  transportIds: [],
 });
 
 const offense = (ammo: number): OffenseObject => ({ identifier: { id: "gun", gameId: "g1", unitId: "attacker" }, definition: key("offense", "gun"), ammo });
@@ -187,7 +306,8 @@ const kind = (moveMax: number): UnitDefinition => ({
   moveMax,
   movement: key("movement", "walk"),
   offenses: [],
-  actions: [],
+  capture: undefined,
+  transport: undefined,
 });
 
 const walker = (x: number, y: number): UnitObject => unit("walker", "walker", x, y);
@@ -375,89 +495,173 @@ describe("canDeploy", () => {
   });
 });
 
-describe("hasAction", () => {
-  it("is true when the action is among the actions", () => {
-    expect(hasAction([key("action", "attack"), key("action", "capture")], key("action", "capture"))).toBe(true);
-  });
-
-  it.each([
-    ["no actions", []],
-    ["only other actions", [key("action", "attack")]],
-    ["an action of the same name in another scope", [key("unit", "capture")]],
-  ])("is false with %s", (_name, actions) => {
-    expect(hasAction(actions, key("action", "capture"))).toBe(false);
-  });
-});
-
 const capturer = (x: number, y: number): UnitObject => ({ ...unit("capturer", "infantry", x, y), playerId: "p1" });
 
+/** The terrain a capture definition allows, among them the base every tile is. */
+const capturable = [{ terrain: key("terrain", "city") }, { terrain: key("terrain", "base") }];
+
 describe("canCapture", () => {
-  it("is true for a unit that has not acted, on terrain that can be captured and that its player does not hold", () => {
-    expect(canCapture(capturer(1, 1), tile(1, 1), true)).toBe(true);
-    expect(canCapture(capturer(1, 1), tile(1, 1, "p2"), true)).toBe(true);
+  it("is true for a unit that has not acted, on terrain its capture definition allows and that its player does not hold", () => {
+    expect(canCapture(capturer(1, 1), tile(1, 1), capturable)).toBe(true);
+    expect(canCapture(capturer(1, 1), tile(1, 1, "p2"), capturable)).toBe(true);
   });
 
   it("is false once the unit has acted", () => {
-    expect(canCapture({ ...capturer(1, 1), acted: true }, tile(1, 1), true)).toBe(false);
+    expect(canCapture({ ...capturer(1, 1), acted: true }, tile(1, 1), capturable)).toBe(false);
   });
 
   it("does not look at whether the unit has moved", () => {
-    expect(canCapture({ ...capturer(1, 1), moved: true }, tile(1, 1), true)).toBe(true);
+    expect(canCapture({ ...capturer(1, 1), moved: true }, tile(1, 1), capturable)).toBe(true);
   });
 
-  it("is false for terrain that cannot be captured", () => {
-    expect(canCapture(capturer(1, 1), tile(1, 1), false)).toBe(false);
+  it.each([
+    ["no terrain", []],
+    ["only other terrain", [{ terrain: key("terrain", "city") }]],
+    ["terrain of the same name in another scope", [{ terrain: key("unit", "base") }]],
+  ])("is false when the capture definition allows %s", (_name, terrains) => {
+    expect(canCapture(capturer(1, 1), tile(1, 1), terrains)).toBe(false);
   });
 
   it.each([[0, 1], [1, 0], [2, 1], [1, 2], [2, 2]])("is false when the unit is at (%i, %i), not on the terrain at (1, 1)", (x, y) => {
-    expect(canCapture(capturer(x, y), tile(1, 1), true)).toBe(false);
+    expect(canCapture(capturer(x, y), tile(1, 1), capturable)).toBe(false);
   });
 
   it("is false for terrain its player already holds", () => {
-    expect(canCapture(capturer(1, 1), tile(1, 1, "p1"), true)).toBe(false);
+    expect(canCapture(capturer(1, 1), tile(1, 1, "p1"), capturable)).toBe(false);
   });
 
   it("changes nothing it was given", () => {
     const unit = capturer(1, 1);
     const terrain = tile(1, 1);
-    const before = JSON.stringify([unit, terrain]);
-    canCapture(unit, terrain, true);
-    expect(JSON.stringify([unit, terrain])).toBe(before);
+    const before = JSON.stringify([unit, terrain, capturable]);
+    canCapture(unit, terrain, capturable);
+    expect(JSON.stringify([unit, terrain, capturable])).toBe(before);
   });
 });
 
-describe("nextId", () => {
-  it("is the first id of the scope when there are no ids", () => {
-    expect(nextId(Scope.Unit, [])).toBe("unit-1");
+const allowed = [{ unit: key("unit", "infantry") }, { unit: key("unit", "mech") }];
+
+const carrier = (x: number, y: number): UnitObject => ({ ...unit("carrier", "apc", x, y), playerId: "p1" });
+
+/** A unit of the carrier's player, of the kind `definition`, at (5, 5). */
+const loader = (definition = "infantry"): UnitObject => ({ ...unit("loader", definition, 5, 5), playerId: "p1" });
+
+/** The carrier at (5, 5), transporting the units `transportIds`. */
+const holder = (...transportIds: string[]): UnitObject => ({ ...carrier(5, 5), transportIds });
+
+describe("canLoad", () => {
+  it("is true for an ally unit that has not acted, on the square of a carrier with room whose transport definition allows it", () => {
+    expect(canLoad(loader(), holder(), allowed, 1)).toBe(true);
+    expect(canLoad(loader("mech"), holder(), allowed, 1)).toBe(true);
   });
 
-  it("is one past the highest id of the scope, whatever order the ids are in and whatever gaps they leave", () => {
-    expect(nextId(Scope.Unit, ["unit-2", "unit-9", "unit-4"])).toBe("unit-10");
+  it("is false once the unit has acted", () => {
+    expect(canLoad({ ...loader(), acted: true }, holder(), allowed, 1)).toBe(false);
+  });
+
+  it("does not look at whether the unit has moved", () => {
+    expect(canLoad({ ...loader(), moved: true }, holder(), allowed, 1)).toBe(true);
+  });
+
+  it("is false for the carrier itself, even when its transport definition allows its kind", () => {
+    expect(canLoad(holder(), holder(), [{ unit: key("unit", "apc") }], 1)).toBe(false);
+  });
+
+  it("is false for a carrier of another player", () => {
+    expect(canLoad(loader(), { ...holder(), playerId: "p2" }, allowed, 1)).toBe(false);
+  });
+
+  it.each([[6, 5], [4, 5], [5, 6], [5, 4], [6, 6]])("is false for a carrier at (%i, %i), not on the unit's square at (5, 5)", (x, y) => {
+    expect(canLoad(loader(), { ...holder(), position: { x, y } }, allowed, 1)).toBe(false);
   });
 
   it.each([
-    ["ids of another scope", ["offense-7"]],
-    ["ids that only start like the scope's", ["unit-3a", "units-5", "unit-"]],
-    ["ids that do not follow the pattern at all", ["tank", "7", ""]],
-  ])("leaves out %s", (_name, ids) => {
-    expect(nextId(Scope.Unit, ids)).toBe("unit-1");
+    ["no units", []],
+    ["only other units", [{ unit: key("unit", "tank") }]],
+    ["a unit of the same name in another scope", [{ unit: key("terrain", "infantry") }]],
+  ])("is false when the transport definition allows %s", (_name, units) => {
+    expect(canLoad(loader(), holder(), units, 1)).toBe(false);
+  });
+
+  it.each([[2, [], true], [2, ["rider"], true], [2, ["rider", "other"], false], [1, ["rider"], false], [1, ["a", "b", "c"], false], [0, [], false]])(
+    "with a max of %i units, a carrier holding %j is %s",
+    (maxUnits, transportIds, allowedToLoad) => {
+      expect(canLoad(loader(), holder(...transportIds), allowed, maxUnits)).toBe(allowedToLoad);
+    },
+  );
+
+  it("changes nothing it was given", () => {
+    const loading = loader();
+    const target = holder("rider");
+    const before = JSON.stringify([loading, target, allowed]);
+    canLoad(loading, target, allowed, 2);
+    expect(JSON.stringify([loading, target, allowed])).toBe(before);
   });
 });
 
-describe("nextUnitId", () => {
-  it("is one past the highest unit id", () => {
-    expect(nextUnitId(["unit-1", "unit-4", "offense-9"])).toBe("unit-5");
+describe("isLoaded", () => {
+  it("is true for a unit that a unit in the list transports", () => {
+    expect(isLoaded([holder("rider")], "rider")).toBe(true);
+    expect(isLoaded([walker(0, 0), holder("other", "rider")], "rider")).toBe(true);
+  });
+
+  it.each([
+    ["no units", []],
+    ["only units that hold nothing", [walker(0, 0), carrier(5, 5)]],
+    ["only units that hold other units", [holder("other")]],
+  ])("is false with %s", (_name, units) => {
+    expect(isLoaded(units, "rider")).toBe(false);
+  });
+
+  it("is false for a carrier itself, which holds units but is not held", () => {
+    expect(isLoaded([holder("rider")], "carrier")).toBe(false);
   });
 });
 
-describe("nextMovementId", () => {
-  it("is one past the highest movement id", () => {
-    expect(nextMovementId(["movement-1", "unit-9"])).toBe("movement-2");
-  });
-});
+describe("canUnload", () => {
+  const walking = movementOf([["plain", 1], ["woods", 2], ["road", 0]]);
 
-describe("nextOffenseId", () => {
-  it("is one past the highest offense id", () => {
-    expect(nextOffenseId(["offense-1", "offense-2", "unit-9"])).toBe("offense-3");
+  it("is true for an empty terrain next to the carrier that the unloaded unit's movement can enter", () => {
+    expect(canUnload(carrier(5, 5), terrain("plain", 6, 5), walking, false)).toBe(true);
+  });
+
+  describe("adjacency", () => {
+    it.each([[6, 5], [4, 5], [5, 6], [5, 4]])("is true for the terrain at (%i, %i), next to (5, 5)", (x, y) => {
+      expect(canUnload(carrier(5, 5), terrain("plain", x, y), walking, false)).toBe(true);
+    });
+
+    it.each([[5, 5], [7, 5], [5, 3], [6, 6], [4, 4], [0, 0]])("is false for the terrain at (%i, %i), which is not next to (5, 5)", (x, y) => {
+      expect(canUnload(carrier(5, 5), terrain("plain", x, y), walking, false)).toBe(false);
+    });
+  });
+
+  describe("the cost", () => {
+    it("is refused for a terrain the unloaded unit's movement has no entry for", () => {
+      expect(canUnload(carrier(5, 5), terrain("sea", 6, 5), walking, false)).toBe(false);
+    });
+
+    it.each([["woods", "costs more than plain"], ["road", "costs nothing"]])("is accepted for a terrain that %s, since unloading spends no fuel", (name) => {
+      expect(canUnload(carrier(5, 5), terrain(name, 6, 5), walking, false)).toBe(true);
+    });
+  });
+
+  it("is false when another unit is on the terrain", () => {
+    expect(canUnload(carrier(5, 5), terrain("plain", 6, 5), walking, true)).toBe(false);
+  });
+
+  it("is false when the carrier has already acted", () => {
+    expect(canUnload({ ...carrier(5, 5), acted: true }, terrain("plain", 6, 5), walking, false)).toBe(false);
+  });
+
+  it("is true when the carrier has moved but not acted", () => {
+    expect(canUnload({ ...carrier(5, 5), moved: true }, terrain("plain", 6, 5), walking, false)).toBe(true);
+  });
+
+  it("changes nothing it was given", () => {
+    const unit = carrier(5, 5);
+    const next = terrain("plain", 6, 5);
+    const before = JSON.stringify([unit, next, walking]);
+    canUnload(unit, next, walking, false);
+    expect(JSON.stringify([unit, next, walking])).toBe(before);
   });
 });

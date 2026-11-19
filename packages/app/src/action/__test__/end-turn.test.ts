@@ -58,6 +58,7 @@ const unit = (id: string, playerId: string, gameId = "g1"): UnitObject => ({
   playerId,
   movementId: "movement-1",
   offenseIds: [],
+  transportIds: [],
 });
 
 const twoPlayers = [player("p1", 0), player("p2", 1)];

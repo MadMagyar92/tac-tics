@@ -1,4 +1,4 @@
-import type { Definition } from "@tac-tics/api";
+import type { Definition, UnitDefinition } from "@tac-tics/api";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -20,11 +20,13 @@ describe("DefinitionServiceImpl", () => {
         });
 
         it.each([
+            ["capture", 2],
             ["game", 3],
             ["movement", 7],
             ["offense", 20],
             ["player", 4],
             ["terrain", 14],
+            ["transport", 4],
             ["unit", 18],
         ])("serves every %s definition in its file (%i of them)", (scope, count) => {
             const service = new DefinitionServiceImpl(realAppConfig);
@@ -37,7 +39,7 @@ describe("DefinitionServiceImpl", () => {
             const service = new DefinitionServiceImpl(realAppConfig);
             expect(service.get({ scope: "game", name: "2-player" })).toEqual({ definition: { scope: "game", name: "2-player" }, turnsMax: 100, playersMax: 2 });
             expect(service.get({ scope: "player", name: "orange-star" })).toEqual({ definition: { scope: "player", name: "orange-star" }, fundsMax: 999999 });
-            expect(service.get({ scope: "terrain", name: "mountain" })).toEqual({ definition: { scope: "terrain", name: "mountain" }, defense: 4, capturable: false });
+            expect(service.get({ scope: "terrain", name: "mountain" })).toEqual({ definition: { scope: "terrain", name: "mountain" }, defense: 4 });
             expect(service.get({ scope: "unit", name: "tank" })).toEqual({
                 definition: { scope: "unit", name: "tank" },
                 fundsCost: 7000,
@@ -49,13 +51,36 @@ describe("DefinitionServiceImpl", () => {
                     { scope: "offense", name: "tank1" },
                     { scope: "offense", name: "tank2" },
                 ],
-                actions: [{ scope: "action", name: "attack" }],
             });
             expect(service.get<Definition & { cost: { terrain: { name: string }; cost: number }[] }>({ scope: "movement", name: "foot" })!.cost.find((c) => c.terrain.name === "mountain")).toEqual({
                 terrain: { scope: "terrain", name: "mountain" },
                 cost: 2,
             });
             expect(service.get<Definition & { ammoMax: number; rangeMin: number }>({ scope: "offense", name: "tank1" })).toMatchObject({ ammoMax: 9, rangeMin: 1 });
+            expect(service.get({ scope: "capture", name: "infantry" })).toEqual({
+                definition: { scope: "capture", name: "infantry" },
+                allowed: ["airport", "base", "city", "headquarters", "port"].map((name) => ({ terrain: { scope: "terrain", name } })),
+            });
+            expect(service.get({ scope: "transport", name: "apc" })).toEqual({
+                definition: { scope: "transport", name: "apc" },
+                maxUnits: 1,
+                allowed: [{ unit: { scope: "unit", name: "infantry" } }, { unit: { scope: "unit", name: "mech" } }],
+            });
+        });
+
+        it.each(["capture", "transport"] as const)("names a served %s definition, named after the unit, in every unit that names one, and names every one of them in one unit", (scope) => {
+            const service = new DefinitionServiceImpl(realAppConfig);
+            const units = (read(definitionFile(dirname(realAppConfig), "unit")) as UnitDefinition[]).filter((unit) => unit[scope] !== undefined);
+            for (const unit of units) {
+                const key = unit[scope];
+                expect(key && service.get(key)?.definition, unit.definition.name).toEqual({ scope, name: unit.definition.name });
+            }
+            expect(units.map(({ definition }) => definition.name).sort()).toEqual(read(definitionFile(dirname(realAppConfig), scope)).map(({ definition }) => definition.name).sort());
+        });
+
+        it("keeps no actions in any unit, nor capturable in any terrain: units name their capture and transport definitions instead", () => {
+            for (const unit of read(definitionFile(dirname(realAppConfig), "unit"))) expect(unit, unit.definition.name).not.toHaveProperty("actions");
+            for (const terrain of read(definitionFile(dirname(realAppConfig), "terrain"))) expect(terrain, terrain.definition.name).not.toHaveProperty("capturable");
         });
 
         it("gives nothing for a name that is not defined", () => {

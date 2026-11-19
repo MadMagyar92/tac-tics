@@ -14,9 +14,17 @@ import {
   type UnitDefinition,
   type UnitObject,
 } from "@tac-tics/api";
-import { fillNewMovement, fillNewOffense, fillNewUnit } from "./fillers";
-import { getPlayerFromTurn, getUnitAtPosition } from "./getters";
-import { canDeploy, nextMovementId, nextOffenseId, nextUnitId } from "./validators";
+import {
+  canDeploy,
+  fillNewMovement,
+  fillNewOffense,
+  fillNewUnit,
+  generateMovementId,
+  generateOffenseId,
+  generateUnitId,
+  getPlayerFromTurn,
+  getUnitAtPosition,
+} from "../common";
 
 export const DEPLOY_ACTION = { scope: "action", name: "deploy" };
 
@@ -56,15 +64,15 @@ export class DeployActionService extends BaseActionService<DeployActionInput, De
       return undefined;
     }
 
-    const id = nextUnitId(units.map((unit) => unit.identifier.id));
-    const movement = fillNewMovement(game.identifier.id, id, nextMovementId([]), unitDefinition.movement, unitDefinition.fuelMax);
+    const id = generateUnitId(units.map((unit) => unit.identifier.id));
+    const movement = fillNewMovement(game.identifier.id, id, generateMovementId([]), unitDefinition.movement, unitDefinition.fuelMax);
     const offenses: OffenseObject[] = [];
     for (const key of unitDefinition.offenses) {
       const offense = this.definitionService.get<OffenseDefinition>(key);
       if (!offense) {
         return undefined;
       }
-      offenses.push(fillNewOffense(game.identifier.id, id, nextOffenseId(offenses.map(({ identifier }) => identifier.id)), key, offense.ammoMax));
+      offenses.push(fillNewOffense(game.identifier.id, id, generateOffenseId(offenses.map(({ identifier }) => identifier.id)), key, offense.ammoMax));
     }
 
     return {

@@ -12,4 +12,5 @@ export type UnitObject = UiBaseObject<GameReferenceId> & {
   playerId: string;
   movementId: string;
   offenseIds: string[];
+  transportIds: string[];
 };

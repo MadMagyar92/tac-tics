@@ -1,13 +1,13 @@
 import type {
   BaseObject,
   CaptureActionInput,
+  CaptureDefinition,
   Definition,
   DefinitionKey,
   DefinitionService,
   GameObject,
   Id,
   ObjectService,
-  TerrainDefinition,
   TerrainObject,
   UnitDefinition,
   UnitObject,
@@ -17,7 +17,7 @@ import { CAPTURE_ACTION, CaptureActionService } from "../capture";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
-const unitDefinition = (name: string, actions: DefinitionKey[]): UnitDefinition => ({
+const unitDefinition = (name: string, capture: string | undefined = undefined): UnitDefinition => ({
   definition: key("unit", name),
   fundsCost: 1000,
   visionMax: 2,
@@ -25,20 +25,25 @@ const unitDefinition = (name: string, actions: DefinitionKey[]): UnitDefinition 
   moveMax: 3,
   movement: key("movement", "foot"),
   offenses: [],
-  actions,
+  capture: capture === undefined ? undefined : key("capture", capture),
+  transport: undefined,
 });
 
-const terrainDefinition = (name: string, capturable: boolean): TerrainDefinition => ({ definition: key("terrain", name), defense: 1, capturable });
+const captureDefinition = (name: string, terrains: string[]): CaptureDefinition => ({
+  definition: key("capture", name),
+  allowed: terrains.map((terrain) => ({ terrain: key("terrain", terrain) })),
+});
 
 const definitions: Definition[] = [
-  unitDefinition("infantry", [key("action", "attack"), CAPTURE_ACTION]),
-  unitDefinition("tank", [key("action", "attack")]),
-  terrainDefinition("city", true),
-  terrainDefinition("plain", false),
+  unitDefinition("infantry", "infantry"),
+  unitDefinition("tank"),
+  unitDefinition("scout", "infantry"), // names the capture definition of another unit, and has none of its own
+  unitDefinition("rogue", "ghost"), // names a capture definition that is not defined
+  captureDefinition("infantry", ["city"]),
 ];
 
-/** A capture service on a definition service that knows `definitions`, and an object service that remembers every save, in order. */
-function createWorld() {
+/** A capture service on a definition service that knows `definitions`, and an object service that holds `units` and remembers every save, in order. */
+function createWorld(units: UnitObject[] = []) {
   const known = new Map(definitions.map((definition) => [`${definition.definition.scope}:${definition.definition.name}`, definition]));
   const definitionService: DefinitionService = {
     get<D extends Definition>(requestedKey: DefinitionKey): D | undefined {
@@ -53,7 +58,10 @@ function createWorld() {
     throw new Error(`unexpected ${what}`);
   };
   const objectService: ObjectService = {
-    loadAll: () => unexpected("loadAll"),
+    loadAll<O extends BaseObject<Id>>(scope: string) {
+      const objects = scope === "unit" ? units : unexpected(`loadAll in the scope "${scope}"`);
+      return new Map(objects.map((object) => [object.identifier, object])) as unknown as Map<O["identifier"], O>;
+    },
     load: () => unexpected("load"),
     delete: () => unexpected("delete"),
     save<O extends BaseObject<Id>>(scope: string, object: O) {
@@ -86,6 +94,7 @@ const capturer = ({ x = 1, health = 100, acted = false, gameId = "g1", definitio
   playerId: "p1",
   movementId: "movement-1",
   offenseIds: [],
+  transportIds: [],
 });
 
 type TerrainOptions = { health?: number; playerId?: string; gameId?: string; definition?: string };
@@ -102,15 +111,15 @@ const capture = (unit: UnitObject, target: TerrainObject): CaptureActionInput =>
 
 /** The captures the capture service refuses, and why. */
 const refused: [reason: string, actionInput: CaptureActionInput][] = [
-  ["the unit's definition does not have the capture action", capture(capturer({ definition: "tank" }), city())],
-  ["the terrain cannot be captured", capture(capturer(), city({ definition: "plain" }))],
+  ["the unit's definition names no capture definition", capture(capturer({ definition: "tank" }), city())],
+  ["the capture definition the unit's definition names is not defined", capture(capturer({ definition: "rogue" }), city())],
+  ["the unit's capture definition does not allow the terrain", capture(capturer(), city({ definition: "plain" }))],
   ["the unit is not on the terrain", capture(capturer({ x: 2 }), city())],
   ["the unit's player already holds the terrain", capture(capturer(), city({ playerId: "p1" }))],
   ["the unit has already acted", capture(capturer({ acted: true }), city())],
   ["the unit is in another game", capture(capturer({ gameId: "g2" }), city())],
   ["the terrain is in another game", capture(capturer(), city({ gameId: "g2" }))],
   ["the unit is not defined", capture(capturer({ definition: "ghost" }), city())],
-  ["the terrain is not defined", capture(capturer(), city({ definition: "ghost" }))],
 ];
 
 describe("CaptureActionService", () => {
@@ -181,6 +190,23 @@ describe("CaptureActionService", () => {
     expect(service.preview(service.plan(capture(capturer(), city()))!)).toEqual({ unit: { ...capturer(), acted: true }, target: city({ health: 10 }) });
     expect(service.preview(service.plan(capture(capturer(), city({ health: 10 })))!)).toEqual({ unit: { ...capturer(), acted: true }, target: city({ playerId: "p1" }) });
     expect(saves).toEqual([]);
+  });
+
+  it("follows the capture definition the unit's definition names, not one named after the unit", () => {
+    const { service } = createWorld();
+    expect(service.plan(capture(capturer({ definition: "scout" }), city()))).toBeDefined();
+  });
+
+  it("refuses a unit loaded in a carrier, and saves nothing", () => {
+    const { service, saves } = createWorld([{ ...capturer({ definition: "apc" }), identifier: { id: "carrier", gameId: "g1" }, transportIds: ["capturer"] }]);
+
+    expect(service.plan(capture(capturer(), city()))).toBeUndefined();
+    expect(saves).toEqual([]);
+  });
+
+  it("captures when only a carrier of another game holds a unit with the unit's id", () => {
+    const { service } = createWorld([{ ...capturer({ definition: "apc" }), identifier: { id: "carrier", gameId: "g2" }, transportIds: ["capturer"] }]);
+    expect(service.plan(capture(capturer(), city()))).toBeDefined();
   });
 
   it.each(refused)("refuses when %s, and saves nothing", (_reason, actionInput) => {

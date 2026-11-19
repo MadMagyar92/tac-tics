@@ -1,4 +1,4 @@
-import { type DefinitionKey, type MovementObject, type OffenseObject, type Position, type UnitObject } from "@tac-tics/api";
+import { type DefinitionKey, type MovementObject, type OffenseObject, type Position, Scope, type UnitObject } from "@tac-tics/api";
 
 /**
  * Fill a new movement for a unit.
@@ -38,7 +38,7 @@ export function fillNewOffense(gameId: string, unitId: string, id: string, key: 
 };
 
 /**
- * Fill a new unit for a player, at full health, that has neither moved nor acted.
+ * Fill a new unit for a player, at full health, that has neither moved nor acted, and carries no units.
  * The key and position are copied, so the unit does not share them with what it was made from.
  *
  * @param gameId game the unit is in
@@ -61,5 +61,50 @@ export function fillNewUnit(gameId: string, playerId: string, id: string, key: D
     playerId,
     movementId,
     offenseIds,
+    transportIds: [],
   };
+};
+
+/**
+ * Generate the next identifier of a scope, one past the highest of its ids.
+ * Ids of other scopes, or that do not follow the pattern, are left out.
+ *
+ * @param scope scope the identifier is for
+ * @param ids identifiers already taken
+ * @returns the next identifier
+ */
+export function generateId(scope: Scope, ids: string[]): string {
+  const pattern = new RegExp(`^${scope}-(\\d+)$`);
+  const numbers = ids.map((id) => pattern.exec(id)).flatMap((match) => (match ? [Number(match[1])] : []));
+  return `${scope}-${Math.max(0, ...numbers) + 1}`;
+};
+
+/**
+ * Generate the next unit identifier.
+ *
+ * @param ids identifiers already taken
+ * @returns the next unit identifier
+ */
+export function generateUnitId(ids: string[]): string {
+  return generateId(Scope.Unit, ids);
+};
+
+/**
+ * Generate the next movement identifier.
+ *
+ * @param ids identifiers already taken
+ * @returns the next movement identifier
+ */
+export function generateMovementId(ids: string[]): string {
+  return generateId(Scope.Movement, ids);
+};
+
+/**
+ * Generate the next offense identifier.
+ *
+ * @param ids identifiers already taken
+ * @returns the next offense identifier
+ */
+export function generateOffenseId(ids: string[]): string {
+  return generateId(Scope.Offense, ids);
 };

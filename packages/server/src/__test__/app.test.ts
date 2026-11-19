@@ -41,7 +41,7 @@ describe("createApp with the repo's config", () => {
     });
 
     it("returns 404 for any /game/:gameId/* request when the game does not exist", async () => {
-      for (const path of ["player", "player/player-1", "unit", "unit/unit-1", "unit/unit-1/attack", "terrain", "terrain/terrain-1"]) {
+      for (const path of ["player", "player/player-1", "unit", "unit/unit-1", "unit/unit-1/attack", "unit/unit-1/unload", "terrain", "terrain/terrain-1"]) {
         const res = await request(app).get(`/game/nope/${path}`);
         expect(res.status, path).toBe(404);
         expect(res.body, path).toEqual({ error: "Game nope not found" });
@@ -177,6 +177,7 @@ describe("createApp with units to attack", () => {
     playerId,
     movementId: "movement-1",
     offenseIds: [],
+    transportIds: [],
   });
 
   /** An app on a copy of the repo's config, whose unit file also holds the enemies and the ally. */
@@ -347,6 +348,7 @@ describe("createApp with a unit on a city", () => {
     playerId: "player-1",
     movementId: "movement-1",
     offenseIds: [],
+    transportIds: [],
   };
 
   const start = () => {
@@ -569,6 +571,7 @@ describe("createApp deploying", () => {
       playerId: "player-1",
       movementId: "movement-1",
       offenseIds: ["offense-1"],
+      transportIds: [],
     });
   });
 
@@ -632,6 +635,7 @@ describe("createApp deploying", () => {
           playerId: "player-2",
           movementId: "movement-1",
           offenseIds: [],
+          transportIds: [],
         },
       ]),
     );
@@ -694,6 +698,157 @@ describe("createApp deploying", () => {
     const files = ["unit", "offense", "player"].map((scope) => join(directory, "object", `${scope}.json`));
     const before = files.map((file) => readFileSync(file, "utf8"));
     await request(app).post(deployPath("terrain-45")).send({ unit: "tank" });
+    expect(files.map((file) => readFileSync(file, "utf8"))).toEqual(before);
+  });
+});
+
+describe("createApp loading and unloading", () => {
+  const move = { scope: "action", name: "move" };
+  const unload = { scope: "action", name: "unload" };
+
+  /** A unit of player-1 of the kind `definition` at (`x`, `y`), as the object file holds it. */
+  const unit = (id: string, definition: string, x: number, y: number) => ({
+    identifier: { id, gameId: "game-1" },
+    definition: { scope: "unit", name: definition },
+    position: { x, y },
+    moved: false,
+    acted: false,
+    health: 100,
+    playerId: "player-1",
+    movementId: "movement-1",
+    offenseIds: [],
+    transportIds: [],
+  });
+
+  /** The movement of the unit `unitId`, as the object file holds it. */
+  const movement = (unitId: string, name: string, fuel: number) => ({
+    identifier: { id: "movement-1", gameId: "game-1", unitId },
+    definition: { scope: "movement", name },
+    fuel,
+  });
+
+  /**
+   * An app on a copy of the repo's config where, on Spann Island, an apc is on the plain terrain-36 at (2, 4), with an
+   * infantry next to it on the plain terrain-35 at (1, 4), another on the city terrain-26 at (2, 3), and a recon on the road terrain-46 at (2, 5).
+   */
+  function start() {
+    const { directory, appConfig } = copyConfig();
+    addObjects(directory, "unit", [unit("apc-1", "apc", 2, 4), unit("infantry-1", "infantry", 1, 4), unit("infantry-2", "infantry", 2, 3), unit("recon-1", "recon", 2, 5)]);
+    addObjects(directory, "movement", [movement("apc-1", "tread", 70), movement("infantry-1", "foot", 99), movement("infantry-2", "foot", 99), movement("recon-1", "tire", 80)]);
+    return { app: createApp({ appConfigPath: appConfig }), directory };
+  }
+
+  const unitOf = async (app: ReturnType<typeof createApp>, id: string) => (await request(app).get(`/game/game-1/unit/${id}`)).body;
+  const movesOf = async (app: ReturnType<typeof createApp>, id: string) => (await request(app).get(`/game/game-1/unit/${id}/move`)).body;
+  const unloadsOf = async (app: ReturnType<typeof createApp>, id: string) =>
+    (await request(app).get(`/game/game-1/unit/${id}/unload`)).body.map((input: any) => `${input.target.identifier.id} onto ${input.terrain.identifier.id}`).sort();
+  const loadInto = (app: ReturnType<typeof createApp>) => request(app).post("/game/game-1/unit/infantry-1/move/terrain-36");
+
+  it("lists the move onto the carrier's square among the moves of a unit the carrier can load", async () => {
+    expect((await movesOf(start().app, "infantry-1")).map((input: any) => input.targets[0].identifier.id)).toContain("terrain-36");
+  });
+
+  it("previews a move onto the carrier without making it: the unit on the carrier's square, and the carrier transporting the unit", async () => {
+    const { app } = start();
+
+    const res = await request(app).get("/game/game-1/unit/infantry-1/move/terrain-36");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ unit: { position: { x: 2, y: 4 }, moved: true }, interrupted: false, transport: { identifier: { id: "apc-1" }, transportIds: ["infantry-1"] } });
+    expect(await unitOf(app, "infantry-1")).toEqual(unit("infantry-1", "infantry", 1, 4));
+    expect(await unitOf(app, "apc-1")).toEqual(unit("apc-1", "apc", 2, 4));
+  });
+
+  it("loads the unit by moving it onto the carrier: it spends the fuel, is on the carrier's square as moved, and is transported by the carrier", async () => {
+    const { app } = start();
+
+    const res = await loadInto(app);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ definition: move, unit: { position: { x: 2, y: 4 }, moved: true }, movement: { fuel: 98 }, interrupted: false, transport: { identifier: { id: "apc-1" }, transportIds: ["infantry-1"] } });
+    expect(await unitOf(app, "apc-1")).toEqual({ ...unit("apc-1", "apc", 2, 4), transportIds: ["infantry-1"] });
+  });
+
+  it("has no load route of its own: a unit loads by moving", async () => {
+    expect((await request(start().app).get("/game/game-1/unit/infantry-1/load")).status).toBe(404);
+  });
+
+  it("refuses a move onto a carrier whose transport definition does not allow the unit, and onto one that holds the most it can", async () => {
+    const { app } = start();
+    expect((await request(app).get("/game/game-1/unit/recon-1/move/terrain-36")).status).toBe(404);
+    expect((await request(app).get("/game/game-1/unit/infantry-2/move/terrain-36")).status).toBe(200);
+
+    await loadInto(app);
+
+    expect((await request(app).get("/game/game-1/unit/infantry-2/move/terrain-36")).status).toBe(404);
+    expect((await request(app).post("/game/game-1/unit/infantry-2/move/terrain-36")).status).toBe(409);
+  });
+
+  it("keeps a loaded unit from moving, even on its player's next turn, and off the square it loaded on once the carrier has left", async () => {
+    const { app } = start();
+    await loadInto(app);
+    await request(app).post("/game/game-1/unit/apc-1/move/terrain-37");
+    await request(app).post("/game/game-1/end-turn");
+    await request(app).post("/game/game-1/end-turn");
+
+    expect(await unitOf(app, "infantry-1")).toMatchObject({ moved: false, acted: false });
+    expect(await unitOf(app, "apc-1")).toMatchObject({ position: { x: 3, y: 4 }, transportIds: ["infantry-1"] });
+    expect(await movesOf(app, "infantry-1")).toEqual([]);
+    expect((await request(app).get("/game/game-1/unit/recon-1/move/terrain-36")).status).toBe(200);
+  });
+
+  it("lets the carrier move with the unit, then unload it next to where the carrier is, as moved and acted, no longer transported", async () => {
+    const { app } = start();
+    await loadInto(app);
+    expect((await request(app).post("/game/game-1/unit/apc-1/move/terrain-37")).status).toBe(200); // the road at (3, 4)
+
+    expect(await unloadsOf(app, "apc-1")).toEqual(["infantry-1 onto terrain-27", "infantry-1 onto terrain-36", "infantry-1 onto terrain-38", "infantry-1 onto terrain-47"]);
+    const res = await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-38");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      definition: unload,
+      unit: { identifier: { id: "apc-1" }, position: { x: 3, y: 4 }, acted: true, transportIds: [] },
+      target: { identifier: { id: "infantry-1" }, position: { x: 4, y: 4 }, moved: true, acted: true },
+    });
+    expect(await unitOf(app, "apc-1")).toMatchObject({ transportIds: [] });
+  });
+
+  it("previews an unload without making it", async () => {
+    const { app } = start();
+    await loadInto(app);
+
+    const res = await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/terrain-35");
+
+    expect(res.status).toBe(200);
+    expect(res.body.target).toMatchObject({ position: { x: 1, y: 4 }, moved: true, acted: true });
+    expect(await unitOf(app, "apc-1")).toMatchObject({ transportIds: ["infantry-1"] });
+  });
+
+  it("lets the carrier unload once a turn, after which neither it nor the unloaded unit can move", async () => {
+    const { app } = start();
+    await loadInto(app);
+    expect((await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-35")).status).toBe(200);
+
+    expect(await unloadsOf(app, "apc-1")).toEqual([]);
+    expect(await movesOf(app, "apc-1")).toEqual([]);
+    expect(await movesOf(app, "infantry-1")).toEqual([]);
+  });
+
+  it("refuses to unload a unit the carrier does not hold, and returns 404 for an unknown unit or terrain", async () => {
+    const { app } = start();
+    expect((await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/terrain-37")).status).toBe(404);
+    expect((await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-37")).status).toBe(409);
+    expect((await request(app).get("/game/game-1/unit/apc-1/unload/nope/terrain-37")).body).toEqual({ error: "Unit nope not found in game game-1" });
+    expect((await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/nope")).body).toEqual({ error: "Terrain nope not found in game game-1" });
+  });
+
+  it("only changes the app's memory, not the object files", async () => {
+    const { app, directory } = start();
+    const files = ["unit", "movement"].map((scope) => join(directory, "object", `${scope}.json`));
+    const before = files.map((file) => readFileSync(file, "utf8"));
+    await loadInto(app);
+    await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-35");
     expect(files.map((file) => readFileSync(file, "utf8"))).toEqual(before);
   });
 });

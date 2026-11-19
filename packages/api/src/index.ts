@@ -22,6 +22,10 @@ export {
   type EndTurnActionPlan,
   type EndTurnActionResult,
   type GameActionInput,
+  type LoadActionInput,
+  type LoadActionOutput,
+  type LoadActionPlan,
+  type LoadActionResult,
   type MoveActionInput,
   type MoveActionOutput,
   type MoveActionPlan,
@@ -32,9 +36,15 @@ export {
   type MultiMoveActionResult,
   type TerrainActionInput,
   type UnitActionInput,
+  type UnloadActionInput,
+  type UnloadActionOutput,
+  type UnloadActionPlan,
+  type UnloadActionResult,
 } from "./action";
 export { type AppConfig, type AppConfigService, type AppScopeConfig } from "./config";
 export {
+  type CaptureAllowedDefinition,
+  type CaptureDefinition,
   type Definition,
   type DefinitionHandler,
   type DefinitionKey,
@@ -47,6 +57,8 @@ export {
   type OffenseDefinition,
   type PlayerDefinition,
   type TerrainDefinition,
+  type TransportAllowedDefinition,
+  type TransportDefinition,
   type UnitDefinition,
 } from "./definition";
 export { Scope } from "./enum";

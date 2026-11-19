@@ -43,6 +43,7 @@ const unit = (
   playerId,
   movementId: "movement-1",
   offenseIds,
+  transportIds: [],
 });
 
 const unitKey = (id: GameReferenceId) => `${id.gameId}:${id.id}`;

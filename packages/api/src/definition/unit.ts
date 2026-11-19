@@ -7,5 +7,6 @@ export type UnitDefinition = Definition & {
     moveMax: number;
     movement: DefinitionKey;
     offenses: DefinitionKey[];
-    actions: DefinitionKey[];
+    capture: DefinitionKey | undefined;
+    transport: DefinitionKey | undefined;
 };

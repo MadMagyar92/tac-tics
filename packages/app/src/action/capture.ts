@@ -4,21 +4,21 @@ import {
   type CaptureActionOutput,
   type CaptureActionPlan,
   type CaptureActionResult,
+  type CaptureDefinition,
   type DefinitionService,
   type ObjectService,
   Scope,
-  type TerrainDefinition,
   type TerrainObject,
   type UnitDefinition,
   type UnitObject,
 } from "@tac-tics/api";
-import { canCapture, hasAction } from "./validators";
+import { canCapture, isLoaded } from "../common";
 
 export const CAPTURE_ACTION = { scope: "action", name: "capture" };
 
 /**
- * Captures the terrain a unit stands on, for the unit's player. Only a unit whose definition lists the capture action
- * can capture, only terrain whose definition can be captured, and only once per turn: capturing counts as acting.
+ * Captures the terrain a unit stands on, for the unit's player. Only a unit whose definition names a capture definition
+ * can capture, only the terrain that definition allows, and only once per turn: capturing counts as acting.
  *
  * Each capture takes a tenth of the unit's health, rounded up, off the terrain's health. Once that reaches zero, the
  * terrain becomes the player's and its health goes back to full.
@@ -38,19 +38,28 @@ export class CaptureActionService extends BaseActionService<CaptureActionInput, 
     }
 
     const unitDefinition = this.definitionService.get<UnitDefinition>(unit.definition);
-    const terrainDefinition = this.definitionService.get<TerrainDefinition>(target.definition);
-    if (!unitDefinition || !terrainDefinition) {
+    if (!unitDefinition?.capture) {
       return undefined;
     }
 
-    if (!hasAction(unitDefinition.actions, CAPTURE_ACTION)) {
+    const captureDefinition = this.definitionService.get<CaptureDefinition>(unitDefinition.capture);
+    if (!captureDefinition) {
       return undefined;
     }
-    if (!canCapture(unit, target, terrainDefinition.capturable)) {
+
+    if (isLoaded(this.getUnitsFromGame(game.identifier.id), unit.identifier.id)) {
+      return undefined;
+    }
+
+    if (!canCapture(unit, target, captureDefinition.allowed)) {
       return undefined;
     }
 
     return { definition, unit, target, amount: Math.ceil(unit.health / 10) };
+  }
+
+  private getUnitsFromGame(gameId: string): UnitObject[] {
+    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
   }
 
   preview({ unit, target, amount }: CaptureActionPlan): CaptureActionResult {

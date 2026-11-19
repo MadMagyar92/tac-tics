@@ -1,6 +1,6 @@
 import { type DefinitionKey, type MovementDefinition, type OffenseDefinition, type PlayerObject, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { describe, expect, it } from "vitest";
-import { getAttackDamage, getMoveCost, getPlayerFromTurn, getUnitAtPosition } from "../getters";
+import { getAttackDamage, getMoveCost, getPlayerFromTurn, getUnitAtPosition, getUnitsFromTransport } from "../getters";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
@@ -14,6 +14,7 @@ const unit = (id: string, definition: string, x: number, y: number): UnitObject 
   playerId: "p2",
   movementId: "walk",
   offenseIds: ["gun"],
+  transportIds: [],
 });
 
 const definition = (damage = [{ unit: key("unit", "recon"), damage: 50 }]): OffenseDefinition => ({
@@ -120,6 +121,45 @@ describe("getUnitAtPosition", () => {
   it("compares the position alone, whatever the game or player of the unit", () => {
     const there = standing(2, 3, "g2", "p1");
     expect(getUnitAtPosition([there], { x: 2, y: 3 })).toBe(there);
+  });
+
+  it("leaves out a unit a carrier in the list holds, which is off the map, and gives the carrier there instead", () => {
+    const loaded = { ...standing(2, 3), identifier: { id: "loaded", gameId: "g1" } };
+    const carrier = { ...standing(2, 3), transportIds: ["loaded"] };
+    expect(getUnitAtPosition([loaded, carrier], { x: 2, y: 3 })).toBe(carrier);
+  });
+
+  it("leaves out a unit a carrier in the list holds, wherever the carrier is", () => {
+    const loaded = { ...standing(2, 3), identifier: { id: "loaded", gameId: "g1" } };
+    expect(getUnitAtPosition([loaded, { ...standing(5, 5), transportIds: ["loaded"] }], { x: 2, y: 3 })).toBeUndefined();
+  });
+});
+
+/** A unit at (1, 1) that transports the units `transportIds`. */
+const holding = (id: string, ...transportIds: string[]): UnitObject => ({ ...unit(id, "apc", 1, 1), transportIds });
+
+describe("getUnitsFromTransport", () => {
+  it("gives the units transported, in the order of the list", () => {
+    const units = [holding("rider-2"), holding("stranger"), holding("rider-1")];
+    expect(getUnitsFromTransport(units, ["rider-1", "rider-2"])).toEqual([holding("rider-2"), holding("rider-1")]);
+  });
+
+  it("gives nothing when no units are transported", () => {
+    expect(getUnitsFromTransport([holding("rider")], [])).toEqual([]);
+  });
+
+  it("gives the units a held carrier holds in turn, each after its carrier", () => {
+    const units = [holding("rider"), holding("lander", "apc"), holding("apc", "rider"), holding("stranger")];
+    expect(getUnitsFromTransport(units, ["apc"]).map(({ identifier }) => identifier.id)).toEqual(["apc", "rider"]);
+  });
+
+  it("leaves out an id that no unit in the list has", () => {
+    expect(getUnitsFromTransport([holding("rider")], ["rider", "ghost"])).toEqual([holding("rider")]);
+  });
+
+  it("compares the ids alone, whatever the position of the units", () => {
+    const far = { ...holding("rider"), position: { x: 9, y: 9 } };
+    expect(getUnitsFromTransport([far], ["rider"])).toEqual([far]);
   });
 });
 

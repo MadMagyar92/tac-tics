@@ -6,7 +6,7 @@ import {
   type TerrainObject,
   type UnitObject,
 } from "@tac-tics/api";
-import { sameKey } from "../definition";
+import { sameKey } from "./validators";
 
 /**
  * Get the damage value for a given offense definition against a target unit.
@@ -32,14 +32,27 @@ export function getMoveCost(definition: MovementDefinition, target: TerrainObjec
 
 /**
  * Get the unit standing at a position from a list of units.
- * Only the position is compared, so the list should hold the units of a single game.
+ * Only the position is compared, so the list should hold the units of a single game, and the units a carrier in the list holds are left out, since they are off the map.
  * 
  * @param units units to look through
  * @param position square to look at
  * @returns the first unit at the position, or `undefined` if the square is empty
  */
 export function getUnitAtPosition(units: UnitObject[], position: Position): UnitObject | undefined {
-  return units.find(({ position: { x, y } }) => x === position.x && y === position.y);
+  const loaded = units.flatMap(({ transportIds }) => transportIds);
+  return units.find(({ identifier, position: { x, y } }) => !loaded.includes(identifier.id) && x === position.x && y === position.y);
+};
+
+/**
+ * Get the units a carrier transports from a list of units, along with the units each of those transports in turn.
+ * Only the ids are compared, so the list should hold the units of a single game.
+ *
+ * @param units units to look through
+ * @param transportIds ids of the units the carrier holds
+ * @returns every unit the carrier holds, directly or through another carrier, or none if it transports no units
+ */
+export function getUnitsFromTransport(units: UnitObject[], transportIds: string[]): UnitObject[] {
+  return units.filter(({ identifier }) => transportIds.includes(identifier.id)).flatMap((unit) => [unit, ...getUnitsFromTransport(units, unit.transportIds)]);
 };
 
 /**

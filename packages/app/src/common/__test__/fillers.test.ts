@@ -1,6 +1,6 @@
-import { type DefinitionKey } from "@tac-tics/api";
+import { type DefinitionKey, Scope } from "@tac-tics/api";
 import { describe, expect, it } from "vitest";
-import { fillNewMovement, fillNewOffense, fillNewUnit } from "../fillers";
+import { fillNewMovement, fillNewOffense, fillNewUnit, generateId, generateMovementId, generateOffenseId, generateUnitId } from "../fillers";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
@@ -46,7 +46,12 @@ describe("fillNewUnit", () => {
       playerId: "p1",
       movementId: "movement-1",
       offenseIds: ["offense-1", "offense-2"],
+      transportIds: [],
     });
+  });
+
+  it("gives a unit that carries no units", () => {
+    expect(fillNewUnit("g1", "p1", "unit-1", key("unit", "apc"), "movement-1", [], { x: 1, y: 5 })).toHaveProperty("transportIds", []);
   });
 
   it("copies the key and the position, so the unit does not share them", () => {
@@ -55,5 +60,41 @@ describe("fillNewUnit", () => {
     const unit = fillNewUnit("g1", "p1", "unit-1", infantry, "movement-1", [], position);
     expect(unit.definition).not.toBe(infantry);
     expect(unit.position).not.toBe(position);
+  });
+});
+
+describe("generateId", () => {
+  it("is the first id of the scope when there are no ids", () => {
+    expect(generateId(Scope.Unit, [])).toBe("unit-1");
+  });
+
+  it("is one past the highest id of the scope, whatever order the ids are in and whatever gaps they leave", () => {
+    expect(generateId(Scope.Unit, ["unit-2", "unit-9", "unit-4"])).toBe("unit-10");
+  });
+
+  it.each([
+    ["ids of another scope", ["offense-7"]],
+    ["ids that only start like the scope's", ["unit-3a", "units-5", "unit-"]],
+    ["ids that do not follow the pattern at all", ["tank", "7", ""]],
+  ])("leaves out %s", (_name, ids) => {
+    expect(generateId(Scope.Unit, ids)).toBe("unit-1");
+  });
+});
+
+describe("generateUnitId", () => {
+  it("is one past the highest unit id", () => {
+    expect(generateUnitId(["unit-1", "unit-4", "offense-9"])).toBe("unit-5");
+  });
+});
+
+describe("generateMovementId", () => {
+  it("is one past the highest movement id", () => {
+    expect(generateMovementId(["movement-1", "unit-9"])).toBe("movement-2");
+  });
+});
+
+describe("generateOffenseId", () => {
+  it("is one past the highest offense id", () => {
+    expect(generateOffenseId(["offense-1", "offense-2", "unit-9"])).toBe("offense-3");
   });
 });

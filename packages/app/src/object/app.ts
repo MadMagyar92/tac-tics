@@ -1,5 +1,6 @@
 import type { AppConfig, BaseObject, Id, ObjectHandler } from "@tac-tics/api";
-import { isDefinitionKey, isId, isPlainObject, loadScopeFile, saveObjectFile } from "../app";
+import { loadScopeFile, saveObjectFile } from "../app";
+import { isDefinitionKey, isId, isPlainObject } from "../common";
 
 const keyOf = (identifier: Id): string => {
     const fields: Record<string, unknown> = identifier;

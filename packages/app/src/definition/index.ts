@@ -1,4 +1,5 @@
-export { MemoryDefinitionHandler, sameKey } from "./app";
+export { MemoryDefinitionHandler } from "./app";
+export { CaptureDefinitionHandler } from "./capture";
 export { GameDefinitionHandler } from "./game";
 export { MapDefinitionHandler } from "./map";
 export { MovementDefinitionHandler } from "./movement";
@@ -6,4 +7,5 @@ export { OffenseDefinitionHandler } from "./offense";
 export { PlayerDefinitionHandler } from "./player";
 export { DefinitionServiceImpl } from "./service";
 export { TerrainDefinitionHandler } from "./terrain";
+export { TransportDefinitionHandler } from "./transport";
 export { UnitDefinitionHandler } from "./unit";

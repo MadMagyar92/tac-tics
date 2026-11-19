@@ -1,0 +1,42 @@
+[
+  {
+    "definition": { "scope": "transport", "name": "apc" },
+    "maxUnits": 1,
+    "allowed": [
+      { "unit": { "scope": "unit", "name": "infantry" } },
+      { "unit": { "scope": "unit", "name": "mech" } }
+    ]
+  },
+  {
+    "definition": { "scope": "transport", "name": "t-copter" },
+    "maxUnits": 1,
+    "allowed": [
+      { "unit": { "scope": "unit", "name": "infantry" } },
+      { "unit": { "scope": "unit", "name": "mech" } }
+    ]
+  },
+  {
+    "definition": { "scope": "transport", "name": "lander" },
+    "maxUnits": 2,
+    "allowed": [
+      { "unit": { "scope": "unit", "name": "infantry" } },
+      { "unit": { "scope": "unit", "name": "mech" } },
+      { "unit": { "scope": "unit", "name": "recon" } },
+      { "unit": { "scope": "unit", "name": "apc" } },
+      { "unit": { "scope": "unit", "name": "anti-air" } },
+      { "unit": { "scope": "unit", "name": "tank" } },
+      { "unit": { "scope": "unit", "name": "mid-tank" } },
+      { "unit": { "scope": "unit", "name": "artillery" } },
+      { "unit": { "scope": "unit", "name": "rockets" } },
+      { "unit": { "scope": "unit", "name": "missile" } }
+    ]
+  },
+  {
+    "definition": { "scope": "transport", "name": "cruiser" },
+    "maxUnits": 2,
+    "allowed": [
+      { "unit": { "scope": "unit", "name": "t-copter" } },
+      { "unit": { "scope": "unit", "name": "b-copter" } }
+    ]
+  }
+]
