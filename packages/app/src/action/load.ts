@@ -11,7 +11,7 @@ import {
   type UnitDefinition,
   type UnitObject,
 } from "@tac-tics/api";
-import { canLoad, isLoaded } from "../common";
+import { canLoad, filterUnitsFromGame, isLoaded } from "../common";
 
 export const LOAD_ACTION = { scope: "action", name: "load" };
 
@@ -46,7 +46,7 @@ export class LoadActionService extends BaseActionService<LoadActionInput, LoadAc
       return undefined;
     }
 
-    const units = this.getUnitsFromGame(game.identifier.id);
+    const units = filterUnitsFromGame([...this.objectService.loadAll<UnitObject>(Scope.Unit).values()], game.identifier.id);
     if (isLoaded(units, unit.identifier.id) || isLoaded(units, target.identifier.id)) {
       return undefined;
     }
@@ -56,10 +56,6 @@ export class LoadActionService extends BaseActionService<LoadActionInput, LoadAc
     }
 
     return { definition, unit, target };
-  }
-
-  private getUnitsFromGame(gameId: string): UnitObject[] {
-    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
   }
 
   preview({ unit, target }: LoadActionPlan): LoadActionResult {

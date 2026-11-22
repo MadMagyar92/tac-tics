@@ -4,6 +4,6 @@
     "definition": { "scope": "game", "name": "2-player" },
     "turn": 0,
     "playerTurn": 0,
-    "mapDefinition": { "scope": "map", "name": "spann-island" }
+    "mapId": "map-1"
   }
 ]

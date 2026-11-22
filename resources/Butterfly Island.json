@@ -1,0 +1,409 @@
+{
+  "name": "Butterfly Island",
+  "author": "Roma_emu",
+  "description": "This is a simple 3p map. It's meant for free for all if GE is a computer, but if it's 3 human then team up OS and BM.",
+  "format": {
+    "header": "AWMap 001",
+    "editor": "AW1 Map Editor (Advance Wars)",
+    "map_type": "AW1",
+    "tileset": "AW1"
+  },
+  "width": 30,
+  "height": 20,
+  "coordinates": "0-based; x = column (0 = left), y = row (0 = top). Row arrays are indexed [y][x].",
+  "map_rows": ["~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ** ** ** ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ** ~~ ~~ ~~", "~~ ~~ ** ~~ ,, ,, ~~ ~~ ~~ ,, ,, ~~ ^^ ff ~~ ~~ ** ~~ ~~ ff ^^ ~~ ,, ,, ,, ,, ~~ ~~ ~~ ~~", "~~ ~~ ~~ ~~ .. .. Pn .. .. .. .. ~~ ~~ ff ff ~~ ~~ ~~ ff ff ~~ ~~ Cn .. .. .. ~~ ~~ ** ~~", "~~ ~~ ~~ ~~ .. Ho .. Co Co .. ff .. ~~ ~~ .. .. rv .. Pn ~~ ~~ ^^ .. .. ff .. .. ~~ ~~ ~~", "~~ ~~ ~~ .. Co == == Bo .. .. .. ff .. Pn .. Cn rv .. .. .. .. ^^ ff .. .. .. .. Cn ,, ~~", "~~ ,, ff .. Bo .. == == .. Bn .. .. .. .. .. ^^ rv Cn .. .. .. ^^ .. .. .. .. .. .. ,, ~~", "** ,, .. .. .. .. .. == == == .. .. .. .. .. ^^ rv Cn .. ff .. Cn Cg Bg .. Cg .. .. ,, ~~", "~~ ~~ ~~ .. Cn .. .. .. .. == == == Cn Cn ^^ ^^ rv .. .. .. .. == == == == .. .. ff ,, ~~", "~~ ~~ ~~ ~~ .. .. .. .. == == ff == == .. .. ff rv ff .. .. Bn == ff ff == .. .. ~~ ~~ **", "~~ ~~ ~~ ~~ .. ff .. .. == Cn .. .. == == .. ff rv ff .. .. .. == == ff == .. Bn ~~ ~~ ~~", "~~ ~~ ~~ ~~ ~~ Bn == == == .. ^^ ^^ ^^ == == == [] == == .. .. .. == Cg Hg .. Pg ~~ ~~ ~~", "** ~~ ~~ ~~ ~~ .. .. == ^^ ^^ ^^ ff .. == .. ff rv ff == == ff Bg == .. Cg .. .. ~~ ~~ **", "~~ ~~ ~~ ~~ ~~ ff .. == == == .. .. Cn == .. ff rv ff .. == == == == Bg .. .. Cn .. ,, ~~", "~~ ** ~~ ~~ ~~ .. Cb .. .. == .. .. .. == .. rv rv ^^ .. .. .. .. Cg .. .. .. .. .. ,, ~~", "~~ ~~ ~~ ,, Cb Bb .. == == == .. ff .. == .. rv ^^ ^^ ff .. .. Bn .. .. ff ^^ ^^ ~~ ~~ ~~", "~~ ~~ ~~ ,, .. ff == == ff == == == ff == Cn rv ^^ .. .. .. .. .. .. .. ^^ ^^ ~~ ~~ ~~ ~~", "~~ ~~ ~~ ,, Hb == == Bn Cb .. .. == == == .. rv Cn Pn .. .. .. ff .. Pn ^^ ~~ ~~ ~~ ~~ **", "~~ ** ~~ ~~ ~~ Bb Pn ~~ ~~ .. Cn .. ff Pn ~~ ~~ ~~ ~~ ,, ,, Cn .. ~~ ~~ ~~ ~~ ~~ ** ~~ ~~", "~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ,, ,, ,, ~~ ~~ ~~ ** ~~ ~~ ~~ ,, ,, ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ** ** ~~ ~~ ~~ **"],
+  "legend": {
+    "..": "Plain",
+    "ff": "Wood",
+    "^^": "Mountain",
+    "==": "Road",
+    "[]": "Bridge",
+    "rv": "River",
+    "pp": "Pipe",
+    "ps": "Pipe Seam",
+    ",,": "Shoal",
+    "~~": "Sea",
+    "**": "Reef",
+    "  ": "Blank",
+    "??": "Unknown",
+    "<Letter><army>": "Building; letters H=HQ, C=City, B=Base, A=Airport, P=Port, T=Com Tower, L=Lab, S=Missile Silo; army o=Orange Star, b=Blue Moon, g=Green Earth, y=Yellow Comet, k=Black Hole, n=Neutral"
+  },
+  "terrain_rows": [
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Reef", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Reef", "Sea", "Shoal", "Shoal", "Sea", "Sea", "Sea", "Shoal", "Shoal", "Sea", "Mountain", "Wood", "Sea", "Sea", "Reef", "Sea", "Sea", "Wood", "Mountain", "Sea", "Shoal", "Shoal", "Shoal", "Shoal", "Sea", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Sea", "Plain", "Plain", "Neutral Port", "Plain", "Plain", "Plain", "Plain", "Sea", "Sea", "Wood", "Wood", "Sea", "Sea", "Sea", "Wood", "Wood", "Sea", "Sea", "Neutral City", "Plain", "Plain", "Plain", "Sea", "Sea", "Reef", "Sea"],
+    ["Sea", "Sea", "Sea", "Sea", "Plain", "Orange Star HQ", "Plain", "Orange Star City", "Orange Star City", "Plain", "Wood", "Plain", "Sea", "Sea", "Plain", "Plain", "River", "Plain", "Neutral Port", "Sea", "Sea", "Mountain", "Plain", "Plain", "Wood", "Plain", "Plain", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Plain", "Orange Star City", "Road", "Road", "Orange Star Base", "Plain", "Plain", "Plain", "Wood", "Plain", "Neutral Port", "Plain", "Neutral City", "River", "Plain", "Plain", "Plain", "Plain", "Mountain", "Wood", "Plain", "Plain", "Plain", "Plain", "Neutral City", "Shoal", "Sea"],
+    ["Sea", "Shoal", "Wood", "Plain", "Orange Star Base", "Plain", "Road", "Road", "Plain", "Neutral Base", "Plain", "Plain", "Plain", "Plain", "Plain", "Mountain", "River", "Neutral City", "Plain", "Plain", "Plain", "Mountain", "Plain", "Plain", "Plain", "Plain", "Plain", "Plain", "Shoal", "Sea"],
+    ["Reef", "Shoal", "Plain", "Plain", "Plain", "Plain", "Plain", "Road", "Road", "Road", "Plain", "Plain", "Plain", "Plain", "Plain", "Mountain", "River", "Neutral City", "Plain", "Wood", "Plain", "Neutral City", "Green Earth City", "Green Earth Base", "Plain", "Green Earth City", "Plain", "Plain", "Shoal", "Sea"],
+    ["Sea", "Sea", "Sea", "Plain", "Neutral City", "Plain", "Plain", "Plain", "Plain", "Road", "Road", "Road", "Neutral City", "Neutral City", "Mountain", "Mountain", "River", "Plain", "Plain", "Plain", "Plain", "Road", "Road", "Road", "Road", "Plain", "Plain", "Wood", "Shoal", "Sea"],
+    ["Sea", "Sea", "Sea", "Sea", "Plain", "Plain", "Plain", "Plain", "Road", "Road", "Wood", "Road", "Road", "Plain", "Plain", "Wood", "River", "Wood", "Plain", "Plain", "Neutral Base", "Road", "Wood", "Wood", "Road", "Plain", "Plain", "Sea", "Sea", "Reef"],
+    ["Sea", "Sea", "Sea", "Sea", "Plain", "Wood", "Plain", "Plain", "Road", "Neutral City", "Plain", "Plain", "Road", "Road", "Plain", "Wood", "River", "Wood", "Plain", "Plain", "Plain", "Road", "Road", "Wood", "Road", "Plain", "Neutral Base", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Neutral Base", "Road", "Road", "Road", "Plain", "Mountain", "Mountain", "Mountain", "Road", "Road", "Road", "Bridge", "Road", "Road", "Plain", "Plain", "Plain", "Road", "Green Earth City", "Green Earth HQ", "Plain", "Green Earth Port", "Sea", "Sea", "Sea"],
+    ["Reef", "Sea", "Sea", "Sea", "Sea", "Plain", "Plain", "Road", "Mountain", "Mountain", "Mountain", "Wood", "Plain", "Road", "Plain", "Wood", "River", "Wood", "Road", "Road", "Wood", "Green Earth Base", "Road", "Plain", "Green Earth City", "Plain", "Plain", "Sea", "Sea", "Reef"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Wood", "Plain", "Road", "Road", "Road", "Plain", "Plain", "Neutral City", "Road", "Plain", "Wood", "River", "Wood", "Plain", "Road", "Road", "Road", "Road", "Green Earth Base", "Plain", "Plain", "Neutral City", "Plain", "Shoal", "Sea"],
+    ["Sea", "Reef", "Sea", "Sea", "Sea", "Plain", "Blue Moon City", "Plain", "Plain", "Road", "Plain", "Plain", "Plain", "Road", "Plain", "River", "River", "Mountain", "Plain", "Plain", "Plain", "Plain", "Green Earth City", "Plain", "Plain", "Plain", "Plain", "Plain", "Shoal", "Sea"],
+    ["Sea", "Sea", "Sea", "Shoal", "Blue Moon City", "Blue Moon Base", "Plain", "Road", "Road", "Road", "Plain", "Wood", "Plain", "Road", "Plain", "River", "Mountain", "Mountain", "Wood", "Plain", "Plain", "Neutral Base", "Plain", "Plain", "Wood", "Mountain", "Mountain", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Shoal", "Plain", "Wood", "Road", "Road", "Wood", "Road", "Road", "Road", "Wood", "Road", "Neutral City", "River", "Mountain", "Plain", "Plain", "Plain", "Plain", "Plain", "Plain", "Plain", "Mountain", "Mountain", "Sea", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Shoal", "Blue Moon HQ", "Road", "Road", "Neutral Base", "Blue Moon City", "Plain", "Plain", "Road", "Road", "Road", "Plain", "River", "Neutral City", "Neutral Port", "Plain", "Plain", "Plain", "Wood", "Plain", "Neutral Port", "Mountain", "Sea", "Sea", "Sea", "Sea", "Reef"],
+    ["Sea", "Reef", "Sea", "Sea", "Sea", "Blue Moon Base", "Neutral Port", "Sea", "Sea", "Plain", "Neutral City", "Plain", "Wood", "Neutral Port", "Sea", "Sea", "Sea", "Sea", "Shoal", "Shoal", "Neutral City", "Plain", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Shoal", "Shoal", "Shoal", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Shoal", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Reef", "Sea", "Sea", "Sea", "Reef"]
+  ],
+  "buildings": [
+    {
+      "x": 6,
+      "y": 2,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 22,
+      "y": 2,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "HQ",
+      "army": "Orange Star"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "City",
+      "army": "Orange Star"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "City",
+      "army": "Orange Star"
+    },
+    {
+      "x": 18,
+      "y": 3,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "City",
+      "army": "Orange Star"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "Base",
+      "army": "Orange Star"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 15,
+      "y": 4,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 27,
+      "y": 4,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "Base",
+      "army": "Orange Star"
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 17,
+      "y": 5,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 17,
+      "y": 6,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 21,
+      "y": 6,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 22,
+      "y": 6,
+      "type": "City",
+      "army": "Green Earth"
+    },
+    {
+      "x": 23,
+      "y": 6,
+      "type": "Base",
+      "army": "Green Earth"
+    },
+    {
+      "x": 25,
+      "y": 6,
+      "type": "City",
+      "army": "Green Earth"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 13,
+      "y": 7,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 20,
+      "y": 8,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 26,
+      "y": 9,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 23,
+      "y": 10,
+      "type": "City",
+      "army": "Green Earth"
+    },
+    {
+      "x": 24,
+      "y": 10,
+      "type": "HQ",
+      "army": "Green Earth"
+    },
+    {
+      "x": 26,
+      "y": 10,
+      "type": "Port",
+      "army": "Green Earth"
+    },
+    {
+      "x": 21,
+      "y": 11,
+      "type": "Base",
+      "army": "Green Earth"
+    },
+    {
+      "x": 24,
+      "y": 11,
+      "type": "City",
+      "army": "Green Earth"
+    },
+    {
+      "x": 12,
+      "y": 12,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 23,
+      "y": 12,
+      "type": "Base",
+      "army": "Green Earth"
+    },
+    {
+      "x": 26,
+      "y": 12,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "type": "City",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 22,
+      "y": 13,
+      "type": "City",
+      "army": "Green Earth"
+    },
+    {
+      "x": 4,
+      "y": 14,
+      "type": "City",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 5,
+      "y": 14,
+      "type": "Base",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 21,
+      "y": 14,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 14,
+      "y": 15,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 4,
+      "y": 16,
+      "type": "HQ",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 7,
+      "y": 16,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 8,
+      "y": 16,
+      "type": "City",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 16,
+      "y": 16,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 17,
+      "y": 16,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 23,
+      "y": 16,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 5,
+      "y": 17,
+      "type": "Base",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 6,
+      "y": 17,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 10,
+      "y": 17,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 13,
+      "y": 17,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 20,
+      "y": 17,
+      "type": "City",
+      "army": "Neutral"
+    }
+  ],
+  "units": [],
+  "raw": {
+    "note": "Original 16-bit tile values, [y][x]. Terrain 0-299, buildings 300-499, units 500-899, extras 900-1299, 65535 = no unit.",
+    "terrain": [
+      [60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 30, 30, 30, 60, 60, 60, 60, 60, 30, 60, 60, 30, 60, 60, 60],
+      [60, 60, 30, 60, 39, 39, 60, 60, 60, 39, 39, 60, 150, 90, 60, 60, 30, 60, 60, 90, 150, 60, 39, 39, 39, 39, 60, 60, 60, 60],
+      [60, 60, 60, 60, 0, 0, 344, 0, 0, 0, 0, 60, 60, 90, 90, 60, 60, 60, 90, 90, 60, 60, 341, 0, 0, 0, 60, 60, 30, 60],
+      [60, 60, 60, 60, 0, 300, 0, 301, 301, 0, 90, 0, 60, 60, 0, 0, 3, 0, 344, 60, 60, 150, 0, 0, 90, 0, 0, 60, 60, 60],
+      [60, 60, 60, 0, 301, 1, 1, 302, 0, 0, 0, 90, 0, 344, 0, 341, 3, 0, 0, 0, 0, 150, 90, 0, 0, 0, 0, 341, 39, 60],
+      [60, 39, 90, 0, 302, 0, 1, 1, 0, 342, 0, 0, 0, 0, 0, 150, 3, 341, 0, 0, 0, 150, 0, 0, 0, 0, 0, 0, 39, 60],
+      [30, 39, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 150, 3, 341, 0, 90, 0, 341, 321, 322, 0, 321, 0, 0, 39, 60],
+      [60, 60, 60, 0, 341, 0, 0, 0, 0, 1, 1, 1, 341, 341, 150, 150, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 90, 39, 60],
+      [60, 60, 60, 60, 0, 0, 0, 0, 1, 1, 90, 1, 1, 0, 0, 90, 3, 90, 0, 0, 342, 1, 90, 90, 1, 0, 0, 60, 60, 30],
+      [60, 60, 60, 60, 0, 90, 0, 0, 1, 341, 0, 0, 1, 1, 0, 90, 3, 90, 0, 0, 0, 1, 1, 90, 1, 0, 342, 60, 60, 60],
+      [60, 60, 60, 60, 60, 342, 1, 1, 1, 0, 150, 150, 150, 1, 1, 1, 2, 1, 1, 0, 0, 0, 1, 321, 320, 0, 324, 60, 60, 60],
+      [30, 60, 60, 60, 60, 0, 0, 1, 150, 150, 150, 90, 0, 1, 0, 90, 3, 90, 1, 1, 90, 322, 1, 0, 321, 0, 0, 60, 60, 30],
+      [60, 60, 60, 60, 60, 90, 0, 1, 1, 1, 0, 0, 341, 1, 0, 90, 3, 90, 0, 1, 1, 1, 1, 322, 0, 0, 341, 0, 39, 60],
+      [60, 30, 60, 60, 60, 0, 311, 0, 0, 1, 0, 0, 0, 1, 0, 3, 3, 150, 0, 0, 0, 0, 321, 0, 0, 0, 0, 0, 39, 60],
+      [60, 60, 60, 39, 311, 312, 0, 1, 1, 1, 0, 90, 0, 1, 0, 3, 150, 150, 90, 0, 0, 342, 0, 0, 90, 150, 150, 60, 60, 60],
+      [60, 60, 60, 39, 0, 90, 1, 1, 90, 1, 1, 1, 90, 1, 341, 3, 150, 0, 0, 0, 0, 0, 0, 0, 150, 150, 60, 60, 60, 60],
+      [60, 60, 60, 39, 310, 1, 1, 342, 311, 0, 0, 1, 1, 1, 0, 3, 341, 344, 0, 0, 0, 90, 0, 344, 150, 60, 60, 60, 60, 30],
+      [60, 30, 60, 60, 60, 312, 344, 60, 60, 0, 341, 0, 90, 344, 60, 60, 60, 60, 39, 39, 341, 0, 60, 60, 60, 60, 60, 30, 60, 60],
+      [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 39, 39, 39, 60, 60, 60, 30, 60, 60, 60, 39, 39, 60, 60, 60, 60, 60, 60, 60, 60],
+      [60, 60, 60, 30, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 30, 30, 60, 60, 60, 30]
+    ],
+    "units": [
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535]
+    ]
+  }
+}

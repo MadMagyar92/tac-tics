@@ -2,13 +2,13 @@ import type {
   BaseObject,
   CaptureActionInput,
   CaptureDefinition,
+  CaptureObject,
   Definition,
   DefinitionKey,
   DefinitionService,
   GameObject,
   Id,
   ObjectService,
-  TerrainObject,
   UnitDefinition,
   UnitObject,
 } from "@tac-tics/api";
@@ -52,7 +52,7 @@ function createWorld(units: UnitObject[] = []) {
   };
 
   const saves: string[] = [];
-  const savedTerrains: TerrainObject[] = [];
+  const savedCaptures: CaptureObject[] = [];
   const savedUnits: UnitObject[] = [];
   const unexpected = (what: string): never => {
     throw new Error(`unexpected ${what}`);
@@ -66,8 +66,8 @@ function createWorld(units: UnitObject[] = []) {
     delete: () => unexpected("delete"),
     save<O extends BaseObject<Id>>(scope: string, object: O) {
       saves.push(scope);
-      if (scope === "terrain") {
-        savedTerrains.push(object as unknown as TerrainObject);
+      if (scope === "capture") {
+        savedCaptures.push(object as unknown as CaptureObject);
       } else if (scope === "unit") {
         savedUnits.push(object as unknown as UnitObject);
       } else {
@@ -77,10 +77,10 @@ function createWorld(units: UnitObject[] = []) {
     },
   };
 
-  return { service: new CaptureActionService(definitionService, objectService), saves, savedTerrains, savedUnits };
+  return { service: new CaptureActionService(definitionService, objectService), saves, savedCaptures, savedUnits };
 }
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
 
 type UnitOptions = { x?: number; health?: number; acted?: boolean; gameId?: string; definition?: string };
 
@@ -99,7 +99,7 @@ const capturer = ({ x = 1, health = 100, acted = false, gameId = "g1", definitio
 
 type TerrainOptions = { health?: number; playerId?: string; gameId?: string; definition?: string };
 
-const city = ({ health = 20, playerId = undefined, gameId = "g1", definition = "city" }: TerrainOptions = {}): TerrainObject => ({
+const city = ({ health = 20, playerId = undefined, gameId = "g1", definition = "city" }: TerrainOptions = {}): CaptureObject => ({
   identifier: { id: "city", gameId },
   definition: key("terrain", definition),
   position: { x: 1, y: 1 },
@@ -107,7 +107,7 @@ const city = ({ health = 20, playerId = undefined, gameId = "g1", definition = "
   playerId,
 });
 
-const capture = (unit: UnitObject, target: TerrainObject): CaptureActionInput => ({ definition: CAPTURE_ACTION, game: game(), unit, target });
+const capture = (unit: UnitObject, target: CaptureObject): CaptureActionInput => ({ definition: CAPTURE_ACTION, game: game(), unit, target });
 
 /** The captures the capture service refuses, and why. */
 const refused: [reason: string, actionInput: CaptureActionInput][] = [
@@ -124,42 +124,42 @@ const refused: [reason: string, actionInput: CaptureActionInput][] = [
 
 describe("CaptureActionService", () => {
   it("takes a tenth of the unit's health off the terrain's health, and leaves the terrain to whoever held it", () => {
-    const { service, savedTerrains } = createWorld();
+    const { service, savedCaptures } = createWorld();
 
     const output = service.execute(service.plan(capture(capturer(), city()))!);
 
     expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer(), acted: true }, target: city({ health: 10 }) });
-    expect(savedTerrains).toEqual([city({ health: 10 })]);
+    expect(savedCaptures).toEqual([city({ health: 10 })]);
   });
 
   it("takes less off for a damaged unit, rounding its tenth up", () => {
-    const { service, savedTerrains } = createWorld();
+    const { service, savedCaptures } = createWorld();
 
     const output = service.execute(service.plan(capture(capturer({ health: 45 }), city()))!);
 
     expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer({ health: 45 }), acted: true }, target: city({ health: 15 }) });
-    expect(savedTerrains).toEqual([city({ health: 15 })]);
+    expect(savedCaptures).toEqual([city({ health: 15 })]);
   });
 
   it.each([[10, 100], [5, 100], [1, 1]])(
     "captures terrain whose %i health the unit's %i health takes to zero or below: it is the player's, and its health is full again",
     (health, unitHealth) => {
-      const { service, savedTerrains } = createWorld();
+      const { service, savedCaptures } = createWorld();
 
       const output = service.execute(service.plan(capture(capturer({ health: unitHealth }), city({ health })))!);
 
       expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer({ health: unitHealth }), acted: true }, target: city({ playerId: "p1" }) });
-      expect(savedTerrains).toEqual([city({ playerId: "p1" })]);
+      expect(savedCaptures).toEqual([city({ playerId: "p1" })]);
     },
   );
 
   it("captures terrain another player holds, which stays theirs until its health reaches zero", () => {
-    const { service, savedTerrains } = createWorld();
+    const { service, savedCaptures } = createWorld();
 
     service.execute(service.plan(capture(capturer(), city({ playerId: "p2" })))!);
-    service.execute(service.plan(capture(capturer(), savedTerrains[0]))!);
+    service.execute(service.plan(capture(capturer(), savedCaptures[0]))!);
 
-    expect(savedTerrains).toEqual([city({ health: 10, playerId: "p2" }), city({ playerId: "p1" })]);
+    expect(savedCaptures).toEqual([city({ health: 10, playerId: "p2" }), city({ playerId: "p1" })]);
   });
 
   it("marks the unit as acted, and changes nothing else about it", () => {
@@ -178,10 +178,10 @@ describe("CaptureActionService", () => {
     expect(service.plan(capture(savedUnits[0], city({ health: 10 })))).toBeUndefined();
   });
 
-  it("saves the terrain, then the unit", () => {
+  it("saves the capture, then the unit", () => {
     const { service, saves } = createWorld();
     service.execute(service.plan(capture(capturer(), city()))!);
-    expect(saves).toEqual(["terrain", "unit"]);
+    expect(saves).toEqual(["capture", "unit"]);
   });
 
   it("previews the unit and the terrain executing saves, and saves nothing", () => {

@@ -12,18 +12,10 @@ import {
   type UnloadActionPlan,
   type UnloadActionResult,
 } from "@tac-tics/api";
-import { canUnload, getUnitAtPosition, isLoaded } from "../common";
+import { canUnload, filterUnitsFromGame, getUnitAtPosition, isInGame, isLoaded } from "../common";
 
 export const UNLOAD_ACTION = { scope: "action", name: "unload" };
 
-/**
- * Unloads a unit a carrier transports onto an empty terrain next to the carrier, that the unloaded unit's movement can
- * enter. Unloading counts as the carrier acting: it may move before it unloads, never after, and unloads once per turn.
- *
- * The unloaded unit is back on the map, without spending fuel, but counts as moved and acted, so it can do nothing else
- * until its player's next turn. Only a carrier whose definition names a transport definition can unload, and only
- * while it is not itself loaded.
- */
 export class UnloadActionService extends BaseActionService<UnloadActionInput, UnloadActionPlan, UnloadActionResult, UnloadActionOutput> {
   constructor(
     private definitionService: DefinitionService,
@@ -34,7 +26,7 @@ export class UnloadActionService extends BaseActionService<UnloadActionInput, Un
 
   plan(input: UnloadActionInput): UnloadActionPlan | undefined {
     const { definition, game, unit, target, terrain } = input;
-    if (unit.identifier.gameId !== game.identifier.id || target.identifier.gameId !== game.identifier.id || terrain.identifier.gameId !== game.identifier.id) {
+    if (unit.identifier.gameId !== game.identifier.id || target.identifier.gameId !== game.identifier.id || !isInGame(game.identifier.id, game.mapId, terrain.identifier)) {
       return undefined;
     }
 
@@ -57,7 +49,7 @@ export class UnloadActionService extends BaseActionService<UnloadActionInput, Un
       return undefined;
     }
 
-    const units = this.getUnitsFromGame(game.identifier.id);
+    const units = filterUnitsFromGame([...this.objectService.loadAll<UnitObject>(Scope.Unit).values()], game.identifier.id);
     if (isLoaded(units, unit.identifier.id)) {
       return undefined;
     }
@@ -68,10 +60,6 @@ export class UnloadActionService extends BaseActionService<UnloadActionInput, Un
     }
 
     return { definition, unit, target, terrain };
-  }
-
-  private getUnitsFromGame(gameId: string): UnitObject[] {
-    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
   }
 
   preview({ unit, target, terrain }: UnloadActionPlan): UnloadActionResult {

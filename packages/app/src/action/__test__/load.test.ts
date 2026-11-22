@@ -86,7 +86,7 @@ function createWorld(units: UnitObject[] = []) {
   return { service: new LoadActionService(definitionService, objectService), saves, savedUnits };
 }
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
 
 type UnitOptions = { x?: number; playerId?: string; gameId?: string; definition?: string; transportIds?: string[]; moved?: boolean; acted?: boolean };
 

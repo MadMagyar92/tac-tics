@@ -12,7 +12,7 @@ import {
   Scope,
   type UnitObject,
 } from "@tac-tics/api";
-import { canAttack, getAttackDamage, isLoaded } from "../common";
+import { canAttack, filterUnitsFromGame, getAttackDamage, isLoaded } from "../common";
 
 export const ATTACK_ACTION = { scope: "action", name: "attack" };
 
@@ -34,7 +34,7 @@ export class AttackActionService extends BaseActionService<AttackActionInput, At
       return undefined;
     }
 
-    const units = this.getUnitsFromGame(game.identifier.id);
+    const units = filterUnitsFromGame([...this.objectService.loadAll<UnitObject>(Scope.Unit).values()], game.identifier.id);
     if (isLoaded(units, unit.identifier.id) || isLoaded(units, target.identifier.id)) {
       return undefined;
     }
@@ -54,10 +54,6 @@ export class AttackActionService extends BaseActionService<AttackActionInput, At
       }
     }
     return undefined;
-  }
-
-  private getUnitsFromGame(gameId: string): UnitObject[] {
-    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
   }
 
   preview({ unit, target, offense, damage }: AttackActionPlan): AttackActionResult {

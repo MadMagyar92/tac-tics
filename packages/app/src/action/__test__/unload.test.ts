@@ -92,7 +92,7 @@ function createWorld(units: UnitObject[] = [], movements: MovementObject[] = uni
   return { service: new UnloadActionService(definitionService, objectService), saves, savedUnits };
 }
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
 
 type UnitOptions = { x?: number; y?: number; playerId?: string; gameId?: string; transportIds?: string[]; moved?: boolean; acted?: boolean };
 
@@ -114,12 +114,10 @@ const apc = (options: UnitOptions = {}) => unit("apc", "apc", { transportIds: ["
 /** A unit the carrier holds, left at (1, 1) with it. */
 const rider = (options: UnitOptions = {}) => unit("rider", "infantry", options);
 
-const terrain = (name: string, x: number, y = 1, gameId = "g1"): TerrainObject => ({
-  identifier: { id: `${name}-${x}-${y}`, gameId },
+const terrain = (name: string, x: number, y = 1, mapId = "m1"): TerrainObject => ({
+  identifier: { id: `${name}-${x}-${y}`, mapId },
   definition: key("terrain", name),
   position: { x, y },
-  health: 20,
-  playerId: undefined,
 });
 
 const unload = (unit: UnitObject, target: UnitObject, to: TerrainObject): UnloadActionInput => ({ definition: UNLOAD_ACTION, game: game(), unit, target, terrain: to });
@@ -139,7 +137,7 @@ const refused: [reason: string, build: () => { world: ReturnType<typeof createWo
   ["the carrier is itself loaded", () => ({ world: createWorld([unit("lander", "lander", { transportIds: ["apc"] }), apc(), rider()]), actionInput: unload(apc(), rider(), terrain("plain", 2)) })],
   ["the carrier is in another game", () => ({ world: createWorld([apc(), rider()]), actionInput: unload(apc({ gameId: "g2" }), rider(), terrain("plain", 2)) })],
   ["the unit is in another game", () => ({ world: createWorld([apc(), rider()]), actionInput: unload(apc(), rider({ gameId: "g2" }), terrain("plain", 2)) })],
-  ["the terrain is in another game", () => ({ world: createWorld([apc(), rider()]), actionInput: unload(apc(), rider(), terrain("plain", 2, 1, "g2")) })],
+  ["the terrain is on the map of another game", () => ({ world: createWorld([apc(), rider()]), actionInput: unload(apc(), rider(), terrain("plain", 2, 1, "m2")) })],
   ["the unit's movement is not held", () => ({ world: createWorld([apc(), rider()], []), actionInput: unload(apc(), rider(), terrain("plain", 2)) })],
   ["the unit's movement is not defined", () => ({ world: createWorld([apc(), rider()], [movement("rider", "ghost")]), actionInput: unload(apc(), rider(), terrain("plain", 2)) })],
 ];

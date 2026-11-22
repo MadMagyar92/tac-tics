@@ -18,6 +18,7 @@ describe("createApp with the repo's config", () => {
   const [orangeStar, blueMoon] = objectsOf("player");
   const [tank] = objectsOf("unit");
   const terrain = objectsOf("terrain");
+  const captures = objectsOf("capture");
 
   // GET /game and GET /game/game-1
   describe("games", () => {
@@ -41,7 +42,7 @@ describe("createApp with the repo's config", () => {
     });
 
     it("returns 404 for any /game/:gameId/* request when the game does not exist", async () => {
-      for (const path of ["player", "player/player-1", "unit", "unit/unit-1", "unit/unit-1/attack", "unit/unit-1/unload", "terrain", "terrain/terrain-1"]) {
+      for (const path of ["player", "player/player-1", "unit", "unit/unit-1", "unit/unit-1/attack", "unit/unit-1/unload", "terrain", "terrain/terrain-017"]) {
         const res = await request(app).get(`/game/nope/${path}`);
         expect(res.status, path).toBe(404);
         expect(res.body, path).toEqual({ error: "Game nope not found" });
@@ -94,32 +95,42 @@ describe("createApp with the repo's config", () => {
     });
   });
 
-  // GET /game/game-1/terrain, GET /game/game-1/terrain/terrain-15 and GET /game/game-1/terrain/sea-150
+  // GET /game/game-1/terrain, GET /game/game-1/terrain/terrain-026, GET /game/game-1/terrain/terrain-033 and GET /game/game-1/terrain/terrain-149
   describe("terrain", () => {
-    it("lists every square of the map of the game: the terrain of the object file, then the sea", async () => {
+    it("lists every square of the game: the static terrain of its map, then its captures", async () => {
       const res = await request(app).get("/game/game-1/terrain");
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(150);
-      expect(res.body.slice(0, terrain.length)).toEqual(terrain);
-      expect(res.body.slice(terrain.length).every((square: any) => square.definition.name === "sea")).toBe(true);
+      expect(res.body).toEqual([...terrain, ...captures]);
+      expect(res.body.filter((square: any) => square.definition.name === "sea")).toHaveLength(65);
     });
 
-    it("gives a terrain of the object file by its id, with the key of its definition and its position", async () => {
-      const res = await request(app).get("/game/game-1/terrain/terrain-15");
+    it("gives a capture of the game by its id, with the key of its definition, its position and its player", async () => {
+      const res = await request(app).get("/game/game-1/terrain/terrain-026");
       expect(res.status).toBe(200);
-      expect(res.body).toEqual(terrain.find((object) => object.identifier.id === "terrain-15"));
-      expect(res.body.definition).toEqual({ scope: "terrain", name: "woods" });
-      expect(res.body.position).toEqual({ x: 3, y: 2 });
+      expect(res.body).toEqual(captures.find((object) => object.identifier.id === "terrain-026"));
+      expect(res.body.definition).toEqual({ scope: "terrain", name: "base" });
+      expect(res.body.position).toEqual({ x: 11, y: 1 });
+      expect(res.body.playerId).toBe(blueMoon.identifier.id);
     });
 
-    it("gives the default terrain of the map for a square the object file does not hold", async () => {
-      const res = await request(app).get("/game/game-1/terrain/sea-150");
+    it("gives the static terrain of the map of the game by its id, with the key of its definition and its position", async () => {
+      const res = await request(app).get("/game/game-1/terrain/terrain-033");
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
-        identifier: { id: "sea-150", gameId: "game-1" },
+        identifier: { id: "terrain-033", mapId: "map-1" },
+        definition: { scope: "terrain", name: "woods" },
+        position: { x: 3, y: 2 },
+      });
+    });
+
+    it("gives the sea of the map as static terrain, like any other", async () => {
+      const res = await request(app).get("/game/game-1/terrain/terrain-149");
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({
+        identifier: { id: "terrain-149", mapId: "map-1" },
         definition: { scope: "terrain", name: "sea" },
         position: { x: 14, y: 9 },
-        health: 20,
       });
     });
 
@@ -266,12 +277,12 @@ describe("createApp with units to attack", () => {
 
   it("refuses to move the unit onto an ally", async () => {
     const { app } = start();
-    expect((await request(app).post("/game/game-1/unit/unit-1/move/terrain-2")).status).toBe(409); // the ally recon is at (3, 1)
+    expect((await request(app).post("/game/game-1/unit/unit-1/move/terrain-018")).status).toBe(409); // the ally recon is at (3, 1)
   });
 
   it("refuses to move the unit onto an enemy", async () => {
     const { app } = start();
-    expect((await request(app).post("/game/game-1/unit/unit-1/move/terrain-14")).status).toBe(409); // the enemy lander is at (2, 2)
+    expect((await request(app).post("/game/game-1/unit/unit-1/move/terrain-032")).status).toBe(409); // the enemy lander is at (2, 2)
   });
 
   it("lists no attacks, and refuses any, once the unit has acted", async () => {
@@ -341,7 +352,7 @@ describe("createApp with a unit on a city", () => {
   const infantry = {
     identifier: { id: "infantry-1", gameId: "game-1" },
     definition: { scope: "unit", name: "infantry" },
-    position: { x: 9, y: 2 }, // the city terrain-20
+    position: { x: 9, y: 2 }, // terrain-039
     moved: false,
     acted: false,
     health: 100,
@@ -362,8 +373,8 @@ describe("createApp with a unit on a city", () => {
     const capture = { scope: "action", name: "capture" };
 
     const first = await request(app).post("/game/game-1/unit/infantry-1/capture");
-    expect(first.body).toMatchObject({ definition: capture, unit: { identifier: { id: "infantry-1" }, acted: true }, target: { identifier: { id: "terrain-20" }, health: 10 } });
-    expect((await request(app).get("/game/game-1/terrain/terrain-20")).body).toMatchObject({ health: 10 });
+    expect(first.body).toMatchObject({ definition: capture, unit: { identifier: { id: "infantry-1" }, acted: true }, target: { identifier: { id: "terrain-039" }, health: 10 } });
+    expect((await request(app).get("/game/game-1/terrain/terrain-039")).body).toMatchObject({ health: 10 });
     expect((await request(app).get("/game/game-1/unit/infantry-1")).body.acted).toBe(true);
     expect((await request(app).post("/game/game-1/unit/infantry-1/capture")).status).toBe(409);
   });
@@ -419,10 +430,10 @@ describe("createApp start-up", () => {
 });
 
 describe("createApp moving", () => {
-  /** The URI of the moves of the tank: `/game/game-1/unit/unit-1/move`. With a terrain, the URI of the move onto it: `/game/game-1/unit/unit-1/move/terrain-16`. */
+  /** The URI of the moves of the tank: `/game/game-1/unit/unit-1/move`. With a terrain, the URI of the move onto it: `/game/game-1/unit/unit-1/move/terrain-034`. */
   const movePath = (terrainId?: string) => `/game/game-1/unit/unit-1/move${terrainId ? `/${terrainId}` : ""}`;
 
-  /** An app on a copy of the repo's config, where the tank is at (3, 2) with 60 fuel; `change` can edit the copy's objects first. */
+  /** An app on a copy of the repo's config, where the tank is at (3, 2) with 60 fuel; `change` can edit the copy's objects and definitions first. */
   function start(change: (directory: string) => void = () => undefined) {
     const { directory, appConfig } = copyConfig();
     change(directory);
@@ -435,33 +446,33 @@ describe("createApp moving", () => {
     const { app } = start();
     const res = await request(app).get(movePath());
     expect(res.status).toBe(200);
-    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-2", "terrain-14", "terrain-16", "terrain-27"]);
+    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-018", "terrain-032", "terrain-034", "terrain-048"]);
     expect(res.body[0].definition).toEqual({ scope: "action", name: "move" });
   });
 
   it("leaves out the terrain the unit's movement cannot enter", async () => {
     const { app } = start((directory) =>
       editObjects(directory, "terrain", (terrain) => {
-        terrain.find((object) => object.identifier.id === "terrain-16").definition.name = "mountain"; // a tread has no cost for a mountain
+        terrain.find(({ identifier }) => identifier.id === "terrain-034").definition.name = "mountain"; // a tread has no cost for a mountain
       }),
     );
     const res = await request(app).get(movePath());
-    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-2", "terrain-14", "terrain-27"]);
-    expect((await request(app).post(movePath("terrain-16"))).status).toBe(409);
+    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-018", "terrain-032", "terrain-048"]);
+    expect((await request(app).post(movePath("terrain-034"))).status).toBe(409);
   });
 
   it("previews a move without making it", async () => {
     const { app } = start();
-    const res = await request(app).get(movePath("terrain-16"));
+    const res = await request(app).get(movePath("terrain-034"));
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ unit: { identifier: { id: "unit-1" }, position: { x: 4, y: 2 }, moved: true }, movement: { fuel: 59 } });
     expect((await tankOf(app)).position).toEqual({ x: 3, y: 2 });
-    expect((await request(app).post(movePath("terrain-16"))).body.movement.fuel).toBe(59); // the preview spent none of the 60
+    expect((await request(app).post(movePath("terrain-034"))).body.movement.fuel).toBe(59); // the preview spent none of the 60
   });
 
   it("makes the move: the unit is on the terrain, and the cost of it is off its fuel", async () => {
     const { app } = start();
-    const res = await request(app).post(movePath("terrain-16"));
+    const res = await request(app).post(movePath("terrain-034"));
     expect(res.status).toBe(200);
     const tank = await tankOf(app);
     const [movement] = objectsOf("movement");
@@ -478,15 +489,15 @@ describe("createApp moving", () => {
       }),
     );
     expect((await request(app).get(movePath())).body).toEqual([]);
-    expect((await request(app).post(movePath("terrain-16"))).status).toBe(409);
+    expect((await request(app).post(movePath("terrain-034"))).status).toBe(409);
     expect((await tankOf(app)).position).toEqual({ x: 3, y: 2 });
   });
 
   it("lists no moves, and refuses any, once the unit has moved", async () => {
     const { app } = start();
-    await request(app).post(movePath("terrain-16"));
+    await request(app).post(movePath("terrain-034"));
     expect((await request(app).get(movePath())).body).toEqual([]);
-    expect((await request(app).post(movePath("terrain-28"))).status).toBe(409);
+    expect((await request(app).post(movePath("terrain-049"))).status).toBe(409);
     expect((await tankOf(app)).position).toEqual({ x: 4, y: 2 });
   });
 
@@ -497,17 +508,17 @@ describe("createApp moving", () => {
       }),
     );
     const res = await request(app).get(movePath());
-    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-14", "terrain-25"]);
-    expect((await request(app).get(movePath("sea-31"))).status).toBe(404);
-    expect((await request(app).post(movePath("sea-31"))).status).toBe(409);
+    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-032", "terrain-046"]);
+    expect((await request(app).get(movePath("terrain-030"))).status).toBe(404);
+    expect((await request(app).post(movePath("terrain-030"))).status).toBe(409);
   });
 
   it("refuses a terrain that is not next to the unit", async () => {
     const { app } = start();
-    const post = await request(app).post(movePath("terrain-1"));
+    const post = await request(app).post(movePath("terrain-017"));
     expect(post.status).toBe(409);
-    expect(post.body).toEqual({ error: "Unit unit-1 cannot move onto terrain terrain-1" });
-    expect((await request(app).get(movePath("terrain-1"))).status).toBe(404);
+    expect(post.body).toEqual({ error: "Unit unit-1 cannot move onto terrain terrain-017" });
+    expect((await request(app).get(movePath("terrain-017"))).status).toBe(404);
     expect((await tankOf(app)).position).toEqual({ x: 3, y: 2 });
   });
 
@@ -517,7 +528,7 @@ describe("createApp moving", () => {
         movements[0].fuel = 0;
       }),
     );
-    expect((await request(app).post(movePath("terrain-16"))).status).toBe(409);
+    expect((await request(app).post(movePath("terrain-034"))).status).toBe(409);
     expect((await request(app).get(movePath())).body).toEqual([]);
   });
 
@@ -533,20 +544,20 @@ describe("createApp moving", () => {
     const { app, directory } = start();
     const file = join(directory, "object", "unit.json");
     const before = readFileSync(file, "utf8");
-    await request(app).post(movePath("terrain-16"));
+    await request(app).post(movePath("terrain-034"));
     expect(readFileSync(file, "utf8")).toBe(before);
   });
 });
 
 describe("createApp deploying", () => {
-  /** The URI of the deploy onto a terrain: `/game/game-1/deploy/terrain-45`. The unit to deploy goes in the body, or in the query when previewing: `?unit=infantry`. */
+  /** The URI of the deploy onto a terrain: `/game/game-1/deploy/terrain-076`. The unit to deploy goes in the body, or in the query when previewing: `?unit=infantry`. */
   const deployPath = (terrainId: string) => `/game/game-1/deploy/${terrainId}`;
   const everyone = (app: ReturnType<typeof createApp>) => request(app).get("/game/game-1/unit").then((res) => res.body.map((unit: any) => unit.identifier.id));
   const fundsOf = async (app: ReturnType<typeof createApp>, id = "player-1") => (await request(app).get(`/game/game-1/player/${id}`)).body.funds;
 
   /**
-   * An app on a copy of the repo's config where player-1 has `funds`. On Spann Island, terrain-45 at (1, 5) and
-   * terrain-56 at (1, 6) are bases of player-1, and terrain-10 at (11, 1) is a base of player-2.
+   * An app on a copy of the repo's config where player-1 has `funds`. On Spann Island, terrain-076 at (1, 5) and
+   * terrain-091 at (1, 6) are bases of player-1, and terrain-026 at (11, 1) is a base of player-2.
    */
   function start(funds = 10000, change: (directory: string) => void = () => undefined) {
     const { directory, appConfig } = copyConfig();
@@ -559,7 +570,7 @@ describe("createApp deploying", () => {
 
   it("deploys a new unit on the terrain, for the player whose turn it is", async () => {
     const { app } = start();
-    const res = await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" });
+    const res = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       identifier: { id: "unit-2", gameId: "game-1" },
@@ -577,7 +588,7 @@ describe("createApp deploying", () => {
 
   it("saves the new unit and the funds", async () => {
     const { app } = start();
-    await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" });
+    await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
     expect(await everyone(app)).toEqual(["unit-1", "unit-2"]);
     expect((await request(app).get("/game/game-1/unit/unit-2")).body.position).toEqual({ x: 1, y: 5 });
     expect(await fundsOf(app)).toBe(9000);
@@ -593,7 +604,7 @@ describe("createApp deploying", () => {
         players[1].funds = 5000;
       });
     });
-    const res = await request(app).post(deployPath("terrain-10")).send({ unit: "infantry" });
+    const res = await request(app).post(deployPath("terrain-026")).send({ unit: "infantry" });
     expect(res.status).toBe(200);
     expect(res.body.playerId).toBe("player-2");
     expect(await fundsOf(app, "player-2")).toBe(4000);
@@ -606,16 +617,16 @@ describe("createApp deploying", () => {
         games[0].playerTurn = 5;
       }),
     );
-    const post = await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" });
+    const post = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
     expect(post.status).toBe(409);
-    expect(post.body).toEqual({ error: "Unit infantry cannot be deployed on terrain terrain-45" });
-    expect((await request(app).get(`${deployPath("terrain-45")}?unit=infantry`)).status).toBe(404);
+    expect(post.body).toEqual({ error: "Unit infantry cannot be deployed on terrain terrain-076" });
+    expect((await request(app).get(`${deployPath("terrain-076")}?unit=infantry`)).status).toBe(404);
     expect(await everyone(app)).toEqual(["unit-1"]);
   });
 
   it("previews a deploy without making it", async () => {
     const { app } = start();
-    const res = await request(app).get(`${deployPath("terrain-45")}?unit=infantry`);
+    const res = await request(app).get(`${deployPath("terrain-076")}?unit=infantry`);
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ unit: { identifier: { id: "unit-2" }, definition: { scope: "unit", name: "infantry" } }, player: { identifier: { id: "player-1" }, funds: 9000 } });
     expect(await everyone(app)).toEqual(["unit-1"]);
@@ -639,11 +650,11 @@ describe("createApp deploying", () => {
         },
       ]),
     );
-    await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" });
+    await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
 
-    const move = await request(app).post("/game/game-1/unit/unit-2/move/terrain-47");
+    const move = await request(app).post("/game/game-1/unit/unit-2/move/terrain-078");
     expect(move.status).toBe(409); // two squares away
-    expect((await request(app).post("/game/game-1/unit/unit-2/move/terrain-35")).status).toBe(200); // (1, 4) is next to (1, 5)
+    expect((await request(app).post("/game/game-1/unit/unit-2/move/terrain-061")).status).toBe(200); // (1, 4) is next to (1, 5)
 
     const attack = await request(app).post("/game/game-1/unit/unit-2/attack/enemy-infantry");
     expect(attack.status).toBe(200); // (2, 4) is next to (1, 4)
@@ -652,29 +663,29 @@ describe("createApp deploying", () => {
 
   it("deploys one unit after another with the next id, until the funds run out", async () => {
     const { app } = start(1500);
-    const first = await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" });
+    const first = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
     expect(first.body.identifier.id).toBe("unit-2");
     expect(await fundsOf(app)).toBe(500);
-    const second = await request(app).post(deployPath("terrain-56")).send({ unit: "infantry" });
+    const second = await request(app).post(deployPath("terrain-091")).send({ unit: "infantry" });
     expect(second.status).toBe(409);
     expect(await everyone(app)).toEqual(["unit-1", "unit-2"]);
   });
 
   it("refuses a second unit on the same terrain", async () => {
     const { app } = start();
-    expect((await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" })).status).toBe(200);
-    const again = await request(app).post(deployPath("terrain-45")).send({ unit: "infantry" });
+    expect((await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" })).status).toBe(200);
+    const again = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
     expect(again.status).toBe(409);
-    expect(again.body).toEqual({ error: "Unit infantry cannot be deployed on terrain terrain-45" });
+    expect(again.body).toEqual({ error: "Unit infantry cannot be deployed on terrain terrain-076" });
     expect(await fundsOf(app)).toBe(9000);
   });
 
   it.each([
-    ["a terrain the player does not control", "terrain-14", "infantry", 10000],
-    ["the sea of the map", "sea-2", "infantry", 10000],
-    ["a terrain another player controls", "terrain-10", "infantry", 10000],
-    ["a unit the player cannot afford", "terrain-45", "infantry", 999],
-    ["a unit that is not defined", "terrain-45", "ghost", 10000],
+    ["a terrain the player does not control", "terrain-032", "infantry", 10000],
+    ["the sea of the map", "terrain-001", "infantry", 10000],
+    ["a terrain another player controls", "terrain-026", "infantry", 10000],
+    ["a unit the player cannot afford", "terrain-076", "infantry", 999],
+    ["a unit that is not defined", "terrain-076", "ghost", 10000],
   ])("refuses to deploy on %s", async (_reason, terrainId, unit, funds) => {
     const { app } = start(funds);
     const res = await request(app).post(deployPath(terrainId)).send({ unit });
@@ -685,7 +696,7 @@ describe("createApp deploying", () => {
 
   it("asks for the name of the unit, and for a terrain that is in the game", async () => {
     const { app } = start();
-    const unnamed = await request(app).post(deployPath("terrain-45")).send({});
+    const unnamed = await request(app).post(deployPath("terrain-076")).send({});
     expect(unnamed.status).toBe(400);
     expect(unnamed.body).toEqual({ error: 'Expected the name of the unit to deploy as "unit"' });
     const unknown = await request(app).post(deployPath("nope")).send({ unit: "infantry" });
@@ -697,7 +708,7 @@ describe("createApp deploying", () => {
     const { app, directory } = start();
     const files = ["unit", "offense", "player"].map((scope) => join(directory, "object", `${scope}.json`));
     const before = files.map((file) => readFileSync(file, "utf8"));
-    await request(app).post(deployPath("terrain-45")).send({ unit: "tank" });
+    await request(app).post(deployPath("terrain-076")).send({ unit: "tank" });
     expect(files.map((file) => readFileSync(file, "utf8"))).toEqual(before);
   });
 });
@@ -728,8 +739,8 @@ describe("createApp loading and unloading", () => {
   });
 
   /**
-   * An app on a copy of the repo's config where, on Spann Island, an apc is on the plain terrain-36 at (2, 4), with an
-   * infantry next to it on the plain terrain-35 at (1, 4), another on the city terrain-26 at (2, 3), and a recon on the road terrain-46 at (2, 5).
+   * An app on a copy of the repo's config where, on Spann Island, an apc is on the plain terrain-062 at (2, 4), with an
+   * infantry next to it on the plain terrain-061 at (1, 4), another on the city terrain-047 at (2, 3), and a recon on the road terrain-077 at (2, 5).
    */
   function start() {
     const { directory, appConfig } = copyConfig();
@@ -742,16 +753,16 @@ describe("createApp loading and unloading", () => {
   const movesOf = async (app: ReturnType<typeof createApp>, id: string) => (await request(app).get(`/game/game-1/unit/${id}/move`)).body;
   const unloadsOf = async (app: ReturnType<typeof createApp>, id: string) =>
     (await request(app).get(`/game/game-1/unit/${id}/unload`)).body.map((input: any) => `${input.target.identifier.id} onto ${input.terrain.identifier.id}`).sort();
-  const loadInto = (app: ReturnType<typeof createApp>) => request(app).post("/game/game-1/unit/infantry-1/move/terrain-36");
+  const loadInto = (app: ReturnType<typeof createApp>) => request(app).post("/game/game-1/unit/infantry-1/move/terrain-062");
 
   it("lists the move onto the carrier's square among the moves of a unit the carrier can load", async () => {
-    expect((await movesOf(start().app, "infantry-1")).map((input: any) => input.targets[0].identifier.id)).toContain("terrain-36");
+    expect((await movesOf(start().app, "infantry-1")).map((input: any) => input.targets[0].identifier.id)).toContain("terrain-062");
   });
 
   it("previews a move onto the carrier without making it: the unit on the carrier's square, and the carrier transporting the unit", async () => {
     const { app } = start();
 
-    const res = await request(app).get("/game/game-1/unit/infantry-1/move/terrain-36");
+    const res = await request(app).get("/game/game-1/unit/infantry-1/move/terrain-062");
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ unit: { position: { x: 2, y: 4 }, moved: true }, interrupted: false, transport: { identifier: { id: "apc-1" }, transportIds: ["infantry-1"] } });
@@ -775,35 +786,35 @@ describe("createApp loading and unloading", () => {
 
   it("refuses a move onto a carrier whose transport definition does not allow the unit, and onto one that holds the most it can", async () => {
     const { app } = start();
-    expect((await request(app).get("/game/game-1/unit/recon-1/move/terrain-36")).status).toBe(404);
-    expect((await request(app).get("/game/game-1/unit/infantry-2/move/terrain-36")).status).toBe(200);
+    expect((await request(app).get("/game/game-1/unit/recon-1/move/terrain-062")).status).toBe(404);
+    expect((await request(app).get("/game/game-1/unit/infantry-2/move/terrain-062")).status).toBe(200);
 
     await loadInto(app);
 
-    expect((await request(app).get("/game/game-1/unit/infantry-2/move/terrain-36")).status).toBe(404);
-    expect((await request(app).post("/game/game-1/unit/infantry-2/move/terrain-36")).status).toBe(409);
+    expect((await request(app).get("/game/game-1/unit/infantry-2/move/terrain-062")).status).toBe(404);
+    expect((await request(app).post("/game/game-1/unit/infantry-2/move/terrain-062")).status).toBe(409);
   });
 
   it("keeps a loaded unit from moving, even on its player's next turn, and off the square it loaded on once the carrier has left", async () => {
     const { app } = start();
     await loadInto(app);
-    await request(app).post("/game/game-1/unit/apc-1/move/terrain-37");
+    await request(app).post("/game/game-1/unit/apc-1/move/terrain-063");
     await request(app).post("/game/game-1/end-turn");
     await request(app).post("/game/game-1/end-turn");
 
     expect(await unitOf(app, "infantry-1")).toMatchObject({ moved: false, acted: false });
     expect(await unitOf(app, "apc-1")).toMatchObject({ position: { x: 3, y: 4 }, transportIds: ["infantry-1"] });
     expect(await movesOf(app, "infantry-1")).toEqual([]);
-    expect((await request(app).get("/game/game-1/unit/recon-1/move/terrain-36")).status).toBe(200);
+    expect((await request(app).get("/game/game-1/unit/recon-1/move/terrain-062")).status).toBe(200);
   });
 
   it("lets the carrier move with the unit, then unload it next to where the carrier is, as moved and acted, no longer transported", async () => {
     const { app } = start();
     await loadInto(app);
-    expect((await request(app).post("/game/game-1/unit/apc-1/move/terrain-37")).status).toBe(200); // the road at (3, 4)
+    expect((await request(app).post("/game/game-1/unit/apc-1/move/terrain-063")).status).toBe(200); // the road at (3, 4)
 
-    expect(await unloadsOf(app, "apc-1")).toEqual(["infantry-1 onto terrain-27", "infantry-1 onto terrain-36", "infantry-1 onto terrain-38", "infantry-1 onto terrain-47"]);
-    const res = await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-38");
+    expect(await unloadsOf(app, "apc-1")).toEqual(["infantry-1 onto terrain-048", "infantry-1 onto terrain-062", "infantry-1 onto terrain-064", "infantry-1 onto terrain-078"]);
+    const res = await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-064");
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
@@ -818,7 +829,7 @@ describe("createApp loading and unloading", () => {
     const { app } = start();
     await loadInto(app);
 
-    const res = await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/terrain-35");
+    const res = await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/terrain-061");
 
     expect(res.status).toBe(200);
     expect(res.body.target).toMatchObject({ position: { x: 1, y: 4 }, moved: true, acted: true });
@@ -828,7 +839,7 @@ describe("createApp loading and unloading", () => {
   it("lets the carrier unload once a turn, after which neither it nor the unloaded unit can move", async () => {
     const { app } = start();
     await loadInto(app);
-    expect((await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-35")).status).toBe(200);
+    expect((await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-061")).status).toBe(200);
 
     expect(await unloadsOf(app, "apc-1")).toEqual([]);
     expect(await movesOf(app, "apc-1")).toEqual([]);
@@ -837,9 +848,9 @@ describe("createApp loading and unloading", () => {
 
   it("refuses to unload a unit the carrier does not hold, and returns 404 for an unknown unit or terrain", async () => {
     const { app } = start();
-    expect((await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/terrain-37")).status).toBe(404);
-    expect((await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-37")).status).toBe(409);
-    expect((await request(app).get("/game/game-1/unit/apc-1/unload/nope/terrain-37")).body).toEqual({ error: "Unit nope not found in game game-1" });
+    expect((await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/terrain-063")).status).toBe(404);
+    expect((await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-063")).status).toBe(409);
+    expect((await request(app).get("/game/game-1/unit/apc-1/unload/nope/terrain-063")).body).toEqual({ error: "Unit nope not found in game game-1" });
     expect((await request(app).get("/game/game-1/unit/apc-1/unload/infantry-1/nope")).body).toEqual({ error: "Terrain nope not found in game game-1" });
   });
 
@@ -848,7 +859,7 @@ describe("createApp loading and unloading", () => {
     const files = ["unit", "movement"].map((scope) => join(directory, "object", `${scope}.json`));
     const before = files.map((file) => readFileSync(file, "utf8"));
     await loadInto(app);
-    await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-35");
+    await request(app).post("/game/game-1/unit/apc-1/unload/infantry-1/terrain-061");
     expect(files.map((file) => readFileSync(file, "utf8"))).toEqual(before);
   });
 });

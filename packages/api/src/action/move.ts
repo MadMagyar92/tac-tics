@@ -1,13 +1,13 @@
-import { MovementObject, TerrainObject, UnitObject } from "../object";
+import { CaptureObject, MovementObject, TerrainObject, UnitObject } from "../object";
 import { ActionOutput, ActionPlan, ActionResult, UnitActionInput } from "./app";
 
 export type MoveActionInput = UnitActionInput & {
-  target: TerrainObject;
+  target: TerrainObject | CaptureObject;
 };
 
 export type MoveActionPlan = ActionPlan & {
   unit: UnitObject;
-  target: TerrainObject;
+  target: TerrainObject | CaptureObject;
   movement: MovementObject;
   other: UnitObject | undefined;
   cost: number;

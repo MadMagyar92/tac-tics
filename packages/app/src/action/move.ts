@@ -11,7 +11,7 @@ import {
   Scope,
   type UnitObject,
 } from "@tac-tics/api";
-import { canMove, getMoveCost, getUnitAtPosition, getUnitsFromTransport, isLoaded } from "../common";
+import { canMove, filterUnitsFromGame, getMoveCost, getUnitAtPosition, getUnitsFromTransport, isInGame, isLoaded } from "../common";
 
 export const MOVE_ACTION = { scope: "action", name: "move" };
 
@@ -25,7 +25,7 @@ export class MoveActionService extends BaseActionService<MoveActionInput, MoveAc
 
   plan(input: MoveActionInput): MoveActionPlan | undefined {
     const { definition, game, unit, target } = input;
-    if (unit.identifier.gameId !== game.identifier.id || target.identifier.gameId !== game.identifier.id) {
+    if (unit.identifier.gameId !== game.identifier.id || !isInGame(game.identifier.id, game.mapId, target.identifier)) {
       return undefined;
     }
 
@@ -53,7 +53,7 @@ export class MoveActionService extends BaseActionService<MoveActionInput, MoveAc
   }
 
   private getOthersFromGame(gameId: string, unitId: string, transportIds: string[]): UnitObject[] {
-    const units = [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
+    const units = filterUnitsFromGame([...this.objectService.loadAll<UnitObject>(Scope.Unit).values()], gameId);
     const transport = getUnitsFromTransport(units, transportIds).map(({ identifier }) => identifier.id);
     return units.filter(({ identifier }) => identifier.id !== unitId && !transport.includes(identifier.id));
   }

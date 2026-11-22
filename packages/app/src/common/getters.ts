@@ -1,4 +1,5 @@
 import {
+  type CaptureObject,
   type MovementDefinition,
   type OffenseDefinition,
   type PlayerObject,
@@ -26,8 +27,20 @@ export function getAttackDamage(definition: OffenseDefinition, target: UnitObjec
  * @param target terrain to apply the movement cost against
  * @returns the base move fuel cost, or `undefined` if the unit cannot move to the given terrain
  */
-export function getMoveCost(definition: MovementDefinition, target: TerrainObject): number | undefined {
+export function getMoveCost(definition: MovementDefinition, target: TerrainObject | CaptureObject): number | undefined {
   return definition.cost.find(({ terrain }: { terrain: typeof target.definition }) => sameKey(terrain, target.definition))?.cost;
+};
+
+/**
+ * Filter a list of units down to the units of a single game.
+ * Only the id of the game is compared, so the units a carrier in the list holds are kept, since they are still in the game.
+ *
+ * @param units units to look through
+ * @param gameId id of the game whose units to keep
+ * @returns the units of the game, in the order of the list, or none if no unit is in the game
+ */
+export function filterUnitsFromGame(units: UnitObject[], gameId: string): UnitObject[] {
+  return units.filter(({ identifier }) => identifier.gameId === gameId);
 };
 
 /**

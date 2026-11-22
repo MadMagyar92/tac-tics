@@ -1,8 +1,11 @@
 import {
   type CaptureAllowedDefinition,
+  type CaptureObject,
   type DefinitionKey,
   type GameObject,
+  type GameReferenceId,
   type Id,
+  type MapReferenceId,
   type MovementDefinition,
   type MovementObject,
   type OffenseDefinition,
@@ -71,6 +74,10 @@ export function sameKey(a: DefinitionKey, b: DefinitionKey): boolean {
   return a.scope === b.scope && a.name === b.name;
 };
 
+export function isInGame(gameId: string, mapId: string, identifier: GameReferenceId | MapReferenceId): boolean {
+  return "gameId" in identifier ? identifier.gameId === gameId : identifier.mapId === mapId;
+};
+
 /**
  * Check if a target unit is within the attack range of an offense.
  * 
@@ -123,7 +130,7 @@ export function canAttack(unit: UnitObject, target: UnitObject, offense: Offense
  * @param target terrain with its position
  * @returns `true` if the target is within the move range, `false` otherwise
  */
-export function inMoveRange(unit: UnitObject, target: TerrainObject): boolean {
+export function inMoveRange(unit: UnitObject, target: TerrainObject | CaptureObject): boolean {
   const distance = Math.abs(unit.position.x - target.position.x) + Math.abs(unit.position.y - target.position.y);
   return distance === 1;
 }
@@ -146,7 +153,7 @@ export function inMoveRange(unit: UnitObject, target: TerrainObject): boolean {
  * @param other unit on the target terrain, or `undefined` if the terrain is empty
  * @returns `true` if the move is valid, `false` otherwise
  */
-export function canMove(unit: UnitObject, target: TerrainObject, movement: MovementObject, definition: MovementDefinition, other: UnitObject | undefined): boolean {
+export function canMove(unit: UnitObject, target: TerrainObject | CaptureObject, movement: MovementObject, definition: MovementDefinition, other: UnitObject | undefined): boolean {
   const cost = getMoveCost(definition, target);
   if (unit.moved || unit.acted) {
     return false;
@@ -163,11 +170,11 @@ export function canMove(unit: UnitObject, target: TerrainObject, movement: Movem
   return true;
 };
 
-export function canDeploy(game: GameObject, player: PlayerObject, terrain: TerrainObject, definition: UnitDefinition): boolean {
+export function canDeploy(game: GameObject, player: PlayerObject, terrain: TerrainObject | CaptureObject, definition: UnitDefinition): boolean {
   if (player.order !== game.playerTurn) {
     return false;
   }
-  if (terrain.playerId !== player.identifier.id) {
+  if (!("playerId" in terrain) || terrain.playerId !== player.identifier.id) {
     return false;
   }
   if (player.funds < definition.fundsCost) {
@@ -190,7 +197,7 @@ export function canDeploy(game: GameObject, player: PlayerObject, terrain: Terra
  * @param allowed terrain the capture definition allows
  * @returns `true` if the capture is valid, `false` otherwise
  */
-export function canCapture(unit: UnitObject, target: TerrainObject, allowed: CaptureAllowedDefinition[]): boolean {
+export function canCapture(unit: UnitObject, target: CaptureObject, allowed: CaptureAllowedDefinition[]): boolean {
   if (unit.acted) {
     return false;
   }
@@ -272,7 +279,7 @@ export function canLoad(unit: UnitObject, target: UnitObject, allowed: Transport
  * @param occupied `true` if another unit is on the target terrain, `false` if it is empty
  * @returns `true` if the unload is valid, `false` otherwise
  */
-export function canUnload(unit: UnitObject, target: TerrainObject, definition: MovementDefinition, occupied: boolean): boolean {
+export function canUnload(unit: UnitObject, target: TerrainObject | CaptureObject, definition: MovementDefinition, occupied: boolean): boolean {
   if (unit.acted) {
     return false;
   }

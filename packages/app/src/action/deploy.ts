@@ -19,11 +19,13 @@ import {
   fillNewMovement,
   fillNewOffense,
   fillNewUnit,
+  filterUnitsFromGame,
   generateMovementId,
   generateOffenseId,
   generateUnitId,
   getPlayerFromTurn,
   getUnitAtPosition,
+  isInGame,
 } from "../common";
 
 export const DEPLOY_ACTION = { scope: "action", name: "deploy" };
@@ -38,7 +40,7 @@ export class DeployActionService extends BaseActionService<DeployActionInput, De
 
   plan(input: DeployActionInput): DeployActionPlan | undefined {
     const { definition, game, terrain, target } = input;
-    if (terrain.identifier.gameId !== game.identifier.id) {
+    if (!isInGame(game.identifier.id, game.mapId, terrain.identifier)) {
       return undefined;
     }
     if (target.scope !== Scope.Unit) {
@@ -56,7 +58,7 @@ export class DeployActionService extends BaseActionService<DeployActionInput, De
       return undefined;
     }
 
-    const units = [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter((unit) => unit.identifier.gameId === game.identifier.id);
+    const units = filterUnitsFromGame([...this.objectService.loadAll<UnitObject>(Scope.Unit).values()], game.identifier.id);
     if (!canDeploy(game, player, terrain, unitDefinition)) {
       return undefined;
     }

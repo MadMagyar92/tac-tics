@@ -1,7 +1,7 @@
 export { type Definition, type DefinitionHandler, type DefinitionKey, type DefinitionService } from "./app";
 export { type CaptureAllowedDefinition, type CaptureDefinition } from "./capture";
 export { type GameDefinition } from "./game";
-export { type MapDefinition } from "./map";
+export { type MapDefinition, type MapTerrainDefinition, type MapUnitDefinition } from "./map";
 export { type MovementCostDefinition, type MovementDefinition } from "./movement";
 export { type OffenseDamageDefinition, type OffenseDefinition } from "./offense";
 export { type PlayerDefinition } from "./player";

@@ -11,7 +11,7 @@ export abstract class MemoryObjectHandler<I extends Id, O extends BaseObject<I>>
     private objects = new Map<string, O>();
     private readonly file: string;
 
-    protected constructor(readonly scope: string, appConfigPath: string, appConfig: AppConfig) {
+    protected constructor(readonly scope: string, appConfigPath: string, appConfig: AppConfig, private readonly definitionScope: string = scope) {
         const { file, contents } = loadScopeFile<O>(appConfig, scope, "object", appConfigPath);
         this.file = file;
         if (!Array.isArray(contents)) {
@@ -71,7 +71,7 @@ export abstract class MemoryObjectHandler<I extends Id, O extends BaseObject<I>>
     }
 
     private validate(object: O): O {
-        if (object.definition.scope !== this.scope) {
+        if (object.definition.scope !== this.definitionScope) {
             throw new Error(`The ${this.scope} objects cannot hold the object "${object.identifier.id}", whose definition has the scope "${object.definition.scope}"`);
         }
         return object;

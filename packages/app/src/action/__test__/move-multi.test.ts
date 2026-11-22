@@ -58,12 +58,10 @@ const definitions: Definition[] = [
   transportDefinition("lander", 2, ["infantry", "apc"]),
 ];
 
-const terrain = (name: string, x: number, y = 0, gameId = "g1"): TerrainObject => ({
-  identifier: { id: `${name}-${x}-${y}`, gameId },
+const terrain = (name: string, x: number, y = 0, mapId = "m1"): TerrainObject => ({
+  identifier: { id: `${name}-${x}-${y}`, mapId },
   definition: key("terrain", name),
   position: { x, y },
-  health: 20,
-  playerId: undefined,
 });
 
 const plain = (x: number) => terrain("plain", x);
@@ -130,7 +128,7 @@ function createWorld(units: UnitObject[] = [], held: MovementObject = movement()
   return { service: new MultiMoveActionService(moveService, loadService, definitionService, objectService), saves, savedUnits, savedMovements };
 }
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
 
 type UnitOptions = { x?: number; y?: number; playerId?: string; gameId?: string; definition?: string; transportIds?: string[] };
 
@@ -165,8 +163,8 @@ const multiMove = (who: UnitObject, targets: TerrainObject[]): MultiMoveActionIn
 /** The plan of `actionInput` in `world`, holding those of `units` on the squares of the path in place of the units there. */
 const planWithOthers = ({ service }: ReturnType<typeof createWorld>, actionInput: MultiMoveActionInput, units: UnitObject[]): MultiMoveActionPlan => ({
   ...service.plan(actionInput)!,
-  others: actionInput.targets.flatMap(({ identifier, position }) =>
-    units.filter((unit) => unit.identifier.gameId === identifier.gameId && unit.position.x === position.x && unit.position.y === position.y),
+  others: actionInput.targets.flatMap(({ position }) =>
+    units.filter((unit) => unit.identifier.gameId === actionInput.game.identifier.id && unit.position.x === position.x && unit.position.y === position.y),
   ),
 });
 

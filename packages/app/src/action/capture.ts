@@ -5,24 +5,17 @@ import {
   type CaptureActionPlan,
   type CaptureActionResult,
   type CaptureDefinition,
+  type CaptureObject,
   type DefinitionService,
   type ObjectService,
   Scope,
-  type TerrainObject,
   type UnitDefinition,
   type UnitObject,
 } from "@tac-tics/api";
-import { canCapture, isLoaded } from "../common";
+import { canCapture, filterUnitsFromGame, isLoaded } from "../common";
 
 export const CAPTURE_ACTION = { scope: "action", name: "capture" };
 
-/**
- * Captures the terrain a unit stands on, for the unit's player. Only a unit whose definition names a capture definition
- * can capture, only the terrain that definition allows, and only once per turn: capturing counts as acting.
- *
- * Each capture takes a tenth of the unit's health, rounded up, off the terrain's health. Once that reaches zero, the
- * terrain becomes the player's and its health goes back to full.
- */
 export class CaptureActionService extends BaseActionService<CaptureActionInput, CaptureActionPlan, CaptureActionResult, CaptureActionOutput> {
   constructor(
     private definitionService: DefinitionService,
@@ -47,7 +40,8 @@ export class CaptureActionService extends BaseActionService<CaptureActionInput, 
       return undefined;
     }
 
-    if (isLoaded(this.getUnitsFromGame(game.identifier.id), unit.identifier.id)) {
+    const units = filterUnitsFromGame([...this.objectService.loadAll<UnitObject>(Scope.Unit).values()], game.identifier.id);
+    if (isLoaded(units, unit.identifier.id)) {
       return undefined;
     }
 
@@ -58,10 +52,6 @@ export class CaptureActionService extends BaseActionService<CaptureActionInput, 
     return { definition, unit, target, amount: Math.ceil(unit.health / 10) };
   }
 
-  private getUnitsFromGame(gameId: string): UnitObject[] {
-    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(({ identifier }) => identifier.gameId === gameId);
-  }
-
   preview({ unit, target, amount }: CaptureActionPlan): CaptureActionResult {
     const health = target.health - amount;
     const terrain = health > 0 ? { ...target, health } : { ...target, health: 20, playerId: unit.playerId };
@@ -69,7 +59,7 @@ export class CaptureActionService extends BaseActionService<CaptureActionInput, 
   }
 
   commit({ unit, target }: CaptureActionResult): CaptureActionOutput {
-    this.objectService.save<TerrainObject>(Scope.Terrain, target);
+    this.objectService.save<CaptureObject>(Scope.Capture, target);
     this.objectService.save<UnitObject>(Scope.Unit, unit);
     return { definition: CAPTURE_ACTION, unit, target };
   }

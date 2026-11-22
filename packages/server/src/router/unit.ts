@@ -9,13 +9,13 @@ import {
   type CaptureActionOutput,
   type CaptureActionPlan,
   type CaptureActionResult,
+  type CaptureObject,
   type MultiMoveActionInput,
   type MultiMoveActionOutput,
   type MultiMoveActionPlan,
   type MultiMoveActionResult,
   type ObjectService,
   Scope,
-  type TerrainObject,
   type UnitObject,
   type UnloadActionInput,
   type UnloadActionOutput,
@@ -23,6 +23,7 @@ import {
   type UnloadActionResult,
 } from "@tac-tics/api";
 import { ATTACK_ACTION, CAPTURE_ACTION, MOVE_ACTION, UNLOAD_ACTION } from "@tac-tics/app";
+import { loadAllTerrainFromGame, loadTerrainFromGame } from "./terrain";
 
 /**
  * Mount this router before any router under `/game/:gameId/unit/:unitId/...`: it loads the unit into
@@ -137,7 +138,7 @@ export function moveRouter(
 
   router.param("terrainId", (req, res, next, terrainId: string) => {
     const { gameId } = req.params as unknown as { gameId: string };
-    const terrain = objectService.load<TerrainObject>(Scope.Terrain, { id: terrainId, gameId });
+    const terrain = loadTerrainFromGame(objectService, gameId, terrainId);
     if (!terrain) {
       res.status(404).json({ error: `Terrain ${terrainId} not found in game ${gameId}` });
       return;
@@ -148,8 +149,7 @@ export function moveRouter(
 
   router.get("/", (_req, res) => {
     const { game, unit } = res.locals;
-    const moves = [...objectService.loadAll<TerrainObject>(Scope.Terrain).values()]
-      .filter((terrain) => terrain.identifier.gameId === game.identifier.id)
+    const moves = loadAllTerrainFromGame(objectService, game.identifier.id)
       .map((terrain): MultiMoveActionInput => ({ definition: MOVE_ACTION, game, unit, targets: [terrain] }))
       .filter((move) => moveService.plan(move) !== undefined);
     res.json(moves);
@@ -178,7 +178,7 @@ export function moveRouter(
 
 /**
  * Mount this router under `/game/:gameId/unit/:unitId/capture`, after the routers that load `res.locals.game` and
- * `res.locals.unit`. The target of the capture is the terrain of the game under the unit.
+ * `res.locals.unit`. The target of the capture is the capture of the game under the unit.
  *
  * - `GET /` previews the capture, if it can be made, and returns the objects it would change. It changes nothing.
  * - `POST /` makes the capture and returns its output. The capture service saves what it changes.
@@ -191,11 +191,11 @@ export function captureRouter(
 
   function getCaptureFromRequest(res: Response) {
     const { game, unit } = res.locals;
-    const target = [...objectService.loadAll<TerrainObject>(Scope.Terrain).values()].find(
-      (terrain) =>
-        terrain.identifier.gameId === game.identifier.id &&
-        terrain.position.x === unit.position.x &&
-        terrain.position.y === unit.position.y,
+    const target = [...objectService.loadAll<CaptureObject>(Scope.Capture).values()].find(
+      (capture) =>
+        capture.identifier.gameId === game.identifier.id &&
+        capture.position.x === unit.position.x &&
+        capture.position.y === unit.position.y,
     );
     return target && captureService.plan({ definition: CAPTURE_ACTION, game, unit, target });
   }
@@ -253,7 +253,7 @@ export function unloadRouter(
 
   router.param("terrainId", (req, res, next, terrainId: string) => {
     const { gameId } = req.params as unknown as { gameId: string };
-    const terrain = objectService.load<TerrainObject>(Scope.Terrain, { id: terrainId, gameId });
+    const terrain = loadTerrainFromGame(objectService, gameId, terrainId);
     if (!terrain) {
       res.status(404).json({ error: `Terrain ${terrainId} not found in game ${gameId}` });
       return;
@@ -267,7 +267,7 @@ export function unloadRouter(
     const targets = [...objectService.loadAll<UnitObject>(Scope.Unit).values()].filter(
       (target) => target.identifier.gameId === game.identifier.id && unit.transportIds.includes(target.identifier.id),
     );
-    const terrains = [...objectService.loadAll<TerrainObject>(Scope.Terrain).values()].filter((terrain) => terrain.identifier.gameId === game.identifier.id);
+    const terrains = loadAllTerrainFromGame(objectService, game.identifier.id);
     const unloads = targets
       .flatMap((target) => terrains.map((terrain): UnloadActionInput => ({ definition: UNLOAD_ACTION, game, unit, target, terrain })))
       .filter((unload) => unloadService.plan(unload) !== undefined);

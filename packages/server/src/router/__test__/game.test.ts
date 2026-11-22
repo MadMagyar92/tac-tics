@@ -6,7 +6,7 @@ import { ObjectServiceImpl } from "@tac-tics/app";
 import { realAppConfig } from "../../../test/config";
 import { gameRouter } from "../game";
 
-const game = (id: string, name = "2-player"): GameObject => ({ identifier: { id }, definition: { scope: "game", name }, turn: 0, playerTurn: 0, mapDefinition: { scope: "map", name: "spann-island" } });
+const game = (id: string, name = "2-player"): GameObject => ({ identifier: { id }, definition: { scope: "game", name }, turn: 0, playerTurn: 0, mapId: "map-1" });
 
 /** The objects of the repo's config, whose games are just game-1. */
 const objectService = () => new ObjectServiceImpl(realAppConfig);
@@ -40,7 +40,7 @@ describe("GET /game/:gameId", () => {
   it("returns the game as JSON, with the key of its definition", async () => {
     const res = await request(app).get("/game/game-1");
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ identifier: { id: "game-1" }, definition: { scope: "game", name: "2-player" }, turn: 0, playerTurn: 0, mapDefinition: { scope: "map", name: "spann-island" } });
+    expect(res.body).toEqual({ identifier: { id: "game-1" }, definition: { scope: "game", name: "2-player" }, turn: 0, playerTurn: 0, mapId: "map-1" });
   });
 
   it("returns 404 for an unknown id", async () => {

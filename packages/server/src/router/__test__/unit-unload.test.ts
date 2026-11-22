@@ -12,7 +12,7 @@ import {
   type UnloadActionPlan,
   type UnloadActionResult,
 } from "@tac-tics/api";
-import { ObjectServiceImpl, UNLOAD_ACTION } from "@tac-tics/app";
+import { isInGame, ObjectServiceImpl, UNLOAD_ACTION } from "@tac-tics/app";
 import { createStubActionService, realAppConfig } from "../../../test/config";
 import { unloadRouter } from "../unit";
 
@@ -92,15 +92,15 @@ describe("unloadRouter", () => {
   describe("GET /game/:gameId/unit/:unitId/unload", () => {
     it("lists an unload for each unit the carrier transports and each terrain in the game that plan accepts, built from the request's game and carrier", async () => {
       const objects = createObjectService();
-      const { service } = createStubUnloadService(only(["rider-1", "terrain-35"], ["rider-2", "terrain-37"]));
+      const { service } = createStubUnloadService(only(["rider-1", "terrain-061"], ["rider-2", "terrain-063"]));
       const carrier = objects.load<UnitObject>(Scope.Unit, { id: "apc-1", gameId: "game-1" });
 
       const res = await request(createApp(service, objects)).get("/game/game-1/unit/apc-1/unload");
 
       expect(res.status).toBe(200);
       expect(res.body.map((unload: UnloadActionInput) => [unload.target.identifier.id, unload.terrain.identifier.id])).toEqual([
-        ["rider-1", "terrain-35"],
-        ["rider-2", "terrain-37"],
+        ["rider-1", "terrain-061"],
+        ["rider-2", "terrain-063"],
       ]);
       for (const unload of res.body) {
         expect(unload.definition).toEqual(UNLOAD_ACTION);
@@ -123,7 +123,7 @@ describe("unloadRouter", () => {
 
       expect(asked).toHaveLength(300);
       expect([...new Set(asked.map((unload) => unload.target.identifier.id))]).toEqual(["rider-1", "rider-2"]);
-      expect(asked.map((unload) => unload.terrain.identifier.gameId)).toEqual(Array(300).fill("game-1"));
+      expect(asked.every((unload) => isInGame("game-1", "map-1", unload.terrain.identifier))).toBe(true);
     });
 
     it("asks nothing for a unit that holds no units", async () => {
@@ -147,9 +147,9 @@ describe("unloadRouter", () => {
       const { service, asked, previewed } = createStubUnloadService();
       const carrier = objects.load<UnitObject>(Scope.Unit, { id: "apc-1", gameId: "game-1" })!;
       const target = objects.load<UnitObject>(Scope.Unit, { id: "rider-1", gameId: "game-1" })!;
-      const terrain = objects.load<TerrainObject>(Scope.Terrain, { id: "terrain-35", gameId: "game-1" })!;
+      const terrain = objects.load<TerrainObject>(Scope.Terrain, { id: "terrain-061", mapId: "map-1" })!;
 
-      const res = await request(createApp(service, objects)).get("/game/game-1/unit/apc-1/unload/rider-1/terrain-35");
+      const res = await request(createApp(service, objects)).get("/game/game-1/unit/apc-1/unload/rider-1/terrain-061");
 
       const unload = { definition: UNLOAD_ACTION, game: objects.load(Scope.Game, { id: "game-1" }), unit: carrier, target, terrain };
       expect(res.status).toBe(200);
@@ -160,21 +160,21 @@ describe("unloadRouter", () => {
 
     it("executes nothing", async () => {
       const { service, executed } = createStubUnloadService();
-      await request(createApp(service, createObjectService())).get("/game/game-1/unit/apc-1/unload/rider-1/terrain-35");
+      await request(createApp(service, createObjectService())).get("/game/game-1/unit/apc-1/unload/rider-1/terrain-061");
       expect(executed).toEqual([]);
     });
 
     it("returns 404 and previews nothing when plan does not accept the unload", async () => {
       const { service, previewed } = createStubUnloadService(() => false);
-      const res = await request(createApp(service, createObjectService())).get("/game/game-1/unit/apc-1/unload/rider-1/terrain-35");
+      const res = await request(createApp(service, createObjectService())).get("/game/game-1/unit/apc-1/unload/rider-1/terrain-061");
       expect(res.status).toBe(404);
-      expect(res.body).toEqual({ error: "Unit rider-1 cannot be unloaded by unit apc-1 onto terrain terrain-35" });
+      expect(res.body).toEqual({ error: "Unit rider-1 cannot be unloaded by unit apc-1 onto terrain terrain-061" });
       expect(previewed).toEqual([]);
     });
 
     it.each([
-      ["an unknown unit", "nope/terrain-35", "Unit nope not found in game game-1"],
-      ["a unit of another game", "elsewhere/terrain-35", "Unit elsewhere not found in game game-1"],
+      ["an unknown unit", "nope/terrain-061", "Unit nope not found in game game-1"],
+      ["a unit of another game", "elsewhere/terrain-061", "Unit elsewhere not found in game game-1"],
       ["an unknown terrain", "rider-1/nope", "Terrain nope not found in game game-1"],
     ])("returns 404 for %s, and asks nothing", async (_what, path, error) => {
       const { service, asked } = createStubUnloadService();
@@ -189,11 +189,11 @@ describe("unloadRouter", () => {
     it("executes the unload built from the request's game, carrier, unit and terrain, and gives the output the service returned", async () => {
       const { service, executed } = createStubUnloadService();
 
-      const res = await request(createApp(service, createObjectService())).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-35");
+      const res = await request(createApp(service, createObjectService())).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-061");
 
       expect(res.status).toBe(200);
       expect(executed).toHaveLength(1);
-      expect([executed[0].unit.identifier.id, executed[0].target.identifier.id, executed[0].terrain.identifier.id]).toEqual(["apc-1", "rider-1", "terrain-35"]);
+      expect([executed[0].unit.identifier.id, executed[0].target.identifier.id, executed[0].terrain.identifier.id]).toEqual(["apc-1", "rider-1", "terrain-061"]);
       expect(res.body).toEqual({
         definition: UNLOAD_ACTION,
         unit: { ...executed[0].unit, acted: true, transportIds: ["rider-2", "elsewhere"] },
@@ -203,7 +203,7 @@ describe("unloadRouter", () => {
 
     it("previews nothing", async () => {
       const { service, previewed } = createStubUnloadService();
-      await request(createApp(service, createObjectService())).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-35");
+      await request(createApp(service, createObjectService())).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-061");
       expect(previewed).toEqual([]);
     });
 
@@ -212,21 +212,21 @@ describe("unloadRouter", () => {
       const before = [objects.load<UnitObject>(Scope.Unit, { id: "apc-1", gameId: "game-1" }), objects.load<UnitObject>(Scope.Unit, { id: "rider-1", gameId: "game-1" })];
       const { service } = createStubUnloadService();
 
-      await request(createApp(service, objects)).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-35");
+      await request(createApp(service, objects)).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-061");
 
       expect([objects.load<UnitObject>(Scope.Unit, { id: "apc-1", gameId: "game-1" }), objects.load<UnitObject>(Scope.Unit, { id: "rider-1", gameId: "game-1" })]).toEqual(before);
     });
 
     it("returns 409 and executes nothing when plan does not accept the unload", async () => {
       const { service, executed } = createStubUnloadService(() => false);
-      const res = await request(createApp(service, createObjectService())).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-35");
+      const res = await request(createApp(service, createObjectService())).post("/game/game-1/unit/apc-1/unload/rider-1/terrain-061");
       expect(res.status).toBe(409);
-      expect(res.body).toEqual({ error: "Unit rider-1 cannot be unloaded by unit apc-1 onto terrain terrain-35" });
+      expect(res.body).toEqual({ error: "Unit rider-1 cannot be unloaded by unit apc-1 onto terrain terrain-061" });
       expect(executed).toEqual([]);
     });
 
     it.each([
-      ["an unknown unit", "nope/terrain-35", "Unit nope not found in game game-1"],
+      ["an unknown unit", "nope/terrain-061", "Unit nope not found in game game-1"],
       ["an unknown terrain", "rider-1/nope", "Terrain nope not found in game game-1"],
     ])("returns 404 for %s, and executes nothing", async (_what, path, error) => {
       const { service, executed } = createStubUnloadService();
@@ -243,7 +243,7 @@ describe("unloadRouter", () => {
     expect((await request(app).post("/game/game-1/unit/apc-1/unload")).status).toBe(404);
     expect((await request(app).get("/game/game-1/unit/apc-1/unload/rider-1")).status).toBe(404);
     expect((await request(app).post("/game/game-1/unit/apc-1/unload/rider-1")).status).toBe(404);
-    expect((await request(app).put("/game/game-1/unit/apc-1/unload/rider-1/terrain-35")).status).toBe(404);
-    expect((await request(app).delete("/game/game-1/unit/apc-1/unload/rider-1/terrain-35")).status).toBe(404);
+    expect((await request(app).put("/game/game-1/unit/apc-1/unload/rider-1/terrain-061")).status).toBe(404);
+    expect((await request(app).delete("/game/game-1/unit/apc-1/unload/rider-1/terrain-061")).status).toBe(404);
   });
 });

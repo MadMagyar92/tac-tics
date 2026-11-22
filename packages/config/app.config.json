@@ -1,7 +1,7 @@
 [
-  { "scope": "capture", "definition": "definition/capture.config.json" },
+  { "scope": "capture", "definition": "definition/capture.config.json", "object": "object/capture.json" },
   { "scope": "game", "definition": "definition/game.config.json", "object": "object/game.json" },
-  { "scope": "map", "definition": "definition/map.config.json" },
+  { "scope": "map", "definition": "definition/map.config.json", "object": "object/map.json" },
   { "scope": "movement", "definition": "definition/movement.config.json", "object": "object/movement.json" },
   { "scope": "offense", "definition": "definition/offense.config.json", "object": "object/offense.json" },
   { "scope": "player", "definition": "definition/player.config.json", "object": "object/player.json" },

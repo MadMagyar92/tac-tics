@@ -14,5 +14,9 @@
   {
     "definition": { "scope": "player", "name": "yellow-comet" },
     "fundsMax": 999999
+  },
+  {
+    "definition": { "scope": "player", "name": "black-hole" },
+    "fundsMax": 999999
   }
 ]

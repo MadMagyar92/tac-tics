@@ -1,5 +1,5 @@
 import { Definition, DefinitionKey } from "../definition";
-import { BaseObject, GameObject, Id, TerrainObject, UnitObject } from "../object";
+import { BaseObject, CaptureObject, GameObject, Id, TerrainObject, UnitObject } from "../object";
 
 /**
  * Contains the action definition, game state, and all other parameters to
@@ -73,7 +73,7 @@ export type GameActionInput = ActionInput & {
 };
 
 export type TerrainActionInput = GameActionInput & {
-  terrain: TerrainObject;
+  terrain: TerrainObject | CaptureObject;
 };
 
 export type UnitActionInput = GameActionInput & {

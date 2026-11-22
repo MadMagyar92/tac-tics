@@ -24,7 +24,7 @@ describe("DefinitionServiceImpl", () => {
             ["game", 3],
             ["movement", 7],
             ["offense", 20],
-            ["player", 4],
+            ["player", 5],
             ["terrain", 14],
             ["transport", 4],
             ["unit", 18],
@@ -172,9 +172,9 @@ describe("DefinitionServiceImpl", () => {
         it("fails when the app config leaves a scope with neither a definition file nor an object file", () => {
             const { appConfig } = copyConfig();
             const config = JSON.parse(readFileSync(appConfig, "utf8"));
-            delete scopeItem(config, "map").definition;
+            delete scopeItem(config, "transport").definition;
             write(appConfig, config);
-            expect(() => new DefinitionServiceImpl(appConfig)).toThrow('scope "map" must have a definition file or an object file');
+            expect(() => new DefinitionServiceImpl(appConfig)).toThrow('scope "transport" must have a definition file or an object file');
         });
 
         it("fails when the app config maps definitions for a scope nothing handles", () => {

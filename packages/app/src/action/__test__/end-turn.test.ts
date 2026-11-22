@@ -38,7 +38,7 @@ const game = (turn: number, playerTurn: number, id = "g1"): GameObject => ({
   definition: { scope: "game", name: "2-player" },
   turn,
   playerTurn,
-  mapDefinition: { scope: "map", name: "m1" },
+  mapId: "m1",
 });
 
 const player = (id: string, order: number, gameId = "g1"): PlayerObject => ({

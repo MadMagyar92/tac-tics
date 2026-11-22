@@ -1,11 +1,8 @@
 import { UiBaseObject } from "./app";
-import { GameReferenceId } from "./game";
+import { MapReferenceId } from "./map";
 
-export type TerrainReferenceId = GameReferenceId & {
+export type TerrainReferenceId = MapReferenceId & {
   terrainId: string;
 };
 
-export type TerrainObject = UiBaseObject<GameReferenceId> & {
-  health: number;
-  playerId: string | undefined;
-};
+export type TerrainObject = UiBaseObject<MapReferenceId>;

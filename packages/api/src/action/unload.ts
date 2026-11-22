@@ -1,15 +1,15 @@
-import { TerrainObject, UnitObject } from "../object";
+import { CaptureObject, TerrainObject, UnitObject } from "../object";
 import { ActionOutput, ActionPlan, ActionResult, UnitActionInput } from "./app";
 
 export type UnloadActionInput = UnitActionInput & {
   target: UnitObject;
-  terrain: TerrainObject;
+  terrain: TerrainObject | CaptureObject;
 };
 
 export type UnloadActionPlan = ActionPlan & {
   unit: UnitObject;
   target: UnitObject;
-  terrain: TerrainObject;
+  terrain: TerrainObject | CaptureObject;
 };
 
 export type UnloadActionResult = ActionResult & {

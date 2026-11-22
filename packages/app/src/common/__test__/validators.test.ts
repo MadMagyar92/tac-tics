@@ -1,4 +1,5 @@
 import {
+  type CaptureObject,
   type DefinitionKey,
   type GameObject,
   type MovementDefinition,
@@ -22,6 +23,7 @@ import {
   inMoveRange,
   isDefinitionKey,
   isId,
+  isInGame,
   isLoaded,
   isNonEmptyString,
   isPlainObject,
@@ -143,6 +145,26 @@ describe("sameKey", () => {
 
   it("looks at the scope and the name only", () => {
     expect(sameKey({ ...tank, extra: 1 } as DefinitionKey, { ...tank, extra: 2 } as DefinitionKey)).toBe(true);
+  });
+});
+
+describe("isInGame", () => {
+  it("is true for a capture of the game, and for the static terrain of the map of the game", () => {
+    expect(isInGame("g1", "m1", { id: "terrain-000", gameId: "g1" })).toBe(true);
+    expect(isInGame("g1", "m1", { id: "terrain-000", mapId: "m1" })).toBe(true);
+  });
+
+  it("is false for a capture of another game, even one played on the same map", () => {
+    expect(isInGame("g1", "m1", { id: "terrain-000", gameId: "g2" })).toBe(false);
+  });
+
+  it("is false for the static terrain of another map", () => {
+    expect(isInGame("g1", "m1", { id: "terrain-000", mapId: "m2" })).toBe(false);
+  });
+
+  it("does not take the id of the game for the id of a map, nor the other way around", () => {
+    expect(isInGame("g1", "m1", { id: "terrain-000", gameId: "m1" })).toBe(false);
+    expect(isInGame("g1", "m1", { id: "terrain-000", mapId: "g1" })).toBe(false);
   });
 });
 
@@ -286,11 +308,9 @@ describe("canAttack", () => {
 });
 
 const terrain = (name: string, x: number, y: number): TerrainObject => ({
-  identifier: { id: `${name}-${x}-${y}`, gameId: "g1" },
+  identifier: { id: `${name}-${x}-${y}`, mapId: "m1" },
   definition: key("terrain", name),
   position: { x, y },
-  health: 20,
-  playerId: undefined,
 });
 
 const movementOf = (costs: [string, number][], scope = "terrain"): MovementDefinition => ({
@@ -413,7 +433,7 @@ describe("canMove", () => {
   });
 });
 
-const tile = (x: number, y: number, playerId: string | undefined = undefined, gameId = "g1"): TerrainObject => ({
+const tile = (x: number, y: number, playerId: string | undefined = undefined, gameId = "g1"): CaptureObject => ({
   identifier: { id: `tile-${x}-${y}`, gameId },
   definition: key("terrain", "base"),
   position: { x, y },
@@ -427,7 +447,7 @@ const standing = (x: number, y: number, gameId = "g1", playerId = "p2"): UnitObj
   playerId,
 });
 
-const turnOf = (playerTurn: number, id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn, mapDefinition: key("map", "m1") });
+const turnOf = (playerTurn: number, id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn, mapId: "m1" });
 
 const playerOf = (id: string, order: number, funds: number, gameId = "g1"): PlayerObject => ({
   identifier: { id, gameId },
@@ -465,6 +485,10 @@ describe("canDeploy", () => {
 
     it("is false for a terrain nobody controls", () => {
       expect(canDeploy(turnOf(0), first, tile(1, 1, undefined), priced(1000))).toBe(false);
+    });
+
+    it("is false for static terrain, which nobody can control", () => {
+      expect(canDeploy(turnOf(0), first, terrain("plain", 1, 1), priced(1000))).toBe(false);
     });
   });
 

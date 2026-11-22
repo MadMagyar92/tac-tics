@@ -12,10 +12,10 @@ import {
   type GameObject,
   type ObjectService,
   Scope,
-  type TerrainObject,
   type UnitObject,
 } from "@tac-tics/api";
 import { DEPLOY_ACTION, END_TURN_ACTION, isNonEmptyString } from "@tac-tics/app";
+import { loadTerrainFromGame } from "./terrain";
 
 /**
  * Mount this router before any router under `/game/:gameId/...`: it loads the game into
@@ -75,7 +75,7 @@ export function deployRouter(
 
   router.param("terrainId", (req, res, next, terrainId: string) => {
     const { gameId } = req.params as unknown as { gameId: string };
-    const terrain = objectService.load<TerrainObject>(Scope.Terrain, { id: terrainId, gameId });
+    const terrain = loadTerrainFromGame(objectService, gameId, terrainId);
     if (!terrain) {
       res.status(404).json({ error: `Terrain ${terrainId} not found in game ${gameId}` });
       return;

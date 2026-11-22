@@ -1,5 +1,6 @@
 import type {
   BaseObject,
+  CaptureObject,
   Definition,
   DefinitionKey,
   DefinitionService,
@@ -103,7 +104,7 @@ function createWorld(units: UnitObject[] = [], players: PlayerObject[] = [player
 
 const sameReference = (a: PlayerObject, b: PlayerObject): boolean => a.identifier.id === b.identifier.id && a.identifier.gameId === b.identifier.gameId;
 
-const game = (playerTurn = 0, id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn, mapDefinition: key("map", "m1") });
+const game = (playerTurn = 0, id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn, mapId: "m1" });
 
 const player = (id = "p1", order = 0, funds = 10000, gameId = "g1"): PlayerObject => ({
   identifier: { id, gameId },
@@ -113,7 +114,7 @@ const player = (id = "p1", order = 0, funds = 10000, gameId = "g1"): PlayerObjec
 });
 
 /** The terrain at (x, y), controlled by `playerId`, or by nobody when it is null. */
-const terrain = (x: number, y: number, playerId: string | null = "p1", gameId = "g1"): TerrainObject => ({
+const terrain = (x: number, y: number, playerId: string | null = "p1", gameId = "g1"): CaptureObject => ({
   identifier: { id: `base-${x}-${y}`, gameId },
   definition: key("terrain", "base"),
   position: { x, y },
@@ -134,7 +135,7 @@ const existing = (id: string, x: number, y: number, gameId = "g1", playerId = "p
   transportIds: [],
 });
 
-type Options = { gameTurn?: number; gameId?: string; where?: TerrainObject; what?: DefinitionKey };
+type Options = { gameTurn?: number; gameId?: string; where?: TerrainObject | CaptureObject; what?: DefinitionKey };
 
 const deploy = ({ gameTurn = 0, gameId = "g1", where = terrain(3, 4), what = key("unit", "tank") }: Options = {}): DeployActionInput => ({
   definition: DEPLOY_ACTION,
@@ -231,6 +232,11 @@ describe("DeployActionService", () => {
     describe("the game", () => {
       it("is false when the terrain is in another game", () => {
         expect(createWorld().service.plan(deploy({ where: terrain(3, 4, "p1", "g2") }))).toBeUndefined();
+      });
+
+      it("is false on the static terrain of the map of the game, which no player holds", () => {
+        const plain: TerrainObject = { identifier: { id: "plain-3-4", mapId: "m1" }, definition: key("terrain", "plain"), position: { x: 3, y: 4 } };
+        expect(createWorld().service.plan(deploy({ where: plain }))).toBeUndefined();
       });
 
       it("is false when the action is for another game than the terrain is in", () => {

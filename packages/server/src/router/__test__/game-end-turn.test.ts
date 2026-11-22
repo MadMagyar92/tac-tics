@@ -11,7 +11,7 @@ const game = (id = "g1"): GameObject => ({
   definition: { scope: "game", name: "2-player" },
   turn: 0,
   playerTurn: 0,
-  mapDefinition: { scope: "map", name: "m1" },
+  mapId: "m1",
 });
 
 /** Stands in for `gameRouter`: it loads `res.locals.game` from the path, then hands over to the end-turn router. */

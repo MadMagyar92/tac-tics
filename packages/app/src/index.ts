@@ -37,6 +37,7 @@ export {
   inMoveRange,
   isDefinitionKey,
   isId,
+  isInGame,
   isNonEmptyString,
   isPlainObject,
   sameKey,
@@ -55,7 +56,9 @@ export {
   UnitDefinitionHandler,
 } from "./definition";
 export {
+  CaptureObjectHandler,
   GameObjectHandler,
+  MapObjectHandler,
   MemoryObjectHandler,
   MovementObjectHandler,
   ObjectServiceImpl,

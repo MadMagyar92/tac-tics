@@ -1,5 +1,6 @@
 import type {
   BaseObject,
+  CaptureObject,
   Definition,
   DefinitionKey,
   DefinitionService,
@@ -37,7 +38,7 @@ const infantry: UnitDefinition = {
 };
 
 const definitions: Definition[] = [
-  movementDefinition("foot", { plain: 1, woods: 2, mountain: 3 }),
+  movementDefinition("foot", { plain: 1, woods: 2, mountain: 3, city: 1 }),
   movementDefinition("tread", { plain: 1, woods: 3 }), // cannot enter a mountain
   movementDefinition("free", { plain: 0 }),
   movementDefinition("refund", { plain: -1 }),
@@ -104,7 +105,7 @@ function createWorld(units: UnitObject[] = [], held: MovementObject = movement()
   return { service: new MoveActionService(definitionService, objectService), requested, saves, savedUnits, savedMovements };
 }
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
 
 type UnitOptions = { x?: number; y?: number; gameId?: string };
 
@@ -128,15 +129,13 @@ const other = (id: string, playerId: string, x: number, y: number, gameId = "g1"
   playerId,
 });
 
-const terrain = (name: string, x: number, y: number, gameId = "g1"): TerrainObject => ({
-  identifier: { id: `${name}-${x}-${y}`, gameId },
+const terrain = (name: string, x: number, y: number, mapId = "m1"): TerrainObject => ({
+  identifier: { id: `${name}-${x}-${y}`, mapId },
   definition: key("terrain", name),
   position: { x, y },
-  health: 20,
-  playerId: undefined,
 });
 
-const move = (who: UnitObject, to: TerrainObject, gameId = "g1"): MoveActionInput => ({
+const move = (who: UnitObject, to: TerrainObject | CaptureObject, gameId = "g1"): MoveActionInput => ({
   definition: key("action", "move"),
   game: game(gameId),
   unit: who,
@@ -198,8 +197,14 @@ describe("MoveActionService", () => {
         expect(createWorld().service.plan(move(unit({ gameId: "g2" }), terrain("plain", 1, 0)))).toBeUndefined();
       });
 
-      it("is false when the terrain is in another game", () => {
-        expect(createWorld().service.plan(move(unit(), terrain("plain", 1, 0, "g2")))).toBeUndefined();
+      it("is false when the terrain is on the map of another game", () => {
+        expect(createWorld().service.plan(move(unit(), terrain("plain", 1, 0, "m2")))).toBeUndefined();
+      });
+
+      it("is true for a capture of the game, and false for a capture of another game", () => {
+        const city = (gameId: string): CaptureObject => ({ identifier: { id: "city-1-0", gameId }, definition: key("terrain", "city"), position: { x: 1, y: 0 }, health: 20, playerId: undefined });
+        expect(createWorld().service.plan(move(unit(), city("g1")))).toBeDefined();
+        expect(createWorld().service.plan(move(unit(), city("g2")))).toBeUndefined();
       });
 
       it("is false when the action is for another game than both are in", () => {
@@ -462,7 +467,7 @@ describe("MoveActionService", () => {
       ["the unit has already moved", movement(), () => move({ ...unit(), moved: true }, terrain("plain", 1, 0))],
       ["it costs more than the unit has fuel", movement({ fuel: 1 }), () => move(unit(), terrain("woods", 1, 0))],
       ["the movement cannot enter the terrain", movement({ walks: "tread" }), () => move(unit(), terrain("mountain", 1, 0))],
-      ["the terrain is in another game", movement(), () => move(unit(), terrain("plain", 1, 0, "g2"))],
+      ["the terrain is on the map of another game", movement(), () => move(unit(), terrain("plain", 1, 0, "m2"))],
       ["the unit's movement is not defined", movement({ walks: "nowhere" }), () => move(unit(), terrain("plain", 1, 0))],
     ])("gives nothing and saves nothing when %s", (_reason, held, build) => {
       const { service, saves } = createWorld([], held);

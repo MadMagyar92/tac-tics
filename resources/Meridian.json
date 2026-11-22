@@ -1,0 +1,553 @@
+{
+  "name": "Meridian",
+  "author": "The_Chives",
+  "description": "Meridian. A small village, maybe two hundred folks, untouched by modern society, on the edge of a lake which provides the town with food, water, and a name.\n\nOf course, even in such a small town, far away from political scandel and overseas terrors, there is evil. Death. Destruction. Hate.\n\nThings which cant be discarded. Sure, most of the folk just want to kill the Saffords and the Pizzanis. They want the twenty-year long feud to just end. They do not condone violence.\n\nBut killing them is violent, no? No matter, really... the Saffords and the Pizzanis both are down to the last strings of the family, having sent for cousins twice and thrice removed across the 'States, which come soley to defend the families honour.\n\nThis fued would be over soon anyways, but the citizens dont want to wait. They want it done now.\n\nAnd your in the middle of it. A blacksmith, who really is indifferent no matter what happens. You might be the strongest fellow in this village, to be sure, but you still should be careful. You and your son are pretty much alone.\n\nWhat to do...? Choose a side, of course... and lead them to victory.\n\nThere have been rumors, though, that the Saffords are making a deal with the townsfolk...\n\nOption 1:Easy\nBlacksmith(You,OS) and Townsfolk(CPU,GE) vs Saffords(CPU,BM) vs Pizzanis(CPU,YC)\n\nOS HQ/Blacksmith on 16,20(Replace GE city).\n\nOption 2:Medium\nBlacksmith(You,OS) and Saffords(CPU,BM) vs Townsfolk(CPU,GE) vs Pizzanis(CPU,YC)\n\nOS HQ/Blacksmith on 6,8.\n\nOption 3:Hard\n\nBlacksmith(You,OS) and Pizzanis(CPU,YC) vs Townfolk(CPU,GE) and Saffords(CPU,BM)\n\nOS HQ/Blacksmith on 3,20.\n\n**Blacksmith:Tank/Mech/Artillery, you decide\n      Your son:OS Mech, use Mech closest to starting point.\n     Strong Folk:Tanks\n     Average Folk:Mechs\n     Children(13-18):Infantry\n     Folks' with shotguns:Artillery\n     Folks' with pistols:Recons\n     Women:APCs\n     Missle Silos:Ger-nades\n     Homes:Cities\n\n*Meant to be played in AWDS*",
+  "format": {
+    "header": "AWSMap001",
+    "editor": "AW Series Map Editor",
+    "map_type": "AWS",
+    "tileset": "AW1"
+  },
+  "width": 21,
+  "height": 20,
+  "coordinates": "0-based; x = column (0 = left), y = row (0 = top). Row arrays are indexed [y][x].",
+  "map_rows": ["ff ^^ ^^ == == Cn .. ff ff == .. .. ^^ ^^ == Hg ff ,, ~~ ~~ ~~", "^^ Sn == == .. .. ff ,, ,, == ff ^^ ff == == .. Sn ff ~~ ~~ ~~", "ff ^^ .. .. ff .. .. .. .. Cn == == ff == ff .. ,, ,, ~~ ~~ ~~", ".. ff .. .. Cn ff ^^ ^^ .. ff .. == == Cn ,, ~~ ~~ ~~ ~~ ~~ ~~", ",, .. .. ff .. ^^ Sn ^^ .. .. ff ,, ,, ~~ ~~ ~~ ** ~~ ~~ ~~ ~~", ",, == == Cn ^^ ^^ == .. .. .. ,, ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~", "Cb == ^^ ^^ .. ff == == Cn ff ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "== Hb .. .. ff .. ff .. .. ,, ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "ff ff .. .. .. ^^ ^^ .. ff ,, ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~", "== Cb ff .. ^^ ff .. .. ,, ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "Sn ^^ .. ff Cn .. .. ff ,, ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~", "^^ ff ff .. == ff ff rv rv ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~", "^^ ^^ .. == == rv [] rv .. ,, ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "rv rv ff == rv rv == == Cn ^^ ,, ,, ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "ff rv rv [] rv ^^ .. == ff ff ^^ Cn ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~", "Cn == [] == .. ff .. Sn .. .. ^^ == .. ,, ~~ ~~ ~~ ~~ ~~ ~~ ~~", ".. ff rv Cy .. ,, .. ff .. .. .. == == Cg ,, ~~ ~~ ** ~~ ~~ ~~", "^^ rv rv == Hy [] == == ff Cn .. .. ff .. .. ,, ~~ ~~ ~~ ~~ ~~", "rv rv ff == == ,, Cy .. ^^ ^^ ff .. .. .. Sn == == ,, ~~ ~~ ~~", "Sn ^^ .. ff == ff ^^ ^^ ff ^^ ^^ ff .. ^^ ff Cg == ff ~~ ~~ ~~"],
+  "legend": {
+    "..": "Plain",
+    "ff": "Wood",
+    "^^": "Mountain",
+    "==": "Road",
+    "[]": "Bridge",
+    "rv": "River",
+    "pp": "Pipe",
+    "ps": "Pipe Seam",
+    ",,": "Shoal",
+    "~~": "Sea",
+    "**": "Reef",
+    "  ": "Blank",
+    "??": "Unknown",
+    "<Letter><army>": "Building; letters H=HQ, C=City, B=Base, A=Airport, P=Port, T=Com Tower, L=Lab, S=Missile Silo; army o=Orange Star, b=Blue Moon, g=Green Earth, y=Yellow Comet, k=Black Hole, n=Neutral"
+  },
+  "terrain_rows": [
+    ["Wood", "Mountain", "Mountain", "Road", "Road", "Neutral City", "Plain", "Wood", "Wood", "Road", "Plain", "Plain", "Mountain", "Mountain", "Road", "Green Earth HQ", "Wood", "Shoal", "Sea", "Sea", "Sea"],
+    ["Mountain", "Neutral Missile Silo", "Road", "Road", "Plain", "Plain", "Wood", "Shoal", "Shoal", "Road", "Wood", "Mountain", "Wood", "Road", "Road", "Plain", "Neutral Missile Silo", "Wood", "Sea", "Sea", "Sea"],
+    ["Wood", "Mountain", "Plain", "Plain", "Wood", "Plain", "Plain", "Plain", "Plain", "Neutral City", "Road", "Road", "Wood", "Road", "Wood", "Plain", "Shoal", "Shoal", "Sea", "Sea", "Sea"],
+    ["Plain", "Wood", "Plain", "Plain", "Neutral City", "Wood", "Mountain", "Mountain", "Plain", "Wood", "Plain", "Road", "Road", "Neutral City", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Shoal", "Plain", "Plain", "Wood", "Plain", "Mountain", "Neutral Missile Silo", "Mountain", "Plain", "Plain", "Wood", "Shoal", "Shoal", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea"],
+    ["Shoal", "Road", "Road", "Neutral City", "Mountain", "Mountain", "Road", "Plain", "Plain", "Plain", "Shoal", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Blue Moon City", "Road", "Mountain", "Mountain", "Plain", "Wood", "Road", "Road", "Neutral City", "Wood", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Road", "Blue Moon HQ", "Plain", "Plain", "Wood", "Plain", "Wood", "Plain", "Plain", "Shoal", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Wood", "Wood", "Plain", "Plain", "Plain", "Mountain", "Mountain", "Plain", "Wood", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Road", "Blue Moon City", "Wood", "Plain", "Mountain", "Wood", "Plain", "Plain", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Neutral Missile Silo", "Mountain", "Plain", "Wood", "Neutral City", "Plain", "Plain", "Wood", "Shoal", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea"],
+    ["Mountain", "Wood", "Wood", "Plain", "Road", "Wood", "Wood", "River", "River", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Mountain", "Mountain", "Plain", "Road", "Road", "River", "Bridge", "River", "Plain", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["River", "River", "Wood", "Road", "River", "River", "Road", "Road", "Neutral City", "Mountain", "Shoal", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Wood", "River", "River", "Bridge", "River", "Mountain", "Plain", "Road", "Wood", "Wood", "Mountain", "Neutral City", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Neutral City", "Road", "Bridge", "Road", "Plain", "Wood", "Plain", "Neutral Missile Silo", "Plain", "Plain", "Mountain", "Road", "Plain", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Plain", "Wood", "River", "Yellow Comet City", "Plain", "Shoal", "Plain", "Wood", "Plain", "Plain", "Plain", "Road", "Road", "Green Earth City", "Shoal", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea"],
+    ["Mountain", "River", "River", "Road", "Yellow Comet HQ", "Bridge", "Road", "Road", "Wood", "Neutral City", "Plain", "Plain", "Wood", "Plain", "Plain", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["River", "River", "Wood", "Road", "Road", "Shoal", "Yellow Comet City", "Plain", "Mountain", "Mountain", "Wood", "Plain", "Plain", "Plain", "Neutral Missile Silo", "Road", "Road", "Shoal", "Sea", "Sea", "Sea"],
+    ["Neutral Missile Silo", "Mountain", "Plain", "Wood", "Road", "Wood", "Mountain", "Mountain", "Wood", "Mountain", "Mountain", "Wood", "Plain", "Mountain", "Wood", "Green Earth City", "Road", "Wood", "Sea", "Sea", "Sea"]
+  ],
+  "buildings": [
+    {
+      "x": 5,
+      "y": 0,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 15,
+      "y": 0,
+      "type": "HQ",
+      "army": "Green Earth"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 16,
+      "y": 1,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 13,
+      "y": 3,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "type": "City",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "type": "HQ",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "type": "City",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 0,
+      "y": 10,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 4,
+      "y": 10,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 8,
+      "y": 13,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 11,
+      "y": 14,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 0,
+      "y": 15,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 7,
+      "y": 15,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 3,
+      "y": 16,
+      "type": "City",
+      "army": "Yellow Comet"
+    },
+    {
+      "x": 13,
+      "y": 16,
+      "type": "City",
+      "army": "Green Earth"
+    },
+    {
+      "x": 4,
+      "y": 17,
+      "type": "HQ",
+      "army": "Yellow Comet"
+    },
+    {
+      "x": 9,
+      "y": 17,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 6,
+      "y": 18,
+      "type": "City",
+      "army": "Yellow Comet"
+    },
+    {
+      "x": 14,
+      "y": 18,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 0,
+      "y": 19,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 15,
+      "y": 19,
+      "type": "City",
+      "army": "Green Earth"
+    }
+  ],
+  "units": [
+    {
+      "x": 3,
+      "y": 0,
+      "type": "Mech",
+      "army": "Green Earth",
+      "on": "Road"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "type": "Infantry",
+      "army": "Green Earth",
+      "on": "Wood"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "type": "Mech",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 15,
+      "y": 0,
+      "type": "Mech",
+      "army": "Green Earth",
+      "on": "Green Earth HQ"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "Infantry",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "type": "Artillery",
+      "army": "Green Earth",
+      "on": "Road"
+    },
+    {
+      "x": 13,
+      "y": 1,
+      "type": "Tank",
+      "army": "Green Earth",
+      "on": "Road"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "Recon",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 15,
+      "y": 2,
+      "type": "Tank",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 17,
+      "y": 2,
+      "type": "Recon",
+      "army": "Green Earth",
+      "on": "Shoal"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "Tank",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "type": "Tank",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "type": "Infantry",
+      "army": "Green Earth",
+      "on": "Shoal"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "Infantry",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "Artillery",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "type": "APC",
+      "army": "Green Earth",
+      "on": "Shoal"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "type": "Artillery",
+      "army": "Blue Moon",
+      "on": "Shoal"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "Mech",
+      "army": "Blue Moon",
+      "on": "Mountain"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "type": "Tank",
+      "army": "Blue Moon",
+      "on": "Blue Moon HQ"
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "type": "Mech",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 0,
+      "y": 9,
+      "type": "Infantry",
+      "army": "Blue Moon",
+      "on": "Road"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "type": "Infantry",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "type": "Mech",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 11,
+      "type": "APC",
+      "army": "Blue Moon",
+      "on": "Wood"
+    },
+    {
+      "x": 0,
+      "y": 14,
+      "type": "Mech",
+      "army": "Yellow Comet",
+      "on": "Wood"
+    },
+    {
+      "x": 10,
+      "y": 14,
+      "type": "Infantry",
+      "army": "Green Earth",
+      "on": "Mountain"
+    },
+    {
+      "x": 2,
+      "y": 15,
+      "type": "Artillery",
+      "army": "Yellow Comet",
+      "on": "Bridge"
+    },
+    {
+      "x": 4,
+      "y": 15,
+      "type": "Mech",
+      "army": "Yellow Comet",
+      "on": "Plain"
+    },
+    {
+      "x": 12,
+      "y": 15,
+      "type": "Recon",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 16,
+      "type": "APC",
+      "army": "Yellow Comet",
+      "on": "Wood"
+    },
+    {
+      "x": 5,
+      "y": 16,
+      "type": "Infantry",
+      "army": "Yellow Comet",
+      "on": "Shoal"
+    },
+    {
+      "x": 14,
+      "y": 17,
+      "type": "Mech",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 18,
+      "type": "Mech",
+      "army": "Orange Star",
+      "on": "River"
+    },
+    {
+      "x": 3,
+      "y": 18,
+      "type": "Recon",
+      "army": "Yellow Comet",
+      "on": "Road"
+    },
+    {
+      "x": 6,
+      "y": 18,
+      "type": "Tank",
+      "army": "Yellow Comet",
+      "on": "Yellow Comet City"
+    },
+    {
+      "x": 11,
+      "y": 18,
+      "type": "Mech",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 17,
+      "y": 18,
+      "type": "Infantry",
+      "army": "Green Earth",
+      "on": "Shoal"
+    },
+    {
+      "x": 5,
+      "y": 19,
+      "type": "Recon",
+      "army": "Yellow Comet",
+      "on": "Wood"
+    },
+    {
+      "x": 7,
+      "y": 19,
+      "type": "Infantry",
+      "army": "Yellow Comet",
+      "on": "Mountain"
+    },
+    {
+      "x": 12,
+      "y": 19,
+      "type": "Artillery",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 16,
+      "y": 19,
+      "type": "Mech",
+      "army": "Orange Star",
+      "on": "Road"
+    }
+  ],
+  "raw": {
+    "note": "Original 16-bit tile values, [y][x]. Terrain 0-299, buildings 300-499, units 500-899, extras 900-1299, 65535 = no unit.",
+    "terrain": [
+      [90, 150, 150, 1, 1, 351, 0, 90, 90, 1, 0, 0, 150, 150, 1, 320, 90, 39, 60, 60, 60],
+      [150, 350, 1, 1, 0, 0, 90, 39, 39, 1, 90, 150, 90, 1, 1, 0, 350, 90, 60, 60, 60],
+      [90, 150, 0, 0, 90, 0, 0, 0, 0, 351, 1, 1, 90, 1, 90, 0, 39, 39, 60, 60, 60],
+      [0, 90, 0, 0, 351, 90, 150, 150, 0, 90, 0, 1, 1, 351, 39, 60, 60, 60, 60, 60, 60],
+      [39, 0, 0, 90, 0, 150, 350, 150, 0, 0, 90, 39, 39, 60, 60, 60, 30, 60, 60, 60, 60],
+      [39, 1, 1, 351, 150, 150, 1, 0, 0, 0, 39, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60],
+      [311, 1, 150, 150, 0, 90, 1, 1, 351, 90, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60],
+      [1, 310, 0, 0, 90, 0, 90, 0, 0, 39, 60, 30, 60, 60, 60, 60, 60, 60, 60, 60, 60],
+      [90, 90, 0, 0, 0, 150, 150, 0, 90, 39, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60],
+      [1, 311, 90, 0, 150, 90, 0, 0, 39, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60],
+      [350, 150, 0, 90, 351, 0, 0, 90, 39, 60, 30, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60],
+      [150, 90, 90, 0, 1, 90, 90, 3, 3, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60],
+      [150, 150, 0, 1, 1, 3, 32, 3, 0, 39, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60],
+      [3, 3, 90, 1, 3, 3, 1, 1, 351, 150, 39, 39, 60, 60, 60, 60, 60, 60, 60, 60, 60],
+      [90, 3, 3, 32, 3, 150, 0, 1, 90, 90, 150, 351, 60, 60, 60, 30, 60, 60, 60, 60, 60],
+      [351, 1, 2, 1, 0, 90, 0, 350, 0, 0, 150, 1, 0, 39, 60, 60, 60, 60, 60, 60, 60],
+      [0, 90, 3, 331, 0, 39, 0, 90, 0, 0, 0, 1, 1, 321, 39, 60, 60, 30, 60, 60, 60],
+      [150, 3, 3, 1, 330, 2, 1, 1, 90, 351, 0, 0, 90, 0, 0, 39, 60, 60, 60, 60, 60],
+      [3, 3, 90, 1, 1, 39, 331, 0, 150, 150, 90, 0, 0, 0, 350, 1, 1, 39, 60, 60, 60],
+      [350, 150, 0, 90, 1, 90, 150, 150, 90, 150, 150, 90, 0, 150, 90, 321, 1, 90, 60, 60, 60]
+    ],
+    "units": [
+      [65535, 65535, 65535, 600, 65535, 65535, 65535, 65535, 580, 65535, 65535, 600, 65535, 65535, 65535, 600, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 580, 65535, 65535, 65535, 583, 65535, 65535, 65535, 601, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 582, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 601, 65535, 582, 65535, 65535, 65535],
+      [561, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 601, 65535, 65535, 65535, 580, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 540, 65535, 65535, 65535, 65535, 65535, 65535, 583, 65535, 65535, 65535, 602, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [543, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 560, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 561, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 560, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [540, 65535, 65535, 540, 65535, 65535, 520, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 562, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [640, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 580, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 623, 65535, 640, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 582, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 642, 65535, 65535, 65535, 620, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 600, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 520, 65535, 622, 65535, 65535, 641, 65535, 65535, 65535, 65535, 600, 65535, 65535, 65535, 65535, 65535, 580, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 622, 65535, 620, 65535, 65535, 65535, 65535, 583, 65535, 65535, 65535, 520, 65535, 65535, 65535, 65535]
+    ]
+  }
+}

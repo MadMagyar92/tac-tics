@@ -10,6 +10,7 @@ import {
   Scope,
   type UnitObject,
 } from "@tac-tics/api";
+import { filterUnitsFromGame } from "../common";
 
 export const END_TURN_ACTION = { scope: "action", name: "end-turn" };
 
@@ -32,15 +33,11 @@ export class EndTurnActionService extends BaseActionService<EndTurnActionInput, 
       return undefined;
     }
 
-    return { definition, game, players, units: this.getUnitsFromGame(game.identifier.id) };
+    return { definition, game, players, units: filterUnitsFromGame([...this.objectService.loadAll<UnitObject>(Scope.Unit).values()], game.identifier.id) };
   }
 
   private getPlayersFromGame(gameId: string): PlayerObject[] {
     return [...this.objectService.loadAll<PlayerObject>(Scope.Player).values()].filter((player) => player.identifier.gameId === gameId);
-  }
-
-  private getUnitsFromGame(gameId: string): UnitObject[] {
-    return [...this.objectService.loadAll<UnitObject>(Scope.Unit).values()].filter((unit) => unit.identifier.gameId === gameId);
   }
 
   preview({ game, players, units }: EndTurnActionPlan): EndTurnActionResult {

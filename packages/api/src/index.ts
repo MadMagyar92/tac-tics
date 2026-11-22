@@ -51,6 +51,8 @@ export {
   type DefinitionService,
   type GameDefinition,
   type MapDefinition,
+  type MapTerrainDefinition,
+  type MapUnitDefinition,
   type MovementCostDefinition,
   type MovementDefinition,
   type OffenseDamageDefinition,
@@ -64,9 +66,12 @@ export {
 export { Scope } from "./enum";
 export {
   type BaseObject,
+  type CaptureObject,
   type GameObject,
   type GameReferenceId,
   type Id,
+  type MapObject,
+  type MapReferenceId,
   type MovementObject,
   type ObjectHandler,
   type ObjectService,

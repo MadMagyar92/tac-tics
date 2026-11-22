@@ -1,0 +1,501 @@
+{
+  "name": "Black Hole",
+  "author": "Roma_emu",
+  "description": "[This map is part of the Legend Campaign, from AWN-DM]\r\n\r\n\"(Sturm) Mwahahaha! When I get the rare artifact from this last island, I will have again power to control the world!\r\n(Olaf) There he is!\r\n(Sami) Oh no, he's already established a base!\r\n(Eagle) Too bad, he will face Eagle's power anyway.\r\n(Sturm) You fools, here, again? Do you really think that you can stop me now? I've learned with my defeat, and you shall be destroyed!\"\r\n\r\nFog of War: on\r\nCapture: no\r\nHow to win: capture the port.",
+  "format": {
+    "header": "AW2Map001",
+    "editor": "AW2 Map Editor (Advance Wars 2)",
+    "map_type": "AW2",
+    "tileset": "AW2"
+  },
+  "width": 30,
+  "height": 20,
+  "coordinates": "0-based; x = column (0 = left), y = row (0 = top). Row arrays are indexed [y][x].",
+  "map_rows": ["~~ ~~ Hg == == == Bg ff .. ff .. ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ^^ ^^ ^^ ff .. Hk", "~~ ~~ ^^ ^^ Bg == == == ff .. Bn .. ^^ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ^^ ^^ Ck ff .. Bk ==", "~~ ~~ ~~ ^^ ^^ .. ff == == == == ^^ ^^ ff ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ^^ ^^ ff .. .. == == ==", "~~ ** ~~ ~~ ^^ Cn .. ff Bn ^^ == ^^ ff ^^ .. ~~ ~~ ~~ ~~ ~~ ~~ .. ff ^^ ^^ .. ff == .. Bk", "~~ ~~ ~~ ~~ ~~ .. ff ^^ ^^ ^^ == == == rv rv rv ~~ ** ~~ ~~ ~~ rv rv .. ^^ ^^ Bn == ff ..", "~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ .. ff rv [] rv Sn ff ~~ ~~ ~~ ~~ ~~ Cn rv rv .. == == == Bk ff", "~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ rv rv rv == == == == == == == == == == == [] == == ^^ ^^ .. ..", "~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ^^ Cn == An ~~ ~~ ~~ Ak == Sn ^^ .. ff rv ff .. .. ^^ ff ~~", "~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ff == ~~ ~~ ,, ~~ ~~ == ff .. ff .. rv .. ff ~~ ~~ ~~ ~~", "~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ == ~~ ,, Pn ,, ~~ == ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ **", "** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ rv ^^ ^^ == ~~ ~~ ,, ~~ ~~ == ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~", "~~ ~~ ff ^^ ^^ ff .. .. ff rv rv Sn == An ~~ ~~ ~~ An == ^^ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~", "^^ ^^ ^^ ff ^^ ^^ ^^ == == == [] == == == == == == == == == ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "^^ ^^ ^^ .. ff ^^ ^^ == .. ff rv rv rv Cn ~~ ~~ ~~ ff Sn == Cn rv ~~ ~~ ~~ ** ~~ ~~ ~~ ~~", "^^ ff ff .. .. ff ^^ == ^^ .. .. ff rv ~~ ~~ ~~ ~~ rv rv [] rv rv .. ~~ ~~ ~~ ~~ ~~ ~~ ~~", "ff .. Cn .. ff Bn == == ^^ ^^ ^^ ~~ ~~ ~~ ~~ ** ~~ ff .. == ff .. ff ^^ ^^ ^^ ~~ ~~ ** ~~", "ff .. ff .. .. == == Bn .. ^^ ^^ ~~ ~~ ~~ ~~ ~~ ~~ .. ^^ == == ^^ ^^ ^^ ^^ ^^ ^^ ~~ ~~ ~~", ".. .. .. .. ff == ff .. ff ^^ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ff ^^ == ^^ Bn ff .. Cn ff ~~ ~~ ~~", "ff Bo .. ff == == .. ff ^^ ^^ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ^^ ^^ == == == == ff .. Bb ff Bb ~~", "Ho == == == == Bo ff ^^ ^^ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ .. ff Bn .. ff == == == == == == Hb"],
+  "legend": {
+    "..": "Plain",
+    "ff": "Wood",
+    "^^": "Mountain",
+    "==": "Road",
+    "[]": "Bridge",
+    "rv": "River",
+    "pp": "Pipe",
+    "ps": "Pipe Seam",
+    ",,": "Shoal",
+    "~~": "Sea",
+    "**": "Reef",
+    "  ": "Blank",
+    "??": "Unknown",
+    "<Letter><army>": "Building; letters H=HQ, C=City, B=Base, A=Airport, P=Port, T=Com Tower, L=Lab, S=Missile Silo; army o=Orange Star, b=Blue Moon, g=Green Earth, y=Yellow Comet, k=Black Hole, n=Neutral"
+  },
+  "terrain_rows": [
+    ["Sea", "Sea", "Green Earth HQ", "Road", "Road", "Road", "Green Earth Base", "Wood", "Plain", "Wood", "Plain", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Mountain", "Mountain", "Mountain", "Wood", "Plain", "Black Hole HQ"],
+    ["Sea", "Sea", "Mountain", "Mountain", "Green Earth Base", "Road", "Road", "Road", "Wood", "Plain", "Neutral Base", "Plain", "Mountain", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Mountain", "Mountain", "Black Hole City", "Wood", "Plain", "Black Hole Base", "Road"],
+    ["Sea", "Sea", "Sea", "Mountain", "Mountain", "Plain", "Wood", "Road", "Road", "Road", "Road", "Mountain", "Mountain", "Wood", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Mountain", "Mountain", "Wood", "Plain", "Plain", "Road", "Road", "Road"],
+    ["Sea", "Reef", "Sea", "Sea", "Mountain", "Neutral City", "Plain", "Wood", "Neutral Base", "Mountain", "Road", "Mountain", "Wood", "Mountain", "Plain", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Plain", "Wood", "Mountain", "Mountain", "Plain", "Wood", "Road", "Plain", "Black Hole Base"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Plain", "Wood", "Mountain", "Mountain", "Mountain", "Road", "Road", "Road", "River", "River", "River", "Sea", "Reef", "Sea", "Sea", "Sea", "River", "River", "Plain", "Mountain", "Mountain", "Neutral Base", "Road", "Wood", "Plain"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Plain", "Wood", "River", "Bridge", "River", "Neutral Missile Silo", "Wood", "Sea", "Sea", "Sea", "Sea", "Sea", "Neutral City", "River", "River", "Plain", "Road", "Road", "Road", "Black Hole Base", "Wood"],
+    ["Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "River", "River", "River", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Bridge", "Road", "Road", "Mountain", "Mountain", "Plain", "Plain"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Mountain", "Neutral City", "Road", "Neutral Airport", "Sea", "Sea", "Sea", "Black Hole Airport", "Road", "Neutral Missile Silo", "Mountain", "Plain", "Wood", "River", "Wood", "Plain", "Plain", "Mountain", "Wood", "Sea"],
+    ["Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Wood", "Road", "Sea", "Sea", "Shoal", "Sea", "Sea", "Road", "Wood", "Plain", "Wood", "Plain", "River", "Plain", "Wood", "Sea", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Road", "Sea", "Shoal", "Neutral Port", "Shoal", "Sea", "Road", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef"],
+    ["Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "River", "Mountain", "Mountain", "Road", "Sea", "Sea", "Shoal", "Sea", "Sea", "Road", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Wood", "Mountain", "Mountain", "Wood", "Plain", "Plain", "Wood", "River", "River", "Neutral Missile Silo", "Road", "Neutral Airport", "Sea", "Sea", "Sea", "Neutral Airport", "Road", "Mountain", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea"],
+    ["Mountain", "Mountain", "Mountain", "Wood", "Mountain", "Mountain", "Mountain", "Road", "Road", "Road", "Bridge", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Mountain", "Mountain", "Mountain", "Plain", "Wood", "Mountain", "Mountain", "Road", "Plain", "Wood", "River", "River", "River", "Neutral City", "Sea", "Sea", "Sea", "Wood", "Neutral Missile Silo", "Road", "Neutral City", "River", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea"],
+    ["Mountain", "Wood", "Wood", "Plain", "Plain", "Wood", "Mountain", "Road", "Mountain", "Plain", "Plain", "Wood", "River", "Sea", "Sea", "Sea", "Sea", "River", "River", "Bridge", "River", "River", "Plain", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Wood", "Plain", "Neutral City", "Plain", "Wood", "Neutral Base", "Road", "Road", "Mountain", "Mountain", "Mountain", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Wood", "Plain", "Road", "Wood", "Plain", "Wood", "Mountain", "Mountain", "Mountain", "Sea", "Sea", "Reef", "Sea"],
+    ["Wood", "Plain", "Wood", "Plain", "Plain", "Road", "Road", "Neutral Base", "Plain", "Mountain", "Mountain", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Plain", "Mountain", "Road", "Road", "Mountain", "Mountain", "Mountain", "Mountain", "Mountain", "Mountain", "Sea", "Sea", "Sea"],
+    ["Plain", "Plain", "Plain", "Plain", "Wood", "Road", "Wood", "Plain", "Wood", "Mountain", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Wood", "Mountain", "Road", "Mountain", "Neutral Base", "Wood", "Plain", "Neutral City", "Wood", "Sea", "Sea", "Sea"],
+    ["Wood", "Orange Star Base", "Plain", "Wood", "Road", "Road", "Plain", "Wood", "Mountain", "Mountain", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Mountain", "Mountain", "Road", "Road", "Road", "Road", "Wood", "Plain", "Blue Moon Base", "Wood", "Blue Moon Base", "Sea"],
+    ["Orange Star HQ", "Road", "Road", "Road", "Road", "Orange Star Base", "Wood", "Mountain", "Mountain", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Plain", "Wood", "Neutral Base", "Plain", "Wood", "Road", "Road", "Road", "Road", "Road", "Road", "Blue Moon HQ"]
+  ],
+  "buildings": [
+    {
+      "x": 2,
+      "y": 0,
+      "type": "HQ",
+      "army": "Green Earth"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "Base",
+      "army": "Green Earth"
+    },
+    {
+      "x": 29,
+      "y": 0,
+      "type": "HQ",
+      "army": "Black Hole"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "type": "Base",
+      "army": "Green Earth"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 25,
+      "y": 1,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 28,
+      "y": 1,
+      "type": "Base",
+      "army": "Black Hole"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 29,
+      "y": 3,
+      "type": "Base",
+      "army": "Black Hole"
+    },
+    {
+      "x": 26,
+      "y": 4,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 21,
+      "y": 5,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 28,
+      "y": 5,
+      "type": "Base",
+      "army": "Black Hole"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 13,
+      "y": 7,
+      "type": "Airport",
+      "army": "Neutral"
+    },
+    {
+      "x": 17,
+      "y": 7,
+      "type": "Airport",
+      "army": "Black Hole"
+    },
+    {
+      "x": 19,
+      "y": 7,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 15,
+      "y": 9,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 13,
+      "y": 11,
+      "type": "Airport",
+      "army": "Neutral"
+    },
+    {
+      "x": 17,
+      "y": 11,
+      "type": "Airport",
+      "army": "Neutral"
+    },
+    {
+      "x": 13,
+      "y": 13,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 18,
+      "y": 13,
+      "type": "Missile Silo",
+      "army": "Neutral"
+    },
+    {
+      "x": 20,
+      "y": 13,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 2,
+      "y": 15,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 5,
+      "y": 15,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 7,
+      "y": 16,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 22,
+      "y": 17,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 25,
+      "y": 17,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 1,
+      "y": 18,
+      "type": "Base",
+      "army": "Orange Star"
+    },
+    {
+      "x": 26,
+      "y": 18,
+      "type": "Base",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 28,
+      "y": 18,
+      "type": "Base",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 0,
+      "y": 19,
+      "type": "HQ",
+      "army": "Orange Star"
+    },
+    {
+      "x": 5,
+      "y": 19,
+      "type": "Base",
+      "army": "Orange Star"
+    },
+    {
+      "x": 20,
+      "y": 19,
+      "type": "Base",
+      "army": "Neutral"
+    },
+    {
+      "x": 29,
+      "y": 19,
+      "type": "HQ",
+      "army": "Blue Moon"
+    }
+  ],
+  "units": [
+    {
+      "x": 8,
+      "y": 0,
+      "type": "Infantry",
+      "army": "Green Earth",
+      "on": "Plain"
+    },
+    {
+      "x": 29,
+      "y": 0,
+      "type": "Recon",
+      "army": "Black Hole",
+      "on": "Black Hole HQ"
+    },
+    {
+      "x": 27,
+      "y": 1,
+      "type": "Tank",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "B Copter",
+      "army": "Green Earth",
+      "on": "Road"
+    },
+    {
+      "x": 23,
+      "y": 2,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Mountain"
+    },
+    {
+      "x": 27,
+      "y": 3,
+      "type": "Missiles",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "B Copter",
+      "army": "Green Earth",
+      "on": "Wood"
+    },
+    {
+      "x": 23,
+      "y": 4,
+      "type": "Md Tank",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 24,
+      "y": 4,
+      "type": "Mech",
+      "army": "Black Hole",
+      "on": "Mountain"
+    },
+    {
+      "x": 29,
+      "y": 4,
+      "type": "Tank",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 24,
+      "y": 5,
+      "type": "Infantry",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 25,
+      "y": 5,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 26,
+      "y": 5,
+      "type": "Anti-Air",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 27,
+      "y": 5,
+      "type": "Rockets",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 25,
+      "y": 6,
+      "type": "Infantry",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 26,
+      "y": 6,
+      "type": "Mech",
+      "army": "Black Hole",
+      "on": "Mountain"
+    },
+    {
+      "x": 26,
+      "y": 7,
+      "type": "Md Tank",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 27,
+      "y": 7,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Mountain"
+    },
+    {
+      "x": 2,
+      "y": 17,
+      "type": "Infantry",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 3,
+      "y": 17,
+      "type": "Tank",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 23,
+      "y": 17,
+      "type": "Tank",
+      "army": "Blue Moon",
+      "on": "Wood"
+    },
+    {
+      "x": 3,
+      "y": 18,
+      "type": "APC",
+      "army": "Orange Star",
+      "on": "Wood"
+    },
+    {
+      "x": 6,
+      "y": 18,
+      "type": "Infantry",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 21,
+      "y": 19,
+      "type": "Anti-Air",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 24,
+      "y": 19,
+      "type": "Recon",
+      "army": "Blue Moon",
+      "on": "Road"
+    }
+  ],
+  "raw": {
+    "note": "Original 16-bit tile values, [y][x]. Terrain 0-299, buildings 300-499, units 500-899, extras 900-1299, 65535 = no unit.",
+    "terrain": [
+      [60, 60, 320, 1, 1, 1, 322, 90, 0, 90, 0, 60, 60, 60, 30, 60, 60, 60, 60, 60, 30, 60, 60, 60, 150, 150, 150, 90, 0, 340],
+      [60, 60, 150, 150, 322, 1, 1, 1, 90, 0, 352, 0, 150, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 150, 150, 341, 90, 0, 342, 1],
+      [60, 60, 60, 150, 150, 0, 90, 1, 1, 1, 1, 150, 150, 90, 60, 60, 60, 60, 60, 30, 60, 60, 150, 150, 90, 0, 0, 1, 1, 1],
+      [60, 30, 60, 60, 150, 351, 0, 90, 352, 150, 1, 150, 90, 150, 0, 60, 60, 60, 60, 60, 60, 0, 90, 150, 150, 0, 90, 1, 0, 342],
+      [60, 60, 60, 60, 60, 0, 90, 150, 150, 150, 1, 1, 1, 3, 3, 3, 60, 30, 60, 60, 60, 3, 3, 0, 150, 150, 352, 1, 90, 0],
+      [60, 60, 60, 60, 60, 60, 60, 60, 60, 0, 90, 3, 32, 3, 350, 90, 60, 60, 60, 60, 60, 351, 3, 3, 0, 1, 1, 1, 342, 90],
+      [60, 60, 60, 60, 30, 60, 60, 60, 60, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 150, 150, 0, 0],
+      [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 150, 351, 1, 353, 60, 60, 60, 343, 1, 350, 150, 0, 90, 3, 90, 0, 0, 150, 90, 60],
+      [60, 60, 30, 60, 60, 60, 60, 60, 30, 60, 60, 90, 1, 60, 60, 39, 60, 60, 1, 90, 0, 90, 0, 3, 0, 90, 60, 60, 60, 60],
+      [60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 1, 60, 39, 354, 39, 60, 1, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30],
+      [30, 60, 60, 60, 60, 60, 60, 60, 60, 3, 150, 150, 1, 60, 60, 39, 60, 60, 1, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60],
+      [60, 60, 90, 150, 150, 90, 0, 0, 90, 3, 3, 350, 1, 353, 60, 60, 60, 353, 1, 150, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60],
+      [150, 150, 150, 90, 150, 150, 150, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60],
+      [150, 150, 150, 0, 90, 150, 150, 1, 0, 90, 3, 3, 3, 351, 60, 60, 60, 90, 350, 1, 351, 3, 60, 60, 60, 30, 60, 60, 60, 60],
+      [150, 90, 90, 0, 0, 90, 150, 1, 150, 0, 0, 90, 3, 60, 60, 60, 60, 3, 3, 32, 3, 3, 0, 60, 60, 60, 60, 60, 60, 60],
+      [90, 0, 351, 0, 90, 352, 1, 1, 150, 150, 150, 60, 60, 60, 60, 30, 60, 90, 0, 1, 90, 0, 90, 150, 150, 150, 60, 60, 30, 60],
+      [90, 0, 90, 0, 0, 1, 1, 352, 0, 150, 150, 60, 60, 60, 60, 60, 60, 0, 150, 1, 1, 150, 150, 150, 150, 150, 150, 60, 60, 60],
+      [0, 0, 0, 0, 90, 1, 90, 0, 90, 150, 60, 60, 60, 60, 30, 60, 60, 60, 90, 150, 1, 150, 352, 90, 0, 351, 90, 60, 60, 60],
+      [90, 302, 0, 90, 1, 1, 0, 90, 150, 150, 60, 30, 60, 60, 60, 60, 60, 60, 150, 150, 1, 1, 1, 1, 90, 0, 312, 90, 312, 60],
+      [300, 1, 1, 1, 1, 302, 90, 150, 150, 60, 60, 60, 60, 60, 60, 60, 30, 60, 0, 90, 352, 0, 90, 1, 1, 1, 1, 1, 1, 310]
+    ],
+    "units": [
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 580, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 662],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 681, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 586, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 666, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 684, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 586, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 661, 680, 65535, 65535, 65535, 65535, 681],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 660, 666, 664, 683, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 660, 680, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 661, 666, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 500, 521, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 561, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 522, 65535, 65535, 500, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 544, 65535, 65535, 542, 65535, 65535, 65535, 65535, 65535]
+    ]
+  }
+}

@@ -1,30 +1,25 @@
-import type { BaseObject, Id, TerrainObject } from "@tac-tics/api";
+import type { BaseObject, CaptureObject, Id, TerrainObject } from "@tac-tics/api";
 import { readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanUp, copyConfig, scopeItem } from "../../../test/config";
 import { loadAppConfigFile } from "../../app";
-import { MapDefinitionHandler } from "../../definition";
-import { GameObjectHandler, type MemoryObjectHandler, MovementObjectHandler, OffenseObjectHandler, PlayerObjectHandler, TerrainObjectHandler, UnitObjectHandler } from "..";
+import { CaptureDefinitionHandler, MapDefinitionHandler } from "../../definition";
+import { CaptureObjectHandler, GameObjectHandler, MapObjectHandler, type MemoryObjectHandler, MovementObjectHandler, OffenseObjectHandler, PlayerObjectHandler, TerrainObjectHandler, UnitObjectHandler } from "..";
 
 afterEach(cleanUp);
 
 type Item = BaseObject<Id> & Record<string, any>;
 type AnyService = MemoryObjectHandler<any, any>;
 
-/** A terrain handler on the app config, which makes virtual terrain for the games of the object file, or for none. */
-const createTerrain = (appConfig: string, games: "none" | "real" = "none"): TerrainObjectHandler => {
-    const config = loadAppConfigFile(appConfig);
-    const handler = games === "real" ? new GameObjectHandler(appConfig, config) : ({ loadAll: () => new Map(), load: () => undefined } as unknown as GameObjectHandler);
-    return new TerrainObjectHandler(appConfig, config, handler, new MapDefinitionHandler(appConfig, config));
-};
-
 const services: { name: string; scope: string; file: string; create: (appConfig: string) => AnyService }[] = [
+    { name: "CaptureObjectHandler", scope: "capture", file: "object/capture.json", create: (appConfig) => new CaptureObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "GameObjectHandler", scope: "game", file: "object/game.json", create: (appConfig) => new GameObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
+    { name: "MapObjectHandler", scope: "map", file: "object/map.json", create: (appConfig) => new MapObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "MovementObjectHandler", scope: "movement", file: "object/movement.json", create: (appConfig) => new MovementObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "OffenseObjectHandler", scope: "offense", file: "object/offense.json", create: (appConfig) => new OffenseObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "PlayerObjectHandler", scope: "player", file: "object/player.json", create: (appConfig) => new PlayerObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
-    { name: "TerrainObjectHandler", scope: "terrain", file: "object/terrain.json", create: (appConfig) => createTerrain(appConfig) },
+    { name: "TerrainObjectHandler", scope: "terrain", file: "object/terrain.json", create: (appConfig) => new TerrainObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "UnitObjectHandler", scope: "unit", file: "object/unit.json", create: (appConfig) => new UnitObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
 ];
 
@@ -53,7 +48,7 @@ describe.each(services)("$name", ({ scope, file, create }) => {
             const { service } = start();
             expect(service.accept(scope)).toBe(true);
             for (const other of services.map((s) => s.scope).filter((name) => name !== scope)) expect(service.accept(other), other).toBe(false);
-            for (const name of ["", `${scope}s`, scope.toUpperCase(), "map", "action"]) expect(service.accept(name), name).toBe(false);
+            for (const name of ["", `${scope}s`, scope.toUpperCase(), "transport", "action"]) expect(service.accept(name), name).toBe(false);
         });
 
         it("knows its scope", () => {
@@ -328,7 +323,7 @@ describe("telling objects apart", () => {
 
     it.each([
         ["unit", "object/unit.json", (appConfig: string) => new UnitObjectHandler(appConfig, loadAppConfigFile(appConfig))],
-        ["terrain", "object/terrain.json", (appConfig: string) => createTerrain(appConfig)],
+        ["capture", "object/capture.json", (appConfig: string) => new CaptureObjectHandler(appConfig, loadAppConfigFile(appConfig))],
         ["player", "object/player.json", (appConfig: string) => new PlayerObjectHandler(appConfig, loadAppConfigFile(appConfig))],
     ])("holds the %s with an id in one game apart from the one with that id in another game", (_scope, file, create) => {
         const { service, items } = start(create, file);
@@ -341,6 +336,17 @@ describe("telling objects apart", () => {
         expect(service.load(inOtherGame.identifier)).toEqual(inOtherGame);
         service.delete(inOtherGame.identifier);
         expect(service.load(items[0].identifier)).toEqual(items[0]);
+    });
+
+    it("holds the terrain with an id in one map apart from the terrain with that id in another map", () => {
+        const { service, items } = start((appConfig) => new TerrainObjectHandler(appConfig, loadAppConfigFile(appConfig)), "object/terrain.json");
+        const inOtherMap = { ...items[0], identifier: { id: items[0].identifier.id, mapId: "another-map" }, note: "other" };
+
+        service.save(inOtherMap);
+
+        expect(values(service)).toHaveLength(items.length + 1);
+        expect(service.load(items[0].identifier)).toEqual(items[0]);
+        expect(service.load(inOtherMap.identifier)).toEqual(inOtherMap);
     });
 
     it("holds an offense of one unit apart from the offense with that id of another unit of the same game", () => {
@@ -385,115 +391,59 @@ describe("telling objects apart", () => {
     });
 });
 
-describe("TerrainObjectHandler with the games of the repo's config", () => {
-    /** A copy of the repo's config, the handler started on it with its games, and the terrain the object file holds. */
+describe("the static terrain and the captures of the repo's config", () => {
+    /** The static terrain of map-1 and the captures of game-1, which is played on it, as a copy of the repo's config holds them, with the map definition of Spann Island and the names of the terrain the capture definitions allow. */
     const start = () => {
-        const copy = copyConfig();
-        const path = join(copy.directory, "object/terrain.json");
-        return { ...copy, path, items: readItems(path) as TerrainObject[], service: createTerrain(copy.appConfig, "real") };
+        const { appConfig } = copyConfig();
+        const config = loadAppConfigFile(appConfig);
+        return {
+            appConfig,
+            terrain: values(new TerrainObjectHandler(appConfig, config)) as TerrainObject[],
+            captures: values(new CaptureObjectHandler(appConfig, config)) as CaptureObject[],
+            map: new MapDefinitionHandler(appConfig, config).get({ scope: "map", name: "spann-island" })!,
+            allowed: [...new CaptureDefinitionHandler(appConfig, config).loadAll().values()].flatMap(({ allowed }) => allowed.map(({ terrain }) => terrain.name)),
+        };
     };
 
-    const sea = (n: number): TerrainObject => ({
-        identifier: { id: `sea-${n}`, gameId: "game-1" },
-        definition: { scope: "terrain", name: "sea" },
-        position: { x: (n - 1) % 15, y: Math.floor((n - 1) / 15) },
-        health: 20,
-        playerId: undefined,
+    it("holds the static terrain by the id of its map, and the captures by the id of their game", () => {
+        const { terrain, captures } = start();
+        for (const { identifier } of terrain) expect(identifier).toEqual({ id: identifier.id, mapId: "map-1" });
+        for (const { identifier } of captures) expect(identifier).toEqual({ id: identifier.id, gameId: "game-1" });
     });
 
-    it("gives the default terrain of the map of the game for a square the object file does not hold, by the number of the square", () => {
-        const { service } = start();
-        expect(service.load({ id: "sea-1", gameId: "game-1" })).toEqual(sea(1));
-        expect(service.load({ id: "sea-16", gameId: "game-1" })).toEqual(sea(16));
-        expect(service.load({ id: "sea-150", gameId: "game-1" })).toEqual(sea(150));
+    it("makes up every square of Spann Island once, between the static terrain of its map and the captures of its game", () => {
+        const { terrain, captures } = start();
+        const squares = [...terrain, ...captures];
+        expect([terrain.length, captures.length]).toEqual([129, 21]);
+        expect(new Set(squares.map(({ position }) => `${position.x},${position.y}`)).size).toBe(150);
     });
 
-    it("gives the terrain of the object file for a square it holds, by the id it holds it under", () => {
-        const { service, items } = start();
-        for (const item of items) expect(service.load(item.identifier)).toEqual(item);
+    it("numbers each square from zero by its position, as the map does", () => {
+        const { terrain, captures } = start();
+        for (const { identifier, position } of [...terrain, ...captures]) expect(identifier.id).toBe(`terrain-${String(position.y * 15 + position.x).padStart(3, "0")}`);
     });
 
-    it("numbers the terrain of the object file without regard to where it is", () => {
-        const { items } = start();
-        expect(items.map((item) => item.identifier.id)).toEqual(items.map((_, index) => `terrain-${index + 1}`));
+    it("holds each square as the map definition places it, or else as the default terrain of the map", () => {
+        const { terrain, captures, map } = start();
+        for (const { identifier, definition, position } of [...terrain, ...captures]) {
+            const placed = map.terrain.find(({ positions }) => positions.some(({ x, y }) => x === position.x && y === position.y));
+            expect(definition, identifier.id).toEqual(placed?.definition ?? map.defaultTerrain);
+        }
     });
 
-    it("gives nothing for the number of a square the object file holds, which is not virtual", () => {
-        const { service, items } = start();
-        const { x, y } = items[0].position;
-        expect(service.load({ id: `sea-${y * 15 + x + 1}`, gameId: "game-1" })).toBeUndefined();
+    it("holds a capture for every square whose terrain a capture definition allows, and static terrain for every other square", () => {
+        const { terrain, captures, allowed } = start();
+        for (const { identifier, definition } of captures) expect(allowed, identifier.id).toContain(definition.name);
+        for (const { identifier, definition } of terrain) expect(allowed, identifier.id).not.toContain(definition.name);
     });
 
-    it.each([
-        ["a number past the last square", { id: "sea-151", gameId: "game-1" }],
-        ["the number 0", { id: "sea-0", gameId: "game-1" }],
-        ["an id that is not of a square", { id: "nope", gameId: "game-1" }],
-        ["an id with no number", { id: "sea-", gameId: "game-1" }],
-        ["an id with a number that is not whole", { id: "sea-1.5", gameId: "game-1" }],
-        ["the number of a square of another terrain than the default", { id: "woods-1", gameId: "game-1" }],
-        ["an id of the object file that it does not hold", { id: "terrain-86", gameId: "game-1" }],
-        ["a game that does not exist", { id: "sea-1", gameId: "game-2" }],
-    ])("gives nothing for %s", (_what, identifier) => {
-        expect(start().service.load(identifier)).toBeUndefined();
-    });
-
-    it("gives nothing for a game whose map is not defined", () => {
-        const copy = copyConfig();
-        editGames(copy.directory, (games) => {
-            games[0].mapDefinition = { scope: "map", name: "nowhere" };
-        });
-        const service = createTerrain(copy.appConfig, "real");
-        expect(service.load({ id: "sea-1", gameId: "game-1" })).toBeUndefined();
-        expect(service.loadAll().size).toBe(readItems(join(copy.directory, "object/terrain.json")).length);
-    });
-
-    it("gives every square of the map with loadAll: the terrain of the object file, then the default terrain", () => {
-        const { service, items } = start();
-        const all = [...service.loadAll().values()];
-        expect(all).toHaveLength(150);
-        expect(all.slice(0, items.length)).toEqual(items);
-        expect(all.slice(items.length).every((terrain) => terrain.definition.name === "sea")).toBe(true);
-        expect(new Set(all.map(({ position }) => `${position.x},${position.y}`)).size).toBe(150);
-        for (const [key, object] of service.loadAll()) expect(key).toBe(object.identifier);
-    });
-
-    it("gives every square an id of its own", () => {
-        const { service } = start();
-        const ids = [...service.loadAll().values()].map((terrain) => terrain.identifier.id);
-        expect(new Set(ids).size).toBe(150);
-    });
-
-    it("gives the same id to the same square of the map every time, whatever else is held", () => {
-        const { service, items } = start();
-        const before = service.load({ id: "sea-1", gameId: "game-1" });
-        service.delete(items[0].identifier);
-        service.save({ ...items[1], identifier: { ...items[1].identifier, id: "terrain-99" } });
-        expect(service.load({ id: "sea-1", gameId: "game-1" })).toEqual(before);
-    });
-
-    it("only writes the terrain of the object file", () => {
-        const { service, path, items } = start();
-        service.saveAll();
-        expect(readItems(path)).toEqual(items);
-    });
-
-    it("keeps a square of the default terrain once it is saved", () => {
-        const { service, path, items } = start();
-        const owned = { ...sea(1), playerId: "player-1" };
-        service.save(owned);
-        expect(service.load(owned.identifier)).toEqual(owned);
-        expect(service.loadAll().size).toBe(150);
-        service.saveAll();
-        expect(readItems(path)).toEqual([...items, owned]);
-    });
-
-    it("gives the default terrain again for a square whose terrain is deleted, by its number", () => {
-        const { service, items } = start();
-        const [first] = items;
-        service.delete(first.identifier);
-        expect(service.load(first.identifier)).toBeUndefined();
-        const number = first.position.y * 15 + first.position.x + 1;
-        expect(service.load({ id: `sea-${number}`, gameId: "game-1" })).toEqual(sea(number));
-        expect(service.loadAll().size).toBe(150);
+    it("holds the captures under the definitions of their terrain, and refuses one under a capture definition", () => {
+        const { appConfig, captures } = start();
+        const service = new CaptureObjectHandler(appConfig, loadAppConfigFile(appConfig));
+        for (const { identifier, definition } of captures) expect(definition.scope, identifier.id).toBe("terrain");
+        expect(() => service.save({ ...captures[0], definition: { scope: "capture", name: "infantry" } })).toThrow(
+            `The capture objects cannot hold the object "${captures[0].identifier.id}", whose definition has the scope "capture"`,
+        );
+        expect(service.load(captures[0].identifier)).toEqual(captures[0]);
     });
 });

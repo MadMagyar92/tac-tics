@@ -10,7 +10,7 @@ afterEach(cleanUp);
 const write = (file: string, value: unknown) => writeFileSync(file, JSON.stringify(value));
 
 describe("ObjectServiceImpl", () => {
-    const scopes = ["game", "movement", "offense", "player", "terrain", "unit"];
+    const scopes = ["capture", "game", "map", "movement", "offense", "player", "terrain", "unit"];
     const objectFile = (directory: string, scope: string) => join(directory, "object", `${scope}.json`);
     const readObjects = (file: string) => JSON.parse(readFileSync(file, "utf8")) as BaseObject<Id>[];
 
@@ -54,7 +54,7 @@ describe("ObjectServiceImpl", () => {
             expect(service.load("player", { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
         });
 
-        it.each(["map", "weather", "", "constructor", "toString", "__proto__"])("gives nothing for the scope %j, which has no objects", (scope) => {
+        it.each(["transport", "weather", "", "constructor", "toString", "__proto__"])("gives nothing for the scope %j, which has no objects", (scope) => {
             expect(new ObjectServiceImpl(realAppConfig).load(scope, { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
         });
 
@@ -65,7 +65,7 @@ describe("ObjectServiceImpl", () => {
             expect(service.load<UnitObject>("unit", identifier)!.health).toBe(100);
         });
 
-        it.each(scopes.filter((scope) => scope !== "terrain"))("gives all the %s objects of its file, by their identifiers, with loadAll", (scope) => {
+        it.each(scopes)("gives all the %s objects of its file, by their identifiers, with loadAll", (scope) => {
             const service = new ObjectServiceImpl(realAppConfig);
             const objects = readObjects(objectFile(dirname(realAppConfig), scope));
             const all = service.loadAll(scope);
@@ -73,16 +73,15 @@ describe("ObjectServiceImpl", () => {
             expect([...all.keys()]).toEqual(objects.map((object) => object.identifier));
         });
 
-        it("gives the terrain objects of its file with loadAll, then the default terrain of every other square of the map", () => {
+        it("gives the terrain of a map by the id of the map, and the captures of a game by the id of the game", () => {
             const service = new ObjectServiceImpl(realAppConfig);
-            const objects = readObjects(objectFile(dirname(realAppConfig), "terrain"));
-            const all = [...service.loadAll("terrain").values()];
-            expect(all).toHaveLength(150);
-            expect(all.slice(0, objects.length)).toEqual(objects);
-            expect(service.load("terrain", { id: "sea-1", gameId: "game-1" } as Id)?.definition).toEqual({ scope: "terrain", name: "sea" });
+            expect(service.load("terrain", { id: "terrain-000", mapId: "map-1" } as Id)?.definition).toEqual({ scope: "terrain", name: "sea" });
+            expect(service.load("terrain", { id: "terrain-000", gameId: "game-1" } as Id)).toBeUndefined();
+            expect(service.load("capture", { id: "terrain-026", gameId: "game-1" } as Id)?.definition).toEqual({ scope: "terrain", name: "base" });
+            expect(service.load("capture", { id: "terrain-026", mapId: "map-1" } as Id)).toBeUndefined();
         });
 
-        it.each(["map", "weather", "", "constructor", "__proto__"])("gives no objects with loadAll for the scope %j", (scope) => {
+        it.each(["transport", "weather", "", "constructor", "__proto__"])("gives no objects with loadAll for the scope %j", (scope) => {
             expect(new ObjectServiceImpl(realAppConfig).loadAll(scope).size).toBe(0);
         });
 
@@ -102,7 +101,7 @@ describe("ObjectServiceImpl", () => {
             service.save<UnitObject>("unit", { ...tank, identifier: { id: "unit-2", gameId: "game-1" } });
             expect(service.loadAll("unit").size).toBe(2);
             expect(service.load<UnitObject>("unit", { id: "unit-2", gameId: "game-1" })?.definition).toEqual(tank.definition);
-            expect(service.loadAll("terrain").size).toBe(150);
+            expect(service.loadAll("terrain").size).toBe(129);
         });
 
         it("refuses to save an object under a scope that is not its own", () => {
@@ -111,7 +110,7 @@ describe("ObjectServiceImpl", () => {
             expect(() => service.save<UnitObject>("terrain", tank)).toThrow('The terrain objects cannot hold the object "unit-1"');
         });
 
-        it.each(["map", "weather", ""])("refuses to save under the scope %j, which has no objects", (scope) => {
+        it.each(["transport", "weather", ""])("refuses to save under the scope %j, which has no objects", (scope) => {
             const service = new ObjectServiceImpl(realAppConfig);
             const tank = service.load<UnitObject>("unit", { id: "unit-1", gameId: "game-1" })!;
             expect(() => service.save<UnitObject>(scope, tank)).toThrow(`No object handler accepts the scope "${scope}"`);
@@ -128,7 +127,7 @@ describe("ObjectServiceImpl", () => {
 
         it("gives nothing when it deletes from a scope without objects, or an object it does not hold", () => {
             const service = new ObjectServiceImpl(realAppConfig);
-            expect(service.delete("map", { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
+            expect(service.delete("transport", { id: "unit-1", gameId: "game-1" } as Id)).toBeUndefined();
             expect(service.delete("unit", { id: "nope", gameId: "game-1" } as Id)).toBeUndefined();
             expect(service.loadAll("unit").size).toBe(1);
         });
@@ -136,7 +135,7 @@ describe("ObjectServiceImpl", () => {
         it("keeps the state of each scope apart from the others", () => {
             const service = new ObjectServiceImpl(realAppConfig);
             service.delete("unit", { id: "unit-1", gameId: "game-1" } as Id);
-            expect(service.loadAll("terrain").size).toBe(150);
+            expect(service.loadAll("terrain").size).toBe(129);
             expect(service.load("game", { id: "game-1" })).toBeDefined();
         });
 
@@ -160,7 +159,7 @@ describe("ObjectServiceImpl", () => {
         it("accepts a scope that has no objects to load, such as one that only has definitions", () => {
             const { appConfig } = copyConfig();
             const config = JSON.parse(readFileSync(appConfig, "utf8"));
-            expect(scopeItem(config, "map").object).toBeUndefined();
+            expect(scopeItem(config, "transport").object).toBeUndefined();
             expect(() => new ObjectServiceImpl(appConfig)).not.toThrow();
         });
     });

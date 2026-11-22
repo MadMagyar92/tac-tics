@@ -1,6 +1,6 @@
 import { type DefinitionKey, type MovementDefinition, type OffenseDefinition, type PlayerObject, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { describe, expect, it } from "vitest";
-import { getAttackDamage, getMoveCost, getPlayerFromTurn, getUnitAtPosition, getUnitsFromTransport } from "../getters";
+import { filterUnitsFromGame, getAttackDamage, getMoveCost, getPlayerFromTurn, getUnitAtPosition, getUnitsFromTransport } from "../getters";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
@@ -59,11 +59,9 @@ describe("getAttackDamage", () => {
 });
 
 const terrain = (name: string, x: number, y: number): TerrainObject => ({
-  identifier: { id: `${name}-${x}-${y}`, gameId: "g1" },
+  identifier: { id: `${name}-${x}-${y}`, mapId: "m1" },
   definition: key("terrain", name),
   position: { x, y },
-  health: 20,
-  playerId: undefined,
 });
 
 const movementOf = (costs: [string, number][], scope = "terrain"): MovementDefinition => ({
@@ -102,6 +100,31 @@ const standing = (x: number, y: number, gameId = "g1", playerId = "p2"): UnitObj
   ...unit("standing", "recon", x, y),
   identifier: { id: `standing-${x}-${y}`, gameId },
   playerId,
+});
+
+describe("filterUnitsFromGame", () => {
+  it("keeps the units of the game, in the order of the list", () => {
+    const units = [standing(1, 1), standing(2, 2, "g2"), standing(3, 3)];
+    expect(filterUnitsFromGame(units, "g1")).toEqual([units[0], units[2]]);
+  });
+
+  it("gives none when no unit is in the game, or there are no units", () => {
+    expect(filterUnitsFromGame([standing(1, 1, "g2")], "g1")).toEqual([]);
+    expect(filterUnitsFromGame([], "g1")).toEqual([]);
+  });
+
+  it("keeps the units a carrier of the game holds, since they are still in the game", () => {
+    const carrier = { ...standing(1, 1), transportIds: ["standing-1-2"] };
+    const rider = standing(1, 2);
+    expect(filterUnitsFromGame([carrier, rider], "g1")).toEqual([carrier, rider]);
+  });
+
+  it("changes nothing it was given", () => {
+    const units = [standing(1, 1), standing(2, 2, "g2")];
+    const before = JSON.stringify(units);
+    filterUnitsFromGame(units, "g1");
+    expect(JSON.stringify(units)).toBe(before);
+  });
 });
 
 describe("getUnitAtPosition", () => {

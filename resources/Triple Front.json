@@ -1,0 +1,923 @@
+{
+  "name": "Triple Front",
+  "author": "Roma_emu",
+  "description": "The COs should be:\r\n\r\nOS: Jess\r\nBM: Eagle\r\nGE: Drake\r\nBH: Adder\r\n\r\nTo play, just place Black Hole as Yellow Comet.",
+  "format": {
+    "header": "AW2Map001",
+    "editor": "AW2 Map Editor (Advance Wars 2)",
+    "map_type": "AW2",
+    "tileset": "AW2"
+  },
+  "width": 30,
+  "height": 20,
+  "coordinates": "0-based; x = column (0 = left), y = row (0 = top). Row arrays are indexed [y][x].",
+  "map_rows": ["^^ ^^ ^^ ff .. .. .. ff .. ff .. .. .. ^^ ^^ ^^ ^^ .. .. ff .. Ck .. ff .. .. ^^ ^^ ^^ ^^", "^^ .. .. .. ff .. .. Co == == == == == .. ^^ ^^ .. ff == == == == == == == .. .. ff ^^ ^^", "ff .. .. .. == == == == == ff .. Ck == == ff Ck .. == == Ck .. .. ff .. == == == == .. ^^", ".. Ho == == == ff ff .. .. ^^ .. .. ff == == == == == ff .. .. .. .. .. .. ff .. == == Hk", "ff == .. Co == == == == == .. ff == == == ^^ .. ff == == == .. ff .. Ck .. .. == == .. ff", "^^ == == == == ff .. Cn == == == == ff .. .. ff .. Ck .. == == == == == == == == ff ff ff", "^^ ^^ .. ff == == == == == Cn .. == == == == == == == == == Ck .. ff ^^ ff .. ff ff ff ^^", "pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp ff ff", ".. ff .. ff .. ^^ .. .. ff .. Cn .. .. == == == == == == == == Cn .. == == == == == == ==", ".. .. .. .. .. ff ff == == == == == == == Cn ff .. ,, ~~ ,, == == == == ~~ ~~ ,, ,, Ck ==", "^^ Hb .. Cb == == == == Cn ,, ~~ ~~ ff .. ,, ,, ~~ ~~ ** ~~ ~~ ~~ ~~ ,, ~~ ~~ ** ~~ .. Ck", "ff == .. == == Cn .. ,, ~~ ~~ ** ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ..", ".. == == == ^^ ,, ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ Cn ~~ ~~ ~~ ~~ Cn ~~ ~~ ~~ ~~ ff", "pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp pp ~~ ..", "~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ..", "~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ Pn", "~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~", "Hg ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ Cn", "~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~", "~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ** ~~ Cn ~~ ~~ ~~ ~~ ~~ ~~ ** ~~"],
+  "legend": {
+    "..": "Plain",
+    "ff": "Wood",
+    "^^": "Mountain",
+    "==": "Road",
+    "[]": "Bridge",
+    "rv": "River",
+    "pp": "Pipe",
+    "ps": "Pipe Seam",
+    ",,": "Shoal",
+    "~~": "Sea",
+    "**": "Reef",
+    "  ": "Blank",
+    "??": "Unknown",
+    "<Letter><army>": "Building; letters H=HQ, C=City, B=Base, A=Airport, P=Port, T=Com Tower, L=Lab, S=Missile Silo; army o=Orange Star, b=Blue Moon, g=Green Earth, y=Yellow Comet, k=Black Hole, n=Neutral"
+  },
+  "terrain_rows": [
+    ["Mountain", "Mountain", "Mountain", "Wood", "Plain", "Plain", "Plain", "Wood", "Plain", "Wood", "Plain", "Plain", "Plain", "Mountain", "Mountain", "Mountain", "Mountain", "Plain", "Plain", "Wood", "Plain", "Black Hole City", "Plain", "Wood", "Plain", "Plain", "Mountain", "Mountain", "Mountain", "Mountain"],
+    ["Mountain", "Plain", "Plain", "Plain", "Wood", "Plain", "Plain", "Orange Star City", "Road", "Road", "Road", "Road", "Road", "Plain", "Mountain", "Mountain", "Plain", "Wood", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Plain", "Plain", "Wood", "Mountain", "Mountain"],
+    ["Wood", "Plain", "Plain", "Plain", "Road", "Road", "Road", "Road", "Road", "Wood", "Plain", "Black Hole City", "Road", "Road", "Wood", "Black Hole City", "Plain", "Road", "Road", "Black Hole City", "Plain", "Plain", "Wood", "Plain", "Road", "Road", "Road", "Road", "Plain", "Mountain"],
+    ["Plain", "Orange Star HQ", "Road", "Road", "Road", "Wood", "Wood", "Plain", "Plain", "Mountain", "Plain", "Plain", "Wood", "Road", "Road", "Road", "Road", "Road", "Wood", "Plain", "Plain", "Plain", "Plain", "Plain", "Plain", "Wood", "Plain", "Road", "Road", "Black Hole HQ"],
+    ["Wood", "Road", "Plain", "Orange Star City", "Road", "Road", "Road", "Road", "Road", "Plain", "Wood", "Road", "Road", "Road", "Mountain", "Plain", "Wood", "Road", "Road", "Road", "Plain", "Wood", "Plain", "Black Hole City", "Plain", "Plain", "Road", "Road", "Plain", "Wood"],
+    ["Mountain", "Road", "Road", "Road", "Road", "Wood", "Plain", "Neutral City", "Road", "Road", "Road", "Road", "Wood", "Plain", "Plain", "Wood", "Plain", "Black Hole City", "Plain", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Wood", "Wood", "Wood"],
+    ["Mountain", "Mountain", "Plain", "Wood", "Road", "Road", "Road", "Road", "Road", "Neutral City", "Plain", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Black Hole City", "Plain", "Wood", "Mountain", "Wood", "Plain", "Wood", "Wood", "Wood", "Mountain"],
+    ["Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Wood", "Wood"],
+    ["Plain", "Wood", "Plain", "Wood", "Plain", "Mountain", "Plain", "Plain", "Wood", "Plain", "Neutral City", "Plain", "Plain", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Neutral City", "Plain", "Road", "Road", "Road", "Road", "Road", "Road", "Road"],
+    ["Plain", "Plain", "Plain", "Plain", "Plain", "Wood", "Wood", "Road", "Road", "Road", "Road", "Road", "Road", "Road", "Neutral City", "Wood", "Plain", "Shoal", "Sea", "Shoal", "Road", "Road", "Road", "Road", "Sea", "Sea", "Shoal", "Shoal", "Black Hole City", "Road"],
+    ["Mountain", "Blue Moon HQ", "Plain", "Blue Moon City", "Road", "Road", "Road", "Road", "Neutral City", "Shoal", "Sea", "Sea", "Wood", "Plain", "Shoal", "Shoal", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Shoal", "Sea", "Sea", "Reef", "Sea", "Plain", "Black Hole City"],
+    ["Wood", "Road", "Plain", "Road", "Road", "Neutral City", "Plain", "Shoal", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Plain"],
+    ["Plain", "Road", "Road", "Road", "Mountain", "Shoal", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Neutral City", "Sea", "Sea", "Sea", "Sea", "Neutral City", "Sea", "Sea", "Sea", "Sea", "Wood"],
+    ["Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Pipe", "Sea", "Plain"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Plain"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Neutral Port"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea"],
+    ["Green Earth HQ", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Neutral City"],
+    ["Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea"],
+    ["Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea", "Neutral City", "Sea", "Sea", "Sea", "Sea", "Sea", "Sea", "Reef", "Sea"]
+  ],
+  "buildings": [
+    {
+      "x": 21,
+      "y": 0,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "City",
+      "army": "Orange Star"
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 15,
+      "y": 2,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 19,
+      "y": 2,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "type": "HQ",
+      "army": "Orange Star"
+    },
+    {
+      "x": 29,
+      "y": 3,
+      "type": "HQ",
+      "army": "Black Hole"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "City",
+      "army": "Orange Star"
+    },
+    {
+      "x": 23,
+      "y": 4,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 17,
+      "y": 5,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 20,
+      "y": 6,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 21,
+      "y": 8,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 14,
+      "y": 9,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 28,
+      "y": 9,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 1,
+      "y": 10,
+      "type": "HQ",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 3,
+      "y": 10,
+      "type": "City",
+      "army": "Blue Moon"
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 29,
+      "y": 10,
+      "type": "City",
+      "army": "Black Hole"
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 19,
+      "y": 12,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 24,
+      "y": 12,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 29,
+      "y": 15,
+      "type": "Port",
+      "army": "Neutral"
+    },
+    {
+      "x": 0,
+      "y": 17,
+      "type": "HQ",
+      "army": "Green Earth"
+    },
+    {
+      "x": 29,
+      "y": 17,
+      "type": "City",
+      "army": "Neutral"
+    },
+    {
+      "x": 21,
+      "y": 19,
+      "type": "City",
+      "army": "Neutral"
+    }
+  ],
+  "units": [
+    {
+      "x": 1,
+      "y": 1,
+      "type": "APC",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "type": "Tank",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 26,
+      "y": 1,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "Artillery",
+      "army": "Orange Star",
+      "on": "Wood"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "type": "Md Tank",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "Tank",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "Anti-Air",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 24,
+      "y": 2,
+      "type": "Rockets",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 25,
+      "y": 2,
+      "type": "Artillery",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 26,
+      "y": 2,
+      "type": "Bomber",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 27,
+      "y": 2,
+      "type": "Md Tank",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 28,
+      "y": 2,
+      "type": "Neotank",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "Rockets",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "type": "Neotank",
+      "army": "Orange Star",
+      "on": "Orange Star HQ"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "Missiles",
+      "army": "Orange Star",
+      "on": "Road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "Anti-Air",
+      "army": "Orange Star",
+      "on": "Road"
+    },
+    {
+      "x": 26,
+      "y": 3,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 27,
+      "y": 3,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 28,
+      "y": 3,
+      "type": "Md Tank",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "Artillery",
+      "army": "Orange Star",
+      "on": "Wood"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "Md Tank",
+      "army": "Orange Star",
+      "on": "Road"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "Tank",
+      "army": "Orange Star",
+      "on": "Plain"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "Anti-Air",
+      "army": "Orange Star",
+      "on": "Orange Star City"
+    },
+    {
+      "x": 24,
+      "y": 4,
+      "type": "Rockets",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 25,
+      "y": 4,
+      "type": "Artillery",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 26,
+      "y": 4,
+      "type": "Bomber",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 27,
+      "y": 4,
+      "type": "Md Tank",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 28,
+      "y": 4,
+      "type": "Neotank",
+      "army": "Black Hole",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "type": "APC",
+      "army": "Orange Star",
+      "on": "Road"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "Tank",
+      "army": "Orange Star",
+      "on": "Road"
+    },
+    {
+      "x": 26,
+      "y": 5,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "type": "APC",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "type": "Bomber",
+      "army": "Blue Moon",
+      "on": "Wood"
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "type": "B Copter",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 23,
+      "y": 8,
+      "type": "Anti-Air",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 24,
+      "y": 8,
+      "type": "Missiles",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 25,
+      "y": 8,
+      "type": "Missiles",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 26,
+      "y": 8,
+      "type": "Fighter",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 0,
+      "y": 9,
+      "type": "Fighter",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "type": "Bomber",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 2,
+      "y": 9,
+      "type": "B Copter",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 23,
+      "y": 9,
+      "type": "Anti-Air",
+      "army": "Black Hole",
+      "on": "Road"
+    },
+    {
+      "x": 25,
+      "y": 9,
+      "type": "Fighter",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 26,
+      "y": 9,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Shoal"
+    },
+    {
+      "x": 0,
+      "y": 10,
+      "type": "Fighter",
+      "army": "Blue Moon",
+      "on": "Mountain"
+    },
+    {
+      "x": 1,
+      "y": 10,
+      "type": "B Copter",
+      "army": "Blue Moon",
+      "on": "Blue Moon HQ"
+    },
+    {
+      "x": 23,
+      "y": 10,
+      "type": "Anti-Air",
+      "army": "Black Hole",
+      "on": "Shoal"
+    },
+    {
+      "x": 25,
+      "y": 10,
+      "type": "Cruiser",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 26,
+      "y": 10,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Reef"
+    },
+    {
+      "x": 27,
+      "y": 10,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 0,
+      "y": 11,
+      "type": "Fighter",
+      "army": "Blue Moon",
+      "on": "Wood"
+    },
+    {
+      "x": 1,
+      "y": 11,
+      "type": "Bomber",
+      "army": "Blue Moon",
+      "on": "Road"
+    },
+    {
+      "x": 2,
+      "y": 11,
+      "type": "B Copter",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 24,
+      "y": 11,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 25,
+      "y": 11,
+      "type": "Cruiser",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 26,
+      "y": 11,
+      "type": "Cruiser",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 27,
+      "y": 11,
+      "type": "Fighter",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 0,
+      "y": 12,
+      "type": "APC",
+      "army": "Blue Moon",
+      "on": "Plain"
+    },
+    {
+      "x": 1,
+      "y": 12,
+      "type": "Bomber",
+      "army": "Blue Moon",
+      "on": "Road"
+    },
+    {
+      "x": 2,
+      "y": 12,
+      "type": "B Copter",
+      "army": "Blue Moon",
+      "on": "Road"
+    },
+    {
+      "x": 19,
+      "y": 12,
+      "type": "Missiles",
+      "army": "Black Hole",
+      "on": "Neutral City"
+    },
+    {
+      "x": 24,
+      "y": 12,
+      "type": "Missiles",
+      "army": "Black Hole",
+      "on": "Neutral City"
+    },
+    {
+      "x": 25,
+      "y": 12,
+      "type": "Cruiser",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 0,
+      "y": 15,
+      "type": "Sub",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 1,
+      "y": 15,
+      "type": "Battleship",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 2,
+      "y": 15,
+      "type": "Sub",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 24,
+      "y": 15,
+      "type": "Sub",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 25,
+      "y": 15,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 26,
+      "y": 15,
+      "type": "Battleship",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 27,
+      "y": 15,
+      "type": "Battleship",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 0,
+      "y": 16,
+      "type": "Cruiser",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 1,
+      "y": 16,
+      "type": "Battleship",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 2,
+      "y": 16,
+      "type": "Cruiser",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 24,
+      "y": 16,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 25,
+      "y": 16,
+      "type": "Sub",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 26,
+      "y": 16,
+      "type": "Bomber",
+      "army": "Black Hole",
+      "on": "Reef"
+    },
+    {
+      "x": 27,
+      "y": 16,
+      "type": "Cruiser",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 2,
+      "y": 17,
+      "type": "Cruiser",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 24,
+      "y": 17,
+      "type": "B Copter",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 25,
+      "y": 17,
+      "type": "Sub",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 26,
+      "y": 17,
+      "type": "Bomber",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 27,
+      "y": 17,
+      "type": "Cruiser",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 29,
+      "y": 17,
+      "type": "Rockets",
+      "army": "Black Hole",
+      "on": "Neutral City"
+    },
+    {
+      "x": 0,
+      "y": 18,
+      "type": "Cruiser",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 1,
+      "y": 18,
+      "type": "Battleship",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 2,
+      "y": 18,
+      "type": "Cruiser",
+      "army": "Green Earth",
+      "on": "Reef"
+    },
+    {
+      "x": 24,
+      "y": 18,
+      "type": "Sub",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 26,
+      "y": 18,
+      "type": "Battleship",
+      "army": "Black Hole",
+      "on": "Sea"
+    },
+    {
+      "x": 0,
+      "y": 19,
+      "type": "Sub",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 1,
+      "y": 19,
+      "type": "Battleship",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 2,
+      "y": 19,
+      "type": "Sub",
+      "army": "Green Earth",
+      "on": "Sea"
+    },
+    {
+      "x": 21,
+      "y": 19,
+      "type": "Rockets",
+      "army": "Black Hole",
+      "on": "Neutral City"
+    },
+    {
+      "x": 26,
+      "y": 19,
+      "type": "Bomber",
+      "army": "Black Hole",
+      "on": "Sea"
+    }
+  ],
+  "raw": {
+    "note": "Original 16-bit tile values, [y][x]. Terrain 0-299, buildings 300-499, units 500-899, extras 900-1299, 65535 = no unit.",
+    "terrain": [
+      [150, 150, 150, 90, 0, 0, 0, 90, 0, 90, 0, 0, 0, 150, 150, 150, 150, 0, 0, 90, 0, 341, 0, 90, 0, 0, 150, 150, 150, 150],
+      [150, 0, 0, 0, 90, 0, 0, 301, 1, 1, 1, 1, 1, 0, 150, 150, 0, 90, 1, 1, 1, 1, 1, 1, 1, 0, 0, 90, 150, 150],
+      [90, 0, 0, 0, 1, 1, 1, 1, 1, 90, 0, 341, 1, 1, 90, 341, 0, 1, 1, 341, 0, 0, 90, 0, 1, 1, 1, 1, 0, 150],
+      [0, 300, 1, 1, 1, 90, 90, 0, 0, 150, 0, 0, 90, 1, 1, 1, 1, 1, 90, 0, 0, 0, 0, 0, 0, 90, 0, 1, 1, 340],
+      [90, 1, 0, 301, 1, 1, 1, 1, 1, 0, 90, 1, 1, 1, 150, 0, 90, 1, 1, 1, 0, 90, 0, 341, 0, 0, 1, 1, 0, 90],
+      [150, 1, 1, 1, 1, 90, 0, 351, 1, 1, 1, 1, 90, 0, 0, 90, 0, 341, 0, 1, 1, 1, 1, 1, 1, 1, 1, 90, 90, 90],
+      [150, 150, 0, 90, 1, 1, 1, 1, 1, 351, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 341, 0, 90, 150, 90, 0, 90, 90, 90, 150],
+      [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 90, 90],
+      [0, 90, 0, 90, 0, 150, 0, 0, 90, 0, 351, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 351, 0, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 90, 90, 1, 1, 1, 1, 1, 1, 1, 351, 90, 0, 39, 60, 39, 1, 1, 1, 1, 60, 60, 39, 39, 341, 1],
+      [150, 310, 0, 311, 1, 1, 1, 1, 351, 39, 60, 60, 90, 0, 39, 39, 60, 60, 30, 60, 60, 60, 60, 39, 60, 60, 30, 60, 0, 341],
+      [90, 1, 0, 1, 1, 351, 0, 39, 60, 60, 30, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 0],
+      [0, 1, 1, 1, 150, 39, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 351, 60, 60, 60, 60, 351, 60, 60, 60, 60, 90],
+      [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 60, 0],
+      [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 0],
+      [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 354],
+      [60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60],
+      [320, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 351],
+      [60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60],
+      [60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 30, 60, 351, 60, 60, 60, 60, 60, 60, 30, 60]
+    ],
+    "units": [
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 522, 521, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 666, 65535, 65535, 65535],
+      [503, 501, 521, 504, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 683, 663, 685, 661, 669, 65535],
+      [523, 509, 524, 504, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 666, 666, 661, 65535],
+      [503, 501, 521, 504, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 683, 663, 685, 661, 669, 65535],
+      [65535, 522, 521, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 666, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [562, 565, 546, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 664, 684, 684, 665, 65535, 65535, 65535],
+      [545, 565, 546, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 664, 65535, 665, 666, 65535, 65535, 65535],
+      [545, 546, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 664, 65535, 687, 666, 666, 65535, 65535],
+      [545, 565, 546, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 666, 687, 687, 665, 65535, 65535],
+      [562, 565, 546, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 684, 65535, 65535, 65535, 65535, 684, 687, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535],
+      [608, 587, 608, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 688, 666, 667, 667, 65535, 65535],
+      [607, 587, 607, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 666, 688, 685, 687, 65535, 65535],
+      [65535, 65535, 607, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 666, 688, 685, 687, 65535, 683],
+      [607, 587, 607, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 688, 65535, 667, 65535, 65535, 65535],
+      [608, 587, 608, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535, 683, 65535, 65535, 65535, 65535, 685, 65535, 65535, 65535]
+    ]
+  }
+}

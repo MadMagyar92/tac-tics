@@ -25,7 +25,7 @@ import { attackRouter } from "../unit";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
 
 type UnitOptions = { gameId?: string; playerId?: string; x?: number; y?: number; health?: number; offenseIds?: string[] };
 

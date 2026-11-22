@@ -168,7 +168,7 @@ function createWorld(ammo: Record<string, number> = {}, units: UnitObject[] = []
   return { service: new AttackActionService(definitionService, objectService), requested, loaded, saved, savedUnits, deletedUnits, deletedMovements, deletedOffenses, saves, deletes, calls, stored };
 }
 
-const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapDefinition: key("map", "m1") });
+const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
 
 type UnitOptions = { offense?: string[]; health?: number; gameId?: string; playerId?: string; x?: number; y?: number; transportIds?: string[] };
 

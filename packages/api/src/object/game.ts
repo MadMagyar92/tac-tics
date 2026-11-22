@@ -1,4 +1,3 @@
-import { DefinitionKey } from "../definition";
 import { BaseObject, Id } from "./app";
 
 export type GameReferenceId = Id & {
@@ -8,5 +7,5 @@ export type GameReferenceId = Id & {
 export type GameObject = BaseObject<Id> & {
   turn: number;
   playerTurn: number;
-  mapDefinition: DefinitionKey;
+  mapId: string;
 };

@@ -1,15 +1,13 @@
-import type { TerrainObject } from "@tac-tics/api";
+import type { CaptureObject, TerrainObject } from "@tac-tics/api";
 import { ObjectServiceImpl } from "@tac-tics/app";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { renderTerrain } from "../ui";
 
 const square = (name: string, x: number, y: number): TerrainObject => ({
-  identifier: { id: `terrain-${y * 10 + x + 1}`, gameId: "game-1" },
+  identifier: { id: `terrain-${y * 10 + x + 1}`, mapId: "map-1" },
   definition: { scope: "terrain", name },
   position: { x, y },
-  health: 20,
-  playerId: undefined,
 });
 
 describe("renderTerrain", () => {
@@ -88,11 +86,14 @@ describe("renderTerrain", () => {
       sea,
     ];
 
-    /** The terrain `GET /game/game-1/terrain` responds with: the land of the object file, and the sea that is virtual. */
-    const terrainOfGame = (): TerrainObject[] =>
-      [...new ObjectServiceImpl(resolve(__dirname, "../../../config/app.config.json")).loadAll<TerrainObject>("terrain").values()].filter(
-        (terrain) => terrain.identifier.gameId === "game-1",
-      );
+    /** The terrain `GET /game/game-1/terrain` responds with: the static terrain of map-1, the map of game-1, then the captures of game-1. */
+    const terrainOfGame = (): (TerrainObject | CaptureObject)[] => {
+      const objects = new ObjectServiceImpl(resolve(__dirname, "../../../config/app.config.json"));
+      return [
+        ...[...objects.loadAll<TerrainObject>("terrain").values()].filter((terrain) => terrain.identifier.mapId === "map-1"),
+        ...[...objects.loadAll<CaptureObject>("capture").values()].filter((capture) => capture.identifier.gameId === "game-1"),
+      ];
+    };
 
     it("renders Spann Island, 15 squares wide and 10 tall", () => {
       expect(terrainOfGame()).toHaveLength(150);

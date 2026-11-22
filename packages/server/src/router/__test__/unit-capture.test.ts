@@ -7,9 +7,9 @@ import {
   type CaptureActionOutput,
   type CaptureActionPlan,
   type CaptureActionResult,
+  type CaptureObject,
   type GameObject,
   Scope,
-  type TerrainObject,
   type UnitObject,
 } from "@tac-tics/api";
 import { CAPTURE_ACTION, ObjectServiceImpl } from "@tac-tics/app";
@@ -21,10 +21,10 @@ const game = (): GameObject => ({
   definition: { scope: "game", name: "2-player" },
   turn: 0,
   playerTurn: 0,
-  mapDefinition: { scope: "map", name: "spann-island" },
+  mapId: "map-1",
 });
 
-/** The unit on the city terrain-20 at (9, 2) of the repo's config. */
+/** The unit on the city terrain-039 at (9, 2) of the repo's config. */
 const unitAt = (x: number, y: number): UnitObject => ({
   identifier: { id: "capturer", gameId: "game-1" },
   definition: { scope: "unit", name: "infantry" },
@@ -90,7 +90,7 @@ describe("captureRouter", () => {
 
       const res = await request(app).get(path);
 
-      const target = objectService.load<TerrainObject>(Scope.Terrain, { id: "terrain-20", gameId: "game-1" });
+      const target = objectService.load<CaptureObject>(Scope.Capture, { id: "terrain-039", gameId: "game-1" });
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ unit, target });
       expect(asked).toEqual([{ definition: CAPTURE_ACTION, game: game(), unit, target }]);
@@ -128,7 +128,7 @@ describe("captureRouter", () => {
 
       const res = await request(app).post(path);
 
-      const target = objectService.load<TerrainObject>(Scope.Terrain, { id: "terrain-20", gameId: "game-1" })!;
+      const target = objectService.load<CaptureObject>(Scope.Capture, { id: "terrain-039", gameId: "game-1" })!;
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ definition: CAPTURE_ACTION, unit, target: { ...target, health: 10 } });
       expect(executed).toEqual([{ definition: CAPTURE_ACTION, game: game(), unit, target }]);

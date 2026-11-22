@@ -1,7 +1,7 @@
 import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { type ActionService, type DeployActionInput, type DeployActionOutput, type DeployActionPlan, type DeployActionResult, type GameObject, type MovementObject, type PlayerObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
+import { type ActionService, type CaptureObject, type DeployActionInput, type DeployActionOutput, type DeployActionPlan, type DeployActionResult, type GameObject, type MovementObject, type PlayerObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { DEPLOY_ACTION, ObjectServiceImpl } from "@tac-tics/app";
 import { createStubActionService, realAppConfig } from "../../../test/config";
 import { deployRouter } from "../game";
@@ -68,7 +68,7 @@ function startObjects() {
   return new ObjectServiceImpl(realAppConfig);
 }
 
-const path = "/game/game-1/deploy/terrain-2";
+const path = "/game/game-1/deploy/terrain-018";
 
 describe("deployRouter", () => {
   describe("POST /game/:gameId/deploy/:terrainId", () => {
@@ -82,7 +82,7 @@ describe("deployRouter", () => {
         {
           definition: DEPLOY_ACTION,
           game: objects.load<GameObject>(Scope.Game, { id: "game-1" }),
-          terrain: objects.load<TerrainObject>(Scope.Terrain, { id: "terrain-2", gameId: "game-1" }),
+          terrain: objects.load<TerrainObject>(Scope.Terrain, { id: "terrain-018", mapId: "map-1" }),
           target: { scope: "unit", name: "tank" },
         },
       ]);
@@ -122,7 +122,7 @@ describe("deployRouter", () => {
       const { service, executed } = createStubDeployService(() => false);
       const res = await request(createApp(service, startObjects())).post(path).send({ unit: "tank" });
       expect(res.status).toBe(409);
-      expect(res.body).toEqual({ error: "Unit tank cannot be deployed on terrain terrain-2" });
+      expect(res.body).toEqual({ error: "Unit tank cannot be deployed on terrain terrain-018" });
       expect(executed).toEqual([]);
     });
   });
@@ -158,7 +158,7 @@ describe("deployRouter", () => {
       const { service, previewed } = createStubDeployService(() => false);
       const res = await request(createApp(service, startObjects())).get(`${path}?unit=tank`);
       expect(res.status).toBe(404);
-      expect(res.body).toEqual({ error: "Unit tank cannot be deployed on terrain terrain-2" });
+      expect(res.body).toEqual({ error: "Unit tank cannot be deployed on terrain terrain-018" });
       expect(previewed).toEqual([]);
     });
   });
@@ -227,15 +227,24 @@ describe("deployRouter", () => {
       expect(asked).toEqual([]);
     });
 
-    it("is not one of another game's terrain", async () => {
+    it("is not one of another game's captures", async () => {
       const objects = startObjects();
-      objects.save<TerrainObject>(Scope.Terrain, {
+      objects.save<CaptureObject>(Scope.Capture, {
         identifier: { id: "elsewhere", gameId: "game-2" },
         definition: { scope: "terrain", name: "base" },
         position: { x: 0, y: 0 },
         health: 20,
         playerId: "player-1",
       });
+      const { service } = createStubDeployService();
+      const res = await request(createApp(service, objects)).get("/game/game-1/deploy/elsewhere?unit=tank");
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ error: "Terrain elsewhere not found in game game-1" });
+    });
+
+    it("is not one of the static terrain of another map", async () => {
+      const objects = startObjects();
+      objects.save<TerrainObject>(Scope.Terrain, { identifier: { id: "elsewhere", mapId: "map-2" }, definition: { scope: "terrain", name: "plain" }, position: { x: 0, y: 0 } });
       const { service } = createStubDeployService();
       const res = await request(createApp(service, objects)).get("/game/game-1/deploy/elsewhere?unit=tank");
       expect(res.status).toBe(404);

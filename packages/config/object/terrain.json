@@ -1,522 +1,647 @@
 [
   {
-    "identifier": { "id": "terrain-1", "gameId": "game-1" },
+    "identifier": { "id": "terrain-000", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-001", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 1, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-002", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 2, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-003", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 3, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-004", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 4, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-005", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 5, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-006", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 6, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-007", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 7, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-008", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 8, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-009", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 9, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-010", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 10, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-011", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 11, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-012", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 12, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-013", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 13, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-014", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 0 }
+  },
+  {
+    "identifier": { "id": "terrain-015", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 1 }
+  },
+  {
+    "identifier": { "id": "terrain-016", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 1, "y": 1 }
+  },
+  {
+    "identifier": { "id": "terrain-017", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 2, "y": 1 },
-    "health": 20
+    "position": { "x": 2, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-2", "gameId": "game-1" },
+    "identifier": { "id": "terrain-018", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 3, "y": 1 },
-    "health": 20
+    "position": { "x": 3, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-3", "gameId": "game-1" },
+    "identifier": { "id": "terrain-019", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 4, "y": 1 },
-    "health": 20
+    "position": { "x": 4, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-4", "gameId": "game-1" },
+    "identifier": { "id": "terrain-020", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 5, "y": 1 },
-    "health": 20
+    "position": { "x": 5, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-5", "gameId": "game-1" },
+    "identifier": { "id": "terrain-021", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "bridge" },
-    "position": { "x": 6, "y": 1 },
-    "health": 20
+    "position": { "x": 6, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-6", "gameId": "game-1" },
+    "identifier": { "id": "terrain-022", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 7, "y": 1 },
-    "health": 20
+    "position": { "x": 7, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-7", "gameId": "game-1" },
+    "identifier": { "id": "terrain-023", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 8, "y": 1 },
-    "health": 20
+    "position": { "x": 8, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-8", "gameId": "game-1" },
+    "identifier": { "id": "terrain-024", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 9, "y": 1 },
-    "health": 20
+    "position": { "x": 9, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-9", "gameId": "game-1" },
+    "identifier": { "id": "terrain-025", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 10, "y": 1 },
-    "health": 20
+    "position": { "x": 10, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-10", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 11, "y": 1 },
-    "health": 20,
-    "playerId": "player-2"
-  },
-  {
-    "identifier": { "id": "terrain-11", "gameId": "game-1" },
+    "identifier": { "id": "terrain-027", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 12, "y": 1 },
-    "health": 20
+    "position": { "x": 12, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-12", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 13, "y": 1 },
-    "health": 20,
-    "playerId": "player-2"
+    "identifier": { "id": "terrain-029", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 1 }
   },
   {
-    "identifier": { "id": "terrain-13", "gameId": "game-1" },
+    "identifier": { "id": "terrain-030", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 2 }
+  },
+  {
+    "identifier": { "id": "terrain-031", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 1, "y": 2 },
-    "health": 20
+    "position": { "x": 1, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-14", "gameId": "game-1" },
+    "identifier": { "id": "terrain-032", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 2, "y": 2 },
-    "health": 20
+    "position": { "x": 2, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-15", "gameId": "game-1" },
+    "identifier": { "id": "terrain-033", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 3, "y": 2 },
-    "health": 20
+    "position": { "x": 3, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-16", "gameId": "game-1" },
+    "identifier": { "id": "terrain-034", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 4, "y": 2 },
-    "health": 20
+    "position": { "x": 4, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-17", "gameId": "game-1" },
+    "identifier": { "id": "terrain-035", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 5, "y": 2 },
-    "health": 20
+    "position": { "x": 5, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-18", "gameId": "game-1" },
+    "identifier": { "id": "terrain-036", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 6, "y": 2 }
+  },
+  {
+    "identifier": { "id": "terrain-037", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 7, "y": 2 },
-    "health": 20
+    "position": { "x": 7, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-19", "gameId": "game-1" },
+    "identifier": { "id": "terrain-038", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 8, "y": 2 },
-    "health": 20
+    "position": { "x": 8, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-20", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 9, "y": 2 },
-    "health": 20
-  },
-  {
-    "identifier": { "id": "terrain-21", "gameId": "game-1" },
+    "identifier": { "id": "terrain-040", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 10, "y": 2 },
-    "health": 20
+    "position": { "x": 10, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-22", "gameId": "game-1" },
+    "identifier": { "id": "terrain-041", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 11, "y": 2 },
-    "health": 20
+    "position": { "x": 11, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-23", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "headquarters" },
-    "position": { "x": 12, "y": 2 },
-    "health": 20,
-    "playerId": "player-2"
+    "identifier": { "id": "terrain-044", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 2 }
   },
   {
-    "identifier": { "id": "terrain-24", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 13, "y": 2 },
-    "health": 20,
-    "playerId": "player-2"
+    "identifier": { "id": "terrain-045", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-25", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 1, "y": 3 },
-    "health": 20
-  },
-  {
-    "identifier": { "id": "terrain-26", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 2, "y": 3 },
-    "health": 20
-  },
-  {
-    "identifier": { "id": "terrain-27", "gameId": "game-1" },
+    "identifier": { "id": "terrain-048", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 3, "y": 3 },
-    "health": 20
+    "position": { "x": 3, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-28", "gameId": "game-1" },
+    "identifier": { "id": "terrain-049", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 4, "y": 3 },
-    "health": 20
+    "position": { "x": 4, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-29", "gameId": "game-1" },
+    "identifier": { "id": "terrain-050", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 5, "y": 3 }
+  },
+  {
+    "identifier": { "id": "terrain-051", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 6, "y": 3 }
+  },
+  {
+    "identifier": { "id": "terrain-052", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 7, "y": 3 }
+  },
+  {
+    "identifier": { "id": "terrain-053", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 8, "y": 3 },
-    "health": 20
+    "position": { "x": 8, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-30", "gameId": "game-1" },
+    "identifier": { "id": "terrain-054", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 9, "y": 3 },
-    "health": 20
+    "position": { "x": 9, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-31", "gameId": "game-1" },
+    "identifier": { "id": "terrain-055", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "mountain" },
-    "position": { "x": 10, "y": 3 },
-    "health": 20
+    "position": { "x": 10, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-32", "gameId": "game-1" },
+    "identifier": { "id": "terrain-056", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 11, "y": 3 },
-    "health": 20
+    "position": { "x": 11, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-33", "gameId": "game-1" },
+    "identifier": { "id": "terrain-057", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 12, "y": 3 },
-    "health": 20
+    "position": { "x": 12, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-34", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 13, "y": 3 },
-    "health": 20,
-    "playerId": "player-2"
+    "identifier": { "id": "terrain-059", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 3 }
   },
   {
-    "identifier": { "id": "terrain-35", "gameId": "game-1" },
+    "identifier": { "id": "terrain-060", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 4 }
+  },
+  {
+    "identifier": { "id": "terrain-061", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 1, "y": 4 },
-    "health": 20
+    "position": { "x": 1, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-36", "gameId": "game-1" },
+    "identifier": { "id": "terrain-062", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 2, "y": 4 },
-    "health": 20
+    "position": { "x": 2, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-37", "gameId": "game-1" },
+    "identifier": { "id": "terrain-063", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 3, "y": 4 },
-    "health": 20
+    "position": { "x": 3, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-38", "gameId": "game-1" },
+    "identifier": { "id": "terrain-064", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 4, "y": 4 },
-    "health": 20
+    "position": { "x": 4, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-39", "gameId": "game-1" },
+    "identifier": { "id": "terrain-065", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 5, "y": 4 }
+  },
+  {
+    "identifier": { "id": "terrain-066", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 6, "y": 4 }
+  },
+  {
+    "identifier": { "id": "terrain-067", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 7, "y": 4 }
+  },
+  {
+    "identifier": { "id": "terrain-068", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 8, "y": 4 },
-    "health": 20
+    "position": { "x": 8, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-40", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 9, "y": 4 },
-    "health": 20
-  },
-  {
-    "identifier": { "id": "terrain-41", "gameId": "game-1" },
+    "identifier": { "id": "terrain-070", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "mountain" },
-    "position": { "x": 10, "y": 4 },
-    "health": 20
+    "position": { "x": 10, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-42", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 11, "y": 4 },
-    "health": 20
-  },
-  {
-    "identifier": { "id": "terrain-43", "gameId": "game-1" },
+    "identifier": { "id": "terrain-072", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 12, "y": 4 },
-    "health": 20
+    "position": { "x": 12, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-44", "gameId": "game-1" },
+    "identifier": { "id": "terrain-073", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 13, "y": 4 },
-    "health": 20
+    "position": { "x": 13, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-45", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 1, "y": 5 },
-    "health": 20,
-    "playerId": "player-1"
+    "identifier": { "id": "terrain-074", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 4 }
   },
   {
-    "identifier": { "id": "terrain-46", "gameId": "game-1" },
+    "identifier": { "id": "terrain-075", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 5 }
+  },
+  {
+    "identifier": { "id": "terrain-077", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 2, "y": 5 },
-    "health": 20
+    "position": { "x": 2, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-47", "gameId": "game-1" },
+    "identifier": { "id": "terrain-078", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 3, "y": 5 },
-    "health": 20
+    "position": { "x": 3, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-48", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 4, "y": 5 },
-    "health": 20
+    "identifier": { "id": "terrain-080", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 5, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-49", "gameId": "game-1" },
+    "identifier": { "id": "terrain-081", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 6, "y": 5 }
+  },
+  {
+    "identifier": { "id": "terrain-082", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 7, "y": 5 },
-    "health": 20
+    "position": { "x": 7, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-50", "gameId": "game-1" },
+    "identifier": { "id": "terrain-083", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 8, "y": 5 },
-    "health": 20
+    "position": { "x": 8, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-51", "gameId": "game-1" },
+    "identifier": { "id": "terrain-084", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 9, "y": 5 },
-    "health": 20
+    "position": { "x": 9, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-52", "gameId": "game-1" },
+    "identifier": { "id": "terrain-085", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 10, "y": 5 },
-    "health": 20
+    "position": { "x": 10, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-53", "gameId": "game-1" },
+    "identifier": { "id": "terrain-086", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 11, "y": 5 },
-    "health": 20
+    "position": { "x": 11, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-54", "gameId": "game-1" },
+    "identifier": { "id": "terrain-087", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "road" },
-    "position": { "x": 12, "y": 5 },
-    "health": 20
+    "position": { "x": 12, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-55", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 13, "y": 5 },
-    "health": 20
+    "identifier": { "id": "terrain-089", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 5 }
   },
   {
-    "identifier": { "id": "terrain-56", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 1, "y": 6 },
-    "health": 20,
-    "playerId": "player-1"
+    "identifier": { "id": "terrain-090", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-57", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "headquarters" },
-    "position": { "x": 2, "y": 6 },
-    "health": 20,
-    "playerId": "player-1"
-  },
-  {
-    "identifier": { "id": "terrain-58", "gameId": "game-1" },
+    "identifier": { "id": "terrain-093", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 3, "y": 6 },
-    "health": 20
+    "position": { "x": 3, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-59", "gameId": "game-1" },
+    "identifier": { "id": "terrain-094", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 4, "y": 6 },
-    "health": 20
+    "position": { "x": 4, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-60", "gameId": "game-1" },
+    "identifier": { "id": "terrain-095", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 5, "y": 6 },
-    "health": 20
+    "position": { "x": 5, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-61", "gameId": "game-1" },
+    "identifier": { "id": "terrain-096", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 6, "y": 6 },
-    "health": 20
+    "position": { "x": 6, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-62", "gameId": "game-1" },
+    "identifier": { "id": "terrain-097", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 7, "y": 6 },
-    "health": 20
+    "position": { "x": 7, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-63", "gameId": "game-1" },
+    "identifier": { "id": "terrain-098", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 8, "y": 6 },
-    "health": 20
+    "position": { "x": 8, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-64", "gameId": "game-1" },
+    "identifier": { "id": "terrain-099", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 9, "y": 6 },
-    "health": 20
+    "position": { "x": 9, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-65", "gameId": "game-1" },
+    "identifier": { "id": "terrain-100", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 10, "y": 6 }
+  },
+  {
+    "identifier": { "id": "terrain-101", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 11, "y": 6 }
+  },
+  {
+    "identifier": { "id": "terrain-102", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "bridge" },
-    "position": { "x": 12, "y": 6 },
-    "health": 20
+    "position": { "x": 12, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-66", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 2, "y": 7 },
-    "health": 20,
-    "playerId": "player-1"
+    "identifier": { "id": "terrain-103", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 13, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-67", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "base" },
-    "position": { "x": 3, "y": 7 },
-    "health": 20,
-    "playerId": "player-1"
+    "identifier": { "id": "terrain-104", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 6 }
   },
   {
-    "identifier": { "id": "terrain-68", "gameId": "game-1" },
+    "identifier": { "id": "terrain-105", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 7 }
+  },
+  {
+    "identifier": { "id": "terrain-106", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 1, "y": 7 }
+  },
+  {
+    "identifier": { "id": "terrain-109", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 4, "y": 7 },
-    "health": 20
+    "position": { "x": 4, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-69", "gameId": "game-1" },
+    "identifier": { "id": "terrain-110", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 5, "y": 7 },
-    "health": 20
+    "position": { "x": 5, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-70", "gameId": "game-1" },
+    "identifier": { "id": "terrain-111", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 6, "y": 7 },
-    "health": 20
+    "position": { "x": 6, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-71", "gameId": "game-1" },
+    "identifier": { "id": "terrain-112", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 7, "y": 7 },
-    "health": 20
+    "position": { "x": 7, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-72", "gameId": "game-1" },
+    "identifier": { "id": "terrain-113", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 8, "y": 7 },
-    "health": 20
+    "position": { "x": 8, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-73", "gameId": "game-1" },
+    "identifier": { "id": "terrain-114", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 9, "y": 7 },
-    "health": 20
+    "position": { "x": 9, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-74", "gameId": "game-1" },
+    "identifier": { "id": "terrain-115", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 10, "y": 7 }
+  },
+  {
+    "identifier": { "id": "terrain-116", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 11, "y": 7 }
+  },
+  {
+    "identifier": { "id": "terrain-117", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 12, "y": 7 },
-    "health": 20
+    "position": { "x": 12, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-75", "gameId": "game-1" },
+    "identifier": { "id": "terrain-118", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 13, "y": 7 },
-    "health": 20
+    "position": { "x": 13, "y": 7 }
   },
   {
-    "identifier": { "id": "terrain-76", "gameId": "game-1" },
+    "identifier": { "id": "terrain-119", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 7 }
+  },
+  {
+    "identifier": { "id": "terrain-120", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 8 }
+  },
+  {
+    "identifier": { "id": "terrain-121", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 1, "y": 8 }
+  },
+  {
+    "identifier": { "id": "terrain-122", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 2, "y": 8 }
+  },
+  {
+    "identifier": { "id": "terrain-123", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 3, "y": 8 }
+  },
+  {
+    "identifier": { "id": "terrain-124", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "mountain" },
-    "position": { "x": 4, "y": 8 },
-    "health": 20
+    "position": { "x": 4, "y": 8 }
   },
   {
-    "identifier": { "id": "terrain-77", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 5, "y": 8 },
-    "health": 20
-  },
-  {
-    "identifier": { "id": "terrain-78", "gameId": "game-1" },
+    "identifier": { "id": "terrain-126", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "mountain" },
-    "position": { "x": 6, "y": 8 },
-    "health": 20
+    "position": { "x": 6, "y": 8 }
   },
   {
-    "identifier": { "id": "terrain-79", "gameId": "game-1" },
+    "identifier": { "id": "terrain-127", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "woods" },
-    "position": { "x": 7, "y": 8 },
-    "health": 20
+    "position": { "x": 7, "y": 8 }
   },
   {
-    "identifier": { "id": "terrain-80", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 8, "y": 8 },
-    "health": 20
-  },
-  {
-    "identifier": { "id": "terrain-81", "gameId": "game-1" },
+    "identifier": { "id": "terrain-129", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 9, "y": 8 },
-    "health": 20
+    "position": { "x": 9, "y": 8 }
   },
   {
-    "identifier": { "id": "terrain-82", "gameId": "game-1" },
+    "identifier": { "id": "terrain-130", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "bridge" },
-    "position": { "x": 10, "y": 8 },
-    "health": 20
+    "position": { "x": 10, "y": 8 }
   },
   {
-    "identifier": { "id": "terrain-83", "gameId": "game-1" },
+    "identifier": { "id": "terrain-131", "mapId": "map-1" },
     "definition": { "scope": "terrain", "name": "plain" },
-    "position": { "x": 11, "y": 8 },
-    "health": 20
+    "position": { "x": 11, "y": 8 }
   },
   {
-    "identifier": { "id": "terrain-84", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 12, "y": 8 },
-    "health": 20
+    "identifier": { "id": "terrain-134", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 8 }
   },
   {
-    "identifier": { "id": "terrain-85", "gameId": "game-1" },
-    "definition": { "scope": "terrain", "name": "city" },
-    "position": { "x": 13, "y": 8 },
-    "health": 20
+    "identifier": { "id": "terrain-135", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 0, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-136", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 1, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-137", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 2, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-138", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 3, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-139", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 4, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-140", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 5, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-141", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 6, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-142", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 7, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-143", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 8, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-144", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 9, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-145", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 10, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-146", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 11, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-147", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 12, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-148", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 13, "y": 9 }
+  },
+  {
+    "identifier": { "id": "terrain-149", "mapId": "map-1" },
+    "definition": { "scope": "terrain", "name": "sea" },
+    "position": { "x": 14, "y": 9 }
   }
 ]
