@@ -1,6 +1,5 @@
 import type {
   BaseObject,
-  CaptureObject,
   Definition,
   DefinitionKey,
   DefinitionService,
@@ -11,6 +10,7 @@ import type {
   ObjectService,
   OffenseDefinition,
   OffenseObject,
+  OutpostObject,
   PlayerObject,
   TerrainObject,
   UnitDefinition,
@@ -114,9 +114,9 @@ const player = (id = "p1", order = 0, funds = 10000, gameId = "g1"): PlayerObjec
 });
 
 /** The terrain at (x, y), controlled by `playerId`, or by nobody when it is null. */
-const terrain = (x: number, y: number, playerId: string | null = "p1", gameId = "g1"): CaptureObject => ({
+const terrain = (x: number, y: number, playerId: string | null = "p1", gameId = "g1"): OutpostObject => ({
   identifier: { id: `base-${x}-${y}`, gameId },
-  definition: key("terrain", "base"),
+  definition: key("outpost", "factory"),
   position: { x, y },
   health: 20,
   playerId: playerId ?? undefined,
@@ -135,7 +135,7 @@ const existing = (id: string, x: number, y: number, gameId = "g1", playerId = "p
   transportIds: [],
 });
 
-type Options = { gameTurn?: number; gameId?: string; where?: TerrainObject | CaptureObject; what?: DefinitionKey };
+type Options = { gameTurn?: number; gameId?: string; where?: TerrainObject | OutpostObject; what?: DefinitionKey };
 
 const deploy = ({ gameTurn = 0, gameId = "g1", where = terrain(3, 4), what = key("unit", "tank") }: Options = {}): DeployActionInput => ({
   definition: DEPLOY_ACTION,
@@ -249,7 +249,7 @@ describe("DeployActionService", () => {
         expect(createWorld().service.plan(deploy({ what: key("unit", "ghost") }))).toBeUndefined();
       });
 
-      it.each([["an offense", key("offense", "cannon")], ["a terrain", key("terrain", "base")]])("is false for the definition of %s, which is not a unit", (_name, what) => {
+      it.each([["an offense", key("offense", "cannon")], ["an outpost", key("outpost", "factory")]])("is false for the definition of %s, which is not a unit", (_name, what) => {
         const { service, requested } = createWorld();
         expect(service.plan(deploy({ what }))).toBeUndefined();
         expect(requested).toEqual([]);
@@ -530,9 +530,10 @@ describe("DeployActionService", () => {
       expect(saves.map((save) => save.scope)).toEqual(["unit", "movement", "offense", "offense", "player"]);
     });
 
-    it("does not save the terrain", () => {
+    it("does not save the outpost, nor any terrain", () => {
       const { service, saves } = createWorld();
       service.execute(service.plan(deploy())!);
+      expect(saves.map((save) => save.scope)).not.toContain("outpost");
       expect(saves.map((save) => save.scope)).not.toContain("terrain");
     });
 

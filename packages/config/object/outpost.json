@@ -1,0 +1,138 @@
+[
+  {
+    "identifier": { "id": "outpost-026", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 11, "y": 1 },
+    "health": 20,
+    "playerId": "player-2"
+  },
+  {
+    "identifier": { "id": "outpost-028", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 13, "y": 1 },
+    "health": 20,
+    "playerId": "player-2"
+  },
+  {
+    "identifier": { "id": "outpost-039", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 9, "y": 2 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-042", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "headquarters" },
+    "position": { "x": 12, "y": 2 },
+    "health": 20,
+    "playerId": "player-2"
+  },
+  {
+    "identifier": { "id": "outpost-043", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 13, "y": 2 },
+    "health": 20,
+    "playerId": "player-2"
+  },
+  {
+    "identifier": { "id": "outpost-046", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 1, "y": 3 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-047", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 2, "y": 3 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-058", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 13, "y": 3 },
+    "health": 20,
+    "playerId": "player-2"
+  },
+  {
+    "identifier": { "id": "outpost-069", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 9, "y": 4 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-071", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 11, "y": 4 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-076", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 1, "y": 5 },
+    "health": 20,
+    "playerId": "player-1"
+  },
+  {
+    "identifier": { "id": "outpost-079", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 4, "y": 5 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-088", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 13, "y": 5 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-091", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 1, "y": 6 },
+    "health": 20,
+    "playerId": "player-1"
+  },
+  {
+    "identifier": { "id": "outpost-092", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "headquarters" },
+    "position": { "x": 2, "y": 6 },
+    "health": 20,
+    "playerId": "player-1"
+  },
+  {
+    "identifier": { "id": "outpost-107", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 2, "y": 7 },
+    "health": 20,
+    "playerId": "player-1"
+  },
+  {
+    "identifier": { "id": "outpost-108", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "factory" },
+    "position": { "x": 3, "y": 7 },
+    "health": 20,
+    "playerId": "player-1"
+  },
+  {
+    "identifier": { "id": "outpost-125", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 5, "y": 8 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-128", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 8, "y": 8 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-132", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 12, "y": 8 },
+    "health": 20
+  },
+  {
+    "identifier": { "id": "outpost-133", "gameId": "game-1" },
+    "definition": { "scope": "outpost", "name": "city" },
+    "position": { "x": 13, "y": 8 },
+    "health": 20
+  }
+]

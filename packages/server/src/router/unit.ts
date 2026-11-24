@@ -9,12 +9,12 @@ import {
   type CaptureActionOutput,
   type CaptureActionPlan,
   type CaptureActionResult,
-  type CaptureObject,
   type MultiMoveActionInput,
   type MultiMoveActionOutput,
   type MultiMoveActionPlan,
   type MultiMoveActionResult,
   type ObjectService,
+  type OutpostObject,
   Scope,
   type UnitObject,
   type UnloadActionInput,
@@ -178,7 +178,7 @@ export function moveRouter(
 
 /**
  * Mount this router under `/game/:gameId/unit/:unitId/capture`, after the routers that load `res.locals.game` and
- * `res.locals.unit`. The target of the capture is the capture of the game under the unit.
+ * `res.locals.unit`. The target of the capture is the outpost of the game under the unit.
  *
  * - `GET /` previews the capture, if it can be made, and returns the objects it would change. It changes nothing.
  * - `POST /` makes the capture and returns its output. The capture service saves what it changes.
@@ -191,11 +191,11 @@ export function captureRouter(
 
   function getCaptureFromRequest(res: Response) {
     const { game, unit } = res.locals;
-    const target = [...objectService.loadAll<CaptureObject>(Scope.Capture).values()].find(
-      (capture) =>
-        capture.identifier.gameId === game.identifier.id &&
-        capture.position.x === unit.position.x &&
-        capture.position.y === unit.position.y,
+    const target = [...objectService.loadAll<OutpostObject>(Scope.Outpost).values()].find(
+      (outpost) =>
+        outpost.identifier.gameId === game.identifier.id &&
+        outpost.position.x === unit.position.x &&
+        outpost.position.y === unit.position.y,
     );
     return target && captureService.plan({ definition: CAPTURE_ACTION, game, unit, target });
   }

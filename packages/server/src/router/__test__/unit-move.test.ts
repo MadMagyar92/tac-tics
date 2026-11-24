@@ -1,7 +1,7 @@
 import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { type ActionService, type CaptureObject, type GameObject, type MovementObject, type MultiMoveActionInput, type MultiMoveActionOutput, type MultiMoveActionPlan, type MultiMoveActionResult, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
+import { type ActionService, type GameObject, type MovementObject, type MultiMoveActionInput, type MultiMoveActionOutput, type MultiMoveActionPlan, type MultiMoveActionResult, type OutpostObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { isInGame, MOVE_ACTION, ObjectServiceImpl } from "@tac-tics/app";
 import { createStubActionService, realAppConfig } from "../../../test/config";
 import { moveRouter } from "../unit";
@@ -50,8 +50,8 @@ function createStubMoveService(accepts: (move: MultiMoveActionInput) => boolean 
   return { service, asked, previewed, executed };
 }
 
-function captureIn(id: string, gameId: string): CaptureObject {
-  return { identifier: { id, gameId }, definition: { scope: Scope.Terrain, name: "city" }, position: { x: 0, y: 0 }, health: 20, playerId: undefined };
+function outpostIn(id: string, gameId: string): OutpostObject {
+  return { identifier: { id, gameId }, definition: { scope: Scope.Outpost, name: "city" }, position: { x: 0, y: 0 }, health: 20, playerId: undefined };
 }
 
 function terrainOn(id: string, mapId: string): TerrainObject {
@@ -62,15 +62,15 @@ const onlyTerrain = (...ids: string[]) => (move: MultiMoveActionInput) => ids.in
 
 describe("moveRouter", () => {
   describe("GET /game/:gameId/unit/:unitId/move", () => {
-    it("lists a move for each terrain in the game that plan accepts, the static terrain of its map before its captures, built from the request's game and unit", async () => {
+    it("lists a move for each terrain in the game that plan accepts, the static terrain of its map before its outposts, built from the request's game and unit", async () => {
       const objects = new ObjectServiceImpl(realAppConfig);
-      const { service } = createStubMoveService(onlyTerrain("terrain-102", "terrain-058"));
+      const { service } = createStubMoveService(onlyTerrain("terrain-102", "outpost-058"));
       const tank = objects.load<UnitObject>(Scope.Unit, { id: "unit-1", gameId: "game-1" })!;
 
       const res = await request(createApp(service, objects)).get("/game/game-1/unit/unit-1/move");
 
       expect(res.status).toBe(200);
-      expect(res.body.map((move: MultiMoveActionInput) => move.targets[0].identifier.id)).toEqual(["terrain-102", "terrain-058"]);
+      expect(res.body.map((move: MultiMoveActionInput) => move.targets[0].identifier.id)).toEqual(["terrain-102", "outpost-058"]);
       for (const move of res.body) {
         expect(move.definition).toEqual(MOVE_ACTION);
         expect(move.game.identifier).toEqual({ id: "game-1" });
@@ -87,7 +87,7 @@ describe("moveRouter", () => {
 
     it("asks plan about every terrain of the game, and none of another game or of the map of another game", async () => {
       const objects = new ObjectServiceImpl(realAppConfig);
-      objects.save<CaptureObject>(Scope.Capture, captureIn("elsewhere", "game-2"));
+      objects.save<OutpostObject>(Scope.Outpost, outpostIn("elsewhere", "game-2"));
       objects.save<TerrainObject>(Scope.Terrain, terrainOn("elsewhere", "map-2"));
       const { service, asked } = createStubMoveService();
 
@@ -143,9 +143,9 @@ describe("moveRouter", () => {
       expect(asked).toEqual([]);
     });
 
-    it("does not find a capture of another game, nor the static terrain of the map of another game", async () => {
+    it("does not find an outpost of another game, nor the static terrain of the map of another game", async () => {
       const objects = new ObjectServiceImpl(realAppConfig);
-      objects.save<CaptureObject>(Scope.Capture, captureIn("elsewhere", "game-2"));
+      objects.save<OutpostObject>(Scope.Outpost, outpostIn("elsewhere", "game-2"));
       objects.save<TerrainObject>(Scope.Terrain, terrainOn("elsewhere", "map-2"));
       const { service } = createStubMoveService();
       const res = await request(createApp(service, objects)).get("/game/game-1/unit/unit-1/move/elsewhere");

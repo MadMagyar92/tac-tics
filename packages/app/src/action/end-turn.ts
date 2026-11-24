@@ -14,13 +14,6 @@ import { filterUnitsFromGame } from "../common";
 
 export const END_TURN_ACTION = { scope: "action", name: "end-turn" };
 
-/**
- * Ends the turn of the player whose turn it is, and hands it to the player of the game with the next order. After the
- * player with the last order, the game moves on to its next turn and starts again from the player with the first order.
- *
- * The units of the player who has the turn next are made ready again: none of them has moved or acted. The units of
- * every other player are left as they are.
- */
 export class EndTurnActionService extends BaseActionService<EndTurnActionInput, EndTurnActionPlan, EndTurnActionResult, EndTurnActionOutput> {
   constructor(private objectService: ObjectService) {
     super();

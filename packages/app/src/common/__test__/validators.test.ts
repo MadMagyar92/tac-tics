@@ -1,11 +1,11 @@
 import {
-  type CaptureObject,
   type DefinitionKey,
   type GameObject,
   type MovementDefinition,
   type MovementObject,
   type OffenseDefinition,
   type OffenseObject,
+  type OutpostObject,
   type PlayerObject,
   type TerrainObject,
   type UnitDefinition,
@@ -149,12 +149,12 @@ describe("sameKey", () => {
 });
 
 describe("isInGame", () => {
-  it("is true for a capture of the game, and for the static terrain of the map of the game", () => {
+  it("is true for an outpost of the game, and for the static terrain of the map of the game", () => {
     expect(isInGame("g1", "m1", { id: "terrain-000", gameId: "g1" })).toBe(true);
     expect(isInGame("g1", "m1", { id: "terrain-000", mapId: "m1" })).toBe(true);
   });
 
-  it("is false for a capture of another game, even one played on the same map", () => {
+  it("is false for an outpost of another game, even one played on the same map", () => {
     expect(isInGame("g1", "m1", { id: "terrain-000", gameId: "g2" })).toBe(false);
   });
 
@@ -433,9 +433,9 @@ describe("canMove", () => {
   });
 });
 
-const tile = (x: number, y: number, playerId: string | undefined = undefined, gameId = "g1"): CaptureObject => ({
+const tile = (x: number, y: number, playerId: string | undefined = undefined, gameId = "g1"): OutpostObject => ({
   identifier: { id: `tile-${x}-${y}`, gameId },
-  definition: key("terrain", "base"),
+  definition: key("outpost", "factory"),
   position: { x, y },
   health: 20,
   playerId,
@@ -521,11 +521,11 @@ describe("canDeploy", () => {
 
 const capturer = (x: number, y: number): UnitObject => ({ ...unit("capturer", "infantry", x, y), playerId: "p1" });
 
-/** The terrain a capture definition allows, among them the base every tile is. */
-const capturable = [{ terrain: key("terrain", "city") }, { terrain: key("terrain", "base") }];
+/** The outposts a capture definition allows, among them the factory every tile is. */
+const capturable = [{ outpost: key("outpost", "city") }, { outpost: key("outpost", "factory") }];
 
 describe("canCapture", () => {
-  it("is true for a unit that has not acted, on terrain its capture definition allows and that its player does not hold", () => {
+  it("is true for a unit that has not acted, on an outpost its capture definition allows and that its player does not hold", () => {
     expect(canCapture(capturer(1, 1), tile(1, 1), capturable)).toBe(true);
     expect(canCapture(capturer(1, 1), tile(1, 1, "p2"), capturable)).toBe(true);
   });
@@ -539,18 +539,18 @@ describe("canCapture", () => {
   });
 
   it.each([
-    ["no terrain", []],
-    ["only other terrain", [{ terrain: key("terrain", "city") }]],
-    ["terrain of the same name in another scope", [{ terrain: key("unit", "base") }]],
-  ])("is false when the capture definition allows %s", (_name, terrains) => {
-    expect(canCapture(capturer(1, 1), tile(1, 1), terrains)).toBe(false);
+    ["no outposts", []],
+    ["only other outposts", [{ outpost: key("outpost", "city") }]],
+    ["an outpost of the same name in another scope", [{ outpost: key("terrain", "factory") }]],
+  ])("is false when the capture definition allows %s", (_name, outposts) => {
+    expect(canCapture(capturer(1, 1), tile(1, 1), outposts)).toBe(false);
   });
 
-  it.each([[0, 1], [1, 0], [2, 1], [1, 2], [2, 2]])("is false when the unit is at (%i, %i), not on the terrain at (1, 1)", (x, y) => {
+  it.each([[0, 1], [1, 0], [2, 1], [1, 2], [2, 2]])("is false when the unit is at (%i, %i), not on the outpost at (1, 1)", (x, y) => {
     expect(canCapture(capturer(x, y), tile(1, 1), capturable)).toBe(false);
   });
 
-  it("is false for terrain its player already holds", () => {
+  it("is false for an outpost its player already holds", () => {
     expect(canCapture(capturer(1, 1), tile(1, 1, "p1"), capturable)).toBe(false);
   });
 

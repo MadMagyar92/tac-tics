@@ -1,7 +1,7 @@
 import { Definition, DefinitionKey } from "./app";
 
 export type CaptureAllowedDefinition = {
-  terrain: DefinitionKey;
+  outpost: DefinitionKey;
 };
 
 export type CaptureDefinition = Definition & {

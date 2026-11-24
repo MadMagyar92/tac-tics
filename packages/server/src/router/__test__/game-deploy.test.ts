@@ -1,7 +1,7 @@
 import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { type ActionService, type CaptureObject, type DeployActionInput, type DeployActionOutput, type DeployActionPlan, type DeployActionResult, type GameObject, type MovementObject, type PlayerObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
+import { type ActionService, type DeployActionInput, type DeployActionOutput, type DeployActionPlan, type DeployActionResult, type GameObject, type MovementObject, type OutpostObject, type PlayerObject, Scope, type TerrainObject, type UnitObject } from "@tac-tics/api";
 import { DEPLOY_ACTION, ObjectServiceImpl } from "@tac-tics/app";
 import { createStubActionService, realAppConfig } from "../../../test/config";
 import { deployRouter } from "../game";
@@ -227,11 +227,11 @@ describe("deployRouter", () => {
       expect(asked).toEqual([]);
     });
 
-    it("is not one of another game's captures", async () => {
+    it("is not one of another game's outposts", async () => {
       const objects = startObjects();
-      objects.save<CaptureObject>(Scope.Capture, {
+      objects.save<OutpostObject>(Scope.Outpost, {
         identifier: { id: "elsewhere", gameId: "game-2" },
-        definition: { scope: "terrain", name: "base" },
+        definition: { scope: "outpost", name: "factory" },
         position: { x: 0, y: 0 },
         health: 20,
         playerId: "player-1",

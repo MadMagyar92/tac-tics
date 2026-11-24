@@ -1,6 +1,5 @@
 import {
   type CaptureAllowedDefinition,
-  type CaptureObject,
   type DefinitionKey,
   type GameObject,
   type GameReferenceId,
@@ -10,6 +9,7 @@ import {
   type MovementObject,
   type OffenseDefinition,
   type OffenseObject,
+  type OutpostObject,
   type PlayerObject,
   type TerrainObject,
   type TransportAllowedDefinition,
@@ -130,7 +130,7 @@ export function canAttack(unit: UnitObject, target: UnitObject, offense: Offense
  * @param target terrain with its position
  * @returns `true` if the target is within the move range, `false` otherwise
  */
-export function inMoveRange(unit: UnitObject, target: TerrainObject | CaptureObject): boolean {
+export function inMoveRange(unit: UnitObject, target: TerrainObject | OutpostObject): boolean {
   const distance = Math.abs(unit.position.x - target.position.x) + Math.abs(unit.position.y - target.position.y);
   return distance === 1;
 }
@@ -153,7 +153,7 @@ export function inMoveRange(unit: UnitObject, target: TerrainObject | CaptureObj
  * @param other unit on the target terrain, or `undefined` if the terrain is empty
  * @returns `true` if the move is valid, `false` otherwise
  */
-export function canMove(unit: UnitObject, target: TerrainObject | CaptureObject, movement: MovementObject, definition: MovementDefinition, other: UnitObject | undefined): boolean {
+export function canMove(unit: UnitObject, target: TerrainObject | OutpostObject, movement: MovementObject, definition: MovementDefinition, other: UnitObject | undefined): boolean {
   const cost = getMoveCost(definition, target);
   if (unit.moved || unit.acted) {
     return false;
@@ -170,7 +170,7 @@ export function canMove(unit: UnitObject, target: TerrainObject | CaptureObject,
   return true;
 };
 
-export function canDeploy(game: GameObject, player: PlayerObject, terrain: TerrainObject | CaptureObject, definition: UnitDefinition): boolean {
+export function canDeploy(game: GameObject, player: PlayerObject, terrain: TerrainObject | OutpostObject, definition: UnitDefinition): boolean {
   if (player.order !== game.playerTurn) {
     return false;
   }
@@ -184,24 +184,24 @@ export function canDeploy(game: GameObject, player: PlayerObject, terrain: Terra
 };
 
 /**
- * Check if a unit can capture a target terrain with the allowed terrain of the unit's capture definition.
+ * Check if a unit can capture a target outpost with the allowed outposts of the unit's capture definition.
  *
  * A capture is valid if:
  * - The capturing unit has not already acted this turn
- * - The capture definition allows the target terrain's definition
- * - The capturing unit stands on the target terrain
- * - The target terrain does not already belong to the capturing unit's player
+ * - The capture definition allows the target outpost's definition
+ * - The capturing unit stands on the target outpost
+ * - The target outpost does not already belong to the capturing unit's player
  *
  * @param unit capturer with its position
- * @param target terrain with its position and the player that holds it
- * @param allowed terrain the capture definition allows
+ * @param target outpost with its position and the player that holds it
+ * @param allowed outposts the capture definition allows
  * @returns `true` if the capture is valid, `false` otherwise
  */
-export function canCapture(unit: UnitObject, target: CaptureObject, allowed: CaptureAllowedDefinition[]): boolean {
+export function canCapture(unit: UnitObject, target: OutpostObject, allowed: CaptureAllowedDefinition[]): boolean {
   if (unit.acted) {
     return false;
   }
-  if (!allowed.some(({ terrain }) => sameKey(terrain, target.definition))) {
+  if (!allowed.some(({ outpost }) => sameKey(outpost, target.definition))) {
     return false;
   }
   if (unit.position.x !== target.position.x || unit.position.y !== target.position.y) {
@@ -279,7 +279,7 @@ export function canLoad(unit: UnitObject, target: UnitObject, allowed: Transport
  * @param occupied `true` if another unit is on the target terrain, `false` if it is empty
  * @returns `true` if the unload is valid, `false` otherwise
  */
-export function canUnload(unit: UnitObject, target: TerrainObject | CaptureObject, definition: MovementDefinition, occupied: boolean): boolean {
+export function canUnload(unit: UnitObject, target: TerrainObject | OutpostObject, definition: MovementDefinition, occupied: boolean): boolean {
   if (unit.acted) {
     return false;
   }

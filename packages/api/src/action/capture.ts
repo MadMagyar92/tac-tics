@@ -1,19 +1,19 @@
-import { CaptureObject, UnitObject } from "../object";
+import { OutpostObject, UnitObject } from "../object";
 import { ActionOutput, ActionPlan, ActionResult, UnitActionInput } from "./app";
 
 export type CaptureActionInput = UnitActionInput & {
-  target: CaptureObject;
+  target: OutpostObject;
 };
 
 export type CaptureActionPlan = ActionPlan & {
   unit: UnitObject;
-  target: CaptureObject;
+  target: OutpostObject;
   amount: number;
 };
 
 export type CaptureActionResult = ActionResult & {
   unit: UnitObject;
-  target: CaptureObject;
+  target: OutpostObject;
 };
 
 export type CaptureActionOutput = ActionOutput & CaptureActionResult;

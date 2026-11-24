@@ -4,6 +4,7 @@ export { GameDefinitionHandler } from "./game";
 export { MapDefinitionHandler } from "./map";
 export { MovementDefinitionHandler } from "./movement";
 export { OffenseDefinitionHandler } from "./offense";
+export { OutpostDefinitionHandler } from "./outpost";
 export { PlayerDefinitionHandler } from "./player";
 export { DefinitionServiceImpl } from "./service";
 export { TerrainDefinitionHandler } from "./terrain";

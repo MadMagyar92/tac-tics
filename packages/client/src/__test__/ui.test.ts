@@ -1,4 +1,4 @@
-import type { CaptureObject, TerrainObject } from "@tac-tics/api";
+import type { OutpostObject, TerrainObject } from "@tac-tics/api";
 import { ObjectServiceImpl } from "@tac-tics/app";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -21,9 +21,9 @@ describe("renderTerrain", () => {
 
   it.each([
     ["airport", "A"],
-    ["base", "B"],
     ["bridge", "#"],
     ["city", "C"],
+    ["factory", "B"],
     ["headquarters", "H"],
     ["mountain", "^"],
     ["plain", " "],
@@ -86,12 +86,12 @@ describe("renderTerrain", () => {
       sea,
     ];
 
-    /** The terrain `GET /game/game-1/terrain` responds with: the static terrain of map-1, the map of game-1, then the captures of game-1. */
-    const terrainOfGame = (): (TerrainObject | CaptureObject)[] => {
+    /** The terrain `GET /game/game-1/terrain` responds with: the static terrain of map-1, the map of game-1, then the outposts of game-1. */
+    const terrainOfGame = (): (TerrainObject | OutpostObject)[] => {
       const objects = new ObjectServiceImpl(resolve(__dirname, "../../../config/app.config.json"));
       return [
         ...[...objects.loadAll<TerrainObject>("terrain").values()].filter((terrain) => terrain.identifier.mapId === "map-1"),
-        ...[...objects.loadAll<CaptureObject>("capture").values()].filter((capture) => capture.identifier.gameId === "game-1"),
+        ...[...objects.loadAll<OutpostObject>("outpost").values()].filter((outpost) => outpost.identifier.gameId === "game-1"),
       ];
     };
 

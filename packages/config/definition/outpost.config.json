@@ -1,0 +1,22 @@
+[
+  {
+    "definition": { "scope": "outpost", "name": "airport" },
+    "defense": 3
+  },
+  {
+    "definition": { "scope": "outpost", "name": "city" },
+    "defense": 3
+  },
+  {
+    "definition": { "scope": "outpost", "name": "factory" },
+    "defense": 3
+  },
+  {
+    "definition": { "scope": "outpost", "name": "headquarters" },
+    "defense": 4
+  },
+  {
+    "definition": { "scope": "outpost", "name": "port" },
+    "defense": 3
+  }
+]

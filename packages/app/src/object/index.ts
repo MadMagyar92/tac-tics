@@ -1,9 +1,9 @@
 export { MemoryObjectHandler } from "./app";
-export { CaptureObjectHandler } from "./capture";
 export { GameObjectHandler } from "./game";
 export { MapObjectHandler } from "./map";
 export { MovementObjectHandler } from "./movement";
 export { OffenseObjectHandler } from "./offense";
+export { OutpostObjectHandler } from "./outpost";
 export { PlayerObjectHandler } from "./player";
 export { ObjectServiceImpl } from "./service";
 export { TerrainObjectHandler } from "./terrain";

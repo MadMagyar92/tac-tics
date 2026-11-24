@@ -18,7 +18,7 @@ describe("createApp with the repo's config", () => {
   const [orangeStar, blueMoon] = objectsOf("player");
   const [tank] = objectsOf("unit");
   const terrain = objectsOf("terrain");
-  const captures = objectsOf("capture");
+  const outposts = objectsOf("outpost");
 
   // GET /game and GET /game/game-1
   describe("games", () => {
@@ -95,21 +95,21 @@ describe("createApp with the repo's config", () => {
     });
   });
 
-  // GET /game/game-1/terrain, GET /game/game-1/terrain/terrain-026, GET /game/game-1/terrain/terrain-033 and GET /game/game-1/terrain/terrain-149
+  // GET /game/game-1/terrain, GET /game/game-1/terrain/outpost-026, GET /game/game-1/terrain/terrain-033 and GET /game/game-1/terrain/terrain-149
   describe("terrain", () => {
-    it("lists every square of the game: the static terrain of its map, then its captures", async () => {
+    it("lists every square of the game: the static terrain of its map, then its outposts", async () => {
       const res = await request(app).get("/game/game-1/terrain");
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(150);
-      expect(res.body).toEqual([...terrain, ...captures]);
+      expect(res.body).toEqual([...terrain, ...outposts]);
       expect(res.body.filter((square: any) => square.definition.name === "sea")).toHaveLength(65);
     });
 
-    it("gives a capture of the game by its id, with the key of its definition, its position and its player", async () => {
-      const res = await request(app).get("/game/game-1/terrain/terrain-026");
+    it("gives an outpost of the game by its id, with the key of its definition, its position and its player", async () => {
+      const res = await request(app).get("/game/game-1/terrain/outpost-026");
       expect(res.status).toBe(200);
-      expect(res.body).toEqual(captures.find((object) => object.identifier.id === "terrain-026"));
-      expect(res.body.definition).toEqual({ scope: "terrain", name: "base" });
+      expect(res.body).toEqual(outposts.find((object) => object.identifier.id === "outpost-026"));
+      expect(res.body.definition).toEqual({ scope: "outpost", name: "factory" });
       expect(res.body.position).toEqual({ x: 11, y: 1 });
       expect(res.body.playerId).toBe(blueMoon.identifier.id);
     });
@@ -352,7 +352,7 @@ describe("createApp with a unit on a city", () => {
   const infantry = {
     identifier: { id: "infantry-1", gameId: "game-1" },
     definition: { scope: "unit", name: "infantry" },
-    position: { x: 9, y: 2 }, // terrain-039
+    position: { x: 9, y: 2 }, // outpost-039
     moved: false,
     acted: false,
     health: 100,
@@ -373,8 +373,8 @@ describe("createApp with a unit on a city", () => {
     const capture = { scope: "action", name: "capture" };
 
     const first = await request(app).post("/game/game-1/unit/infantry-1/capture");
-    expect(first.body).toMatchObject({ definition: capture, unit: { identifier: { id: "infantry-1" }, acted: true }, target: { identifier: { id: "terrain-039" }, health: 10 } });
-    expect((await request(app).get("/game/game-1/terrain/terrain-039")).body).toMatchObject({ health: 10 });
+    expect(first.body).toMatchObject({ definition: capture, unit: { identifier: { id: "infantry-1" }, acted: true }, target: { identifier: { id: "outpost-039" }, health: 10 } });
+    expect((await request(app).get("/game/game-1/terrain/outpost-039")).body).toMatchObject({ health: 10 });
     expect((await request(app).get("/game/game-1/unit/infantry-1")).body.acted).toBe(true);
     expect((await request(app).post("/game/game-1/unit/infantry-1/capture")).status).toBe(409);
   });
@@ -508,7 +508,7 @@ describe("createApp moving", () => {
       }),
     );
     const res = await request(app).get(movePath());
-    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-032", "terrain-046"]);
+    expect(res.body.map((move: any) => move.targets[0].identifier.id)).toEqual(["terrain-032", "outpost-046"]);
     expect((await request(app).get(movePath("terrain-030"))).status).toBe(404);
     expect((await request(app).post(movePath("terrain-030"))).status).toBe(409);
   });
@@ -550,14 +550,14 @@ describe("createApp moving", () => {
 });
 
 describe("createApp deploying", () => {
-  /** The URI of the deploy onto a terrain: `/game/game-1/deploy/terrain-076`. The unit to deploy goes in the body, or in the query when previewing: `?unit=infantry`. */
+  /** The URI of the deploy onto a terrain: `/game/game-1/deploy/outpost-076`. The unit to deploy goes in the body, or in the query when previewing: `?unit=infantry`. */
   const deployPath = (terrainId: string) => `/game/game-1/deploy/${terrainId}`;
   const everyone = (app: ReturnType<typeof createApp>) => request(app).get("/game/game-1/unit").then((res) => res.body.map((unit: any) => unit.identifier.id));
   const fundsOf = async (app: ReturnType<typeof createApp>, id = "player-1") => (await request(app).get(`/game/game-1/player/${id}`)).body.funds;
 
   /**
-   * An app on a copy of the repo's config where player-1 has `funds`. On Spann Island, terrain-076 at (1, 5) and
-   * terrain-091 at (1, 6) are bases of player-1, and terrain-026 at (11, 1) is a base of player-2.
+   * An app on a copy of the repo's config where player-1 has `funds`. On Spann Island, outpost-076 at (1, 5) and
+   * outpost-091 at (1, 6) are factories of player-1, and outpost-026 at (11, 1) is a factory of player-2.
    */
   function start(funds = 10000, change: (directory: string) => void = () => undefined) {
     const { directory, appConfig } = copyConfig();
@@ -570,7 +570,7 @@ describe("createApp deploying", () => {
 
   it("deploys a new unit on the terrain, for the player whose turn it is", async () => {
     const { app } = start();
-    const res = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
+    const res = await request(app).post(deployPath("outpost-076")).send({ unit: "infantry" });
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       identifier: { id: "unit-2", gameId: "game-1" },
@@ -588,7 +588,7 @@ describe("createApp deploying", () => {
 
   it("saves the new unit and the funds", async () => {
     const { app } = start();
-    await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
+    await request(app).post(deployPath("outpost-076")).send({ unit: "infantry" });
     expect(await everyone(app)).toEqual(["unit-1", "unit-2"]);
     expect((await request(app).get("/game/game-1/unit/unit-2")).body.position).toEqual({ x: 1, y: 5 });
     expect(await fundsOf(app)).toBe(9000);
@@ -604,7 +604,7 @@ describe("createApp deploying", () => {
         players[1].funds = 5000;
       });
     });
-    const res = await request(app).post(deployPath("terrain-026")).send({ unit: "infantry" });
+    const res = await request(app).post(deployPath("outpost-026")).send({ unit: "infantry" });
     expect(res.status).toBe(200);
     expect(res.body.playerId).toBe("player-2");
     expect(await fundsOf(app, "player-2")).toBe(4000);
@@ -617,16 +617,16 @@ describe("createApp deploying", () => {
         games[0].playerTurn = 5;
       }),
     );
-    const post = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
+    const post = await request(app).post(deployPath("outpost-076")).send({ unit: "infantry" });
     expect(post.status).toBe(409);
-    expect(post.body).toEqual({ error: "Unit infantry cannot be deployed on terrain terrain-076" });
-    expect((await request(app).get(`${deployPath("terrain-076")}?unit=infantry`)).status).toBe(404);
+    expect(post.body).toEqual({ error: "Unit infantry cannot be deployed on terrain outpost-076" });
+    expect((await request(app).get(`${deployPath("outpost-076")}?unit=infantry`)).status).toBe(404);
     expect(await everyone(app)).toEqual(["unit-1"]);
   });
 
   it("previews a deploy without making it", async () => {
     const { app } = start();
-    const res = await request(app).get(`${deployPath("terrain-076")}?unit=infantry`);
+    const res = await request(app).get(`${deployPath("outpost-076")}?unit=infantry`);
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ unit: { identifier: { id: "unit-2" }, definition: { scope: "unit", name: "infantry" } }, player: { identifier: { id: "player-1" }, funds: 9000 } });
     expect(await everyone(app)).toEqual(["unit-1"]);
@@ -650,7 +650,7 @@ describe("createApp deploying", () => {
         },
       ]),
     );
-    await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
+    await request(app).post(deployPath("outpost-076")).send({ unit: "infantry" });
 
     const move = await request(app).post("/game/game-1/unit/unit-2/move/terrain-078");
     expect(move.status).toBe(409); // two squares away
@@ -663,29 +663,29 @@ describe("createApp deploying", () => {
 
   it("deploys one unit after another with the next id, until the funds run out", async () => {
     const { app } = start(1500);
-    const first = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
+    const first = await request(app).post(deployPath("outpost-076")).send({ unit: "infantry" });
     expect(first.body.identifier.id).toBe("unit-2");
     expect(await fundsOf(app)).toBe(500);
-    const second = await request(app).post(deployPath("terrain-091")).send({ unit: "infantry" });
+    const second = await request(app).post(deployPath("outpost-091")).send({ unit: "infantry" });
     expect(second.status).toBe(409);
     expect(await everyone(app)).toEqual(["unit-1", "unit-2"]);
   });
 
   it("refuses a second unit on the same terrain", async () => {
     const { app } = start();
-    expect((await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" })).status).toBe(200);
-    const again = await request(app).post(deployPath("terrain-076")).send({ unit: "infantry" });
+    expect((await request(app).post(deployPath("outpost-076")).send({ unit: "infantry" })).status).toBe(200);
+    const again = await request(app).post(deployPath("outpost-076")).send({ unit: "infantry" });
     expect(again.status).toBe(409);
-    expect(again.body).toEqual({ error: "Unit infantry cannot be deployed on terrain terrain-076" });
+    expect(again.body).toEqual({ error: "Unit infantry cannot be deployed on terrain outpost-076" });
     expect(await fundsOf(app)).toBe(9000);
   });
 
   it.each([
     ["a terrain the player does not control", "terrain-032", "infantry", 10000],
     ["the sea of the map", "terrain-001", "infantry", 10000],
-    ["a terrain another player controls", "terrain-026", "infantry", 10000],
-    ["a unit the player cannot afford", "terrain-076", "infantry", 999],
-    ["a unit that is not defined", "terrain-076", "ghost", 10000],
+    ["a terrain another player controls", "outpost-026", "infantry", 10000],
+    ["a unit the player cannot afford", "outpost-076", "infantry", 999],
+    ["a unit that is not defined", "outpost-076", "ghost", 10000],
   ])("refuses to deploy on %s", async (_reason, terrainId, unit, funds) => {
     const { app } = start(funds);
     const res = await request(app).post(deployPath(terrainId)).send({ unit });
@@ -696,7 +696,7 @@ describe("createApp deploying", () => {
 
   it("asks for the name of the unit, and for a terrain that is in the game", async () => {
     const { app } = start();
-    const unnamed = await request(app).post(deployPath("terrain-076")).send({});
+    const unnamed = await request(app).post(deployPath("outpost-076")).send({});
     expect(unnamed.status).toBe(400);
     expect(unnamed.body).toEqual({ error: 'Expected the name of the unit to deploy as "unit"' });
     const unknown = await request(app).post(deployPath("nope")).send({ unit: "infantry" });
@@ -708,7 +708,7 @@ describe("createApp deploying", () => {
     const { app, directory } = start();
     const files = ["unit", "offense", "player"].map((scope) => join(directory, "object", `${scope}.json`));
     const before = files.map((file) => readFileSync(file, "utf8"));
-    await request(app).post(deployPath("terrain-076")).send({ unit: "tank" });
+    await request(app).post(deployPath("outpost-076")).send({ unit: "tank" });
     expect(files.map((file) => readFileSync(file, "utf8"))).toEqual(before);
   });
 });
@@ -740,7 +740,7 @@ describe("createApp loading and unloading", () => {
 
   /**
    * An app on a copy of the repo's config where, on Spann Island, an apc is on the plain terrain-062 at (2, 4), with an
-   * infantry next to it on the plain terrain-061 at (1, 4), another on the city terrain-047 at (2, 3), and a recon on the road terrain-077 at (2, 5).
+   * infantry next to it on the plain terrain-061 at (1, 4), another on the city outpost-047 at (2, 3), and a recon on the road terrain-077 at (2, 5).
    */
   function start() {
     const { directory, appConfig } = copyConfig();

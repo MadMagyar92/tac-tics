@@ -1,12 +1,12 @@
 import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it } from "vitest";
-import { type CaptureObject, Scope, type TerrainObject } from "@tac-tics/api";
+import { type OutpostObject, Scope, type TerrainObject } from "@tac-tics/api";
 import { ObjectServiceImpl } from "@tac-tics/app";
 import { realAppConfig } from "../../../test/config";
 import { terrainRouter } from "../terrain";
 
-/** The terrain of the repo's config: game-1 is played on map-1, Spann Island, a 15 by 10 grid, of which the static terrain of the map holds 129 squares and the captures of the game hold the other 21. */
+/** The terrain of the repo's config: game-1 is played on map-1, Spann Island, a 15 by 10 grid, of which the static terrain of the map holds 129 squares and the outposts of the game hold the other 21. */
 describe("GET /game/:gameId/terrain/:id", () => {
   let app: express.Express;
 
@@ -14,12 +14,12 @@ describe("GET /game/:gameId/terrain/:id", () => {
     app = express().use("/game/:gameId/terrain", terrainRouter(new ObjectServiceImpl(realAppConfig)));
   });
 
-  it("lists every square of the game, the static terrain of its map and then its captures", async () => {
+  it("lists every square of the game, the static terrain of its map and then its outposts", async () => {
     const res = await request(app).get("/game/game-1/terrain");
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(150);
     expect(res.body[0].identifier).toEqual({ id: "terrain-000", mapId: "map-1" });
-    expect(res.body[129].identifier).toEqual({ id: "terrain-026", gameId: "game-1" });
+    expect(res.body[129].identifier).toEqual({ id: "outpost-026", gameId: "game-1" });
     expect(res.body.filter((terrain: any) => terrain.definition.name === "sea")).toHaveLength(65);
     expect(new Set(res.body.map((terrain: any) => terrain.identifier.id)).size).toBe(150);
   });
@@ -30,12 +30,12 @@ describe("GET /game/:gameId/terrain/:id", () => {
     expect(res.body).toEqual([]);
   });
 
-  it("returns a capture of the game as JSON, with the key of its definition, its position and its player", async () => {
-    const res = await request(app).get("/game/game-1/terrain/terrain-026");
+  it("returns an outpost of the game as JSON, with the key of its definition, its position and its player", async () => {
+    const res = await request(app).get("/game/game-1/terrain/outpost-026");
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
-      identifier: { id: "terrain-026", gameId: "game-1" },
-      definition: { scope: "terrain", name: "base" },
+      identifier: { id: "outpost-026", gameId: "game-1" },
+      definition: { scope: "outpost", name: "factory" },
       position: { x: 11, y: 1 },
       health: 20,
       playerId: "player-2",
@@ -79,9 +79,9 @@ describe("GET /game/:gameId/terrain/:id", () => {
     expect(res.status).toBe(404);
   });
 
-  it("neither lists nor finds a capture of another game, or the static terrain of another map", async () => {
+  it("neither lists nor finds an outpost of another game, or the static terrain of another map", async () => {
     const objects = new ObjectServiceImpl(realAppConfig);
-    objects.save<CaptureObject>(Scope.Capture, { identifier: { id: "captured", gameId: "game-2" }, definition: { scope: "terrain", name: "city" }, position: { x: 0, y: 0 }, health: 20, playerId: undefined });
+    objects.save<OutpostObject>(Scope.Outpost, { identifier: { id: "captured", gameId: "game-2" }, definition: { scope: "outpost", name: "city" }, position: { x: 0, y: 0 }, health: 20, playerId: undefined });
     objects.save<TerrainObject>(Scope.Terrain, { identifier: { id: "placed", mapId: "map-2" }, definition: { scope: "terrain", name: "plain" }, position: { x: 0, y: 0 } });
     const other = express().use("/game/:gameId/terrain", terrainRouter(objects));
     expect((await request(other).get("/game/game-1/terrain")).body).toHaveLength(150);

@@ -6,6 +6,7 @@ import { GameDefinitionHandler } from "./game";
 import { MapDefinitionHandler } from "./map";
 import { MovementDefinitionHandler } from "./movement";
 import { OffenseDefinitionHandler } from "./offense";
+import { OutpostDefinitionHandler } from "./outpost";
 import { PlayerDefinitionHandler } from "./player";
 import { TerrainDefinitionHandler } from "./terrain";
 import { TransportDefinitionHandler } from "./transport";
@@ -26,6 +27,7 @@ export class DefinitionServiceImpl implements DefinitionService {
             new MapDefinitionHandler(appConfigPath, appConfig),
             new MovementDefinitionHandler(appConfigPath, appConfig),
             new OffenseDefinitionHandler(appConfigPath, appConfig),
+            new OutpostDefinitionHandler(appConfigPath, appConfig),
             new PlayerDefinitionHandler(appConfigPath, appConfig),
             new TerrainDefinitionHandler(appConfigPath, appConfig),
             new TransportDefinitionHandler(appConfigPath, appConfig),

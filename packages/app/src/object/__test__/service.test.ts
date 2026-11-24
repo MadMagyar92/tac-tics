@@ -10,7 +10,7 @@ afterEach(cleanUp);
 const write = (file: string, value: unknown) => writeFileSync(file, JSON.stringify(value));
 
 describe("ObjectServiceImpl", () => {
-    const scopes = ["capture", "game", "map", "movement", "offense", "player", "terrain", "unit"];
+    const scopes = ["game", "map", "movement", "offense", "outpost", "player", "terrain", "unit"];
     const objectFile = (directory: string, scope: string) => join(directory, "object", `${scope}.json`);
     const readObjects = (file: string) => JSON.parse(readFileSync(file, "utf8")) as BaseObject<Id>[];
 
@@ -73,12 +73,12 @@ describe("ObjectServiceImpl", () => {
             expect([...all.keys()]).toEqual(objects.map((object) => object.identifier));
         });
 
-        it("gives the terrain of a map by the id of the map, and the captures of a game by the id of the game", () => {
+        it("gives the terrain of a map by the id of the map, and the outposts of a game by the id of the game", () => {
             const service = new ObjectServiceImpl(realAppConfig);
             expect(service.load("terrain", { id: "terrain-000", mapId: "map-1" } as Id)?.definition).toEqual({ scope: "terrain", name: "sea" });
             expect(service.load("terrain", { id: "terrain-000", gameId: "game-1" } as Id)).toBeUndefined();
-            expect(service.load("capture", { id: "terrain-026", gameId: "game-1" } as Id)?.definition).toEqual({ scope: "terrain", name: "base" });
-            expect(service.load("capture", { id: "terrain-026", mapId: "map-1" } as Id)).toBeUndefined();
+            expect(service.load("outpost", { id: "outpost-026", gameId: "game-1" } as Id)?.definition).toEqual({ scope: "outpost", name: "factory" });
+            expect(service.load("outpost", { id: "outpost-026", mapId: "map-1" } as Id)).toBeUndefined();
         });
 
         it.each(["transport", "weather", "", "constructor", "__proto__"])("gives no objects with loadAll for the scope %j", (scope) => {

@@ -1,7 +1,7 @@
 import {
-  type CaptureObject,
   type MovementDefinition,
   type OffenseDefinition,
+  type OutpostObject,
   type PlayerObject,
   type Position,
   type TerrainObject,
@@ -27,7 +27,7 @@ export function getAttackDamage(definition: OffenseDefinition, target: UnitObjec
  * @param target terrain to apply the movement cost against
  * @returns the base move fuel cost, or `undefined` if the unit cannot move to the given terrain
  */
-export function getMoveCost(definition: MovementDefinition, target: TerrainObject | CaptureObject): number | undefined {
+export function getMoveCost(definition: MovementDefinition, target: TerrainObject | OutpostObject): number | undefined {
   return definition.cost.find(({ terrain }: { terrain: typeof target.definition }) => sameKey(terrain, target.definition))?.cost;
 };
 

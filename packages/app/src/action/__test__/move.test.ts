@@ -1,6 +1,5 @@
 import type {
   BaseObject,
-  CaptureObject,
   Definition,
   DefinitionKey,
   DefinitionService,
@@ -10,6 +9,7 @@ import type {
   MovementDefinition,
   MovementObject,
   ObjectService,
+  OutpostObject,
   TerrainObject,
   UnitDefinition,
   UnitObject,
@@ -20,9 +20,12 @@ import { MOVE_ACTION, MoveActionService } from "../move";
 
 const key = (scope: string, name: string): DefinitionKey => ({ scope, name });
 
-const movementDefinition = (name: string, costs: Record<string, number>): MovementDefinition => ({
+const movementDefinition = (name: string, costs: Record<string, number>, outposts: Record<string, number> = {}): MovementDefinition => ({
   definition: key("movement", name),
-  cost: Object.entries(costs).map(([terrain, cost]) => ({ terrain: key("terrain", terrain), cost })),
+  cost: [
+    ...Object.entries(costs).map(([terrain, cost]) => ({ terrain: key("terrain", terrain), cost })),
+    ...Object.entries(outposts).map(([outpost, cost]) => ({ terrain: key("outpost", outpost), cost })),
+  ],
 });
 
 const infantry: UnitDefinition = {
@@ -38,7 +41,7 @@ const infantry: UnitDefinition = {
 };
 
 const definitions: Definition[] = [
-  movementDefinition("foot", { plain: 1, woods: 2, mountain: 3, city: 1 }),
+  movementDefinition("foot", { plain: 1, woods: 2, mountain: 3 }, { city: 1 }),
   movementDefinition("tread", { plain: 1, woods: 3 }), // cannot enter a mountain
   movementDefinition("free", { plain: 0 }),
   movementDefinition("refund", { plain: -1 }),
@@ -135,7 +138,7 @@ const terrain = (name: string, x: number, y: number, mapId = "m1"): TerrainObjec
   position: { x, y },
 });
 
-const move = (who: UnitObject, to: TerrainObject | CaptureObject, gameId = "g1"): MoveActionInput => ({
+const move = (who: UnitObject, to: TerrainObject | OutpostObject, gameId = "g1"): MoveActionInput => ({
   definition: key("action", "move"),
   game: game(gameId),
   unit: who,
@@ -201,8 +204,8 @@ describe("MoveActionService", () => {
         expect(createWorld().service.plan(move(unit(), terrain("plain", 1, 0, "m2")))).toBeUndefined();
       });
 
-      it("is true for a capture of the game, and false for a capture of another game", () => {
-        const city = (gameId: string): CaptureObject => ({ identifier: { id: "city-1-0", gameId }, definition: key("terrain", "city"), position: { x: 1, y: 0 }, health: 20, playerId: undefined });
+      it("is true for an outpost of the game, and false for an outpost of another game", () => {
+        const city = (gameId: string): OutpostObject => ({ identifier: { id: "city-1-0", gameId }, definition: key("outpost", "city"), position: { x: 1, y: 0 }, health: 20, playerId: undefined });
         expect(createWorld().service.plan(move(unit(), city("g1")))).toBeDefined();
         expect(createWorld().service.plan(move(unit(), city("g2")))).toBeUndefined();
       });

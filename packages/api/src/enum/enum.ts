@@ -4,6 +4,7 @@ export enum Scope {
   Map = "map",
   Movement = "movement",
   Offense = "offense",
+  Outpost = "outpost",
   Player = "player",
   Terrain = "terrain",
   Transport = "transport",

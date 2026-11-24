@@ -2,21 +2,21 @@
   {
     "definition": { "scope": "capture", "name": "infantry" },
     "allowed": [
-      { "terrain": { "scope": "terrain", "name": "airport" } },
-      { "terrain": { "scope": "terrain", "name": "base" } },
-      { "terrain": { "scope": "terrain", "name": "city" } },
-      { "terrain": { "scope": "terrain", "name": "headquarters" } },
-      { "terrain": { "scope": "terrain", "name": "port" } }
+      { "outpost": { "scope": "outpost", "name": "airport" } },
+      { "outpost": { "scope": "outpost", "name": "city" } },
+      { "outpost": { "scope": "outpost", "name": "factory" } },
+      { "outpost": { "scope": "outpost", "name": "headquarters" } },
+      { "outpost": { "scope": "outpost", "name": "port" } }
     ]
   },
   {
     "definition": { "scope": "capture", "name": "mech" },
     "allowed": [
-      { "terrain": { "scope": "terrain", "name": "airport" } },
-      { "terrain": { "scope": "terrain", "name": "base" } },
-      { "terrain": { "scope": "terrain", "name": "city" } },
-      { "terrain": { "scope": "terrain", "name": "headquarters" } },
-      { "terrain": { "scope": "terrain", "name": "port" } }
+      { "outpost": { "scope": "outpost", "name": "airport" } },
+      { "outpost": { "scope": "outpost", "name": "city" } },
+      { "outpost": { "scope": "outpost", "name": "factory" } },
+      { "outpost": { "scope": "outpost", "name": "headquarters" } },
+      { "outpost": { "scope": "outpost", "name": "port" } }
     ]
   }
 ]

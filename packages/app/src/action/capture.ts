@@ -5,9 +5,9 @@ import {
   type CaptureActionPlan,
   type CaptureActionResult,
   type CaptureDefinition,
-  type CaptureObject,
   type DefinitionService,
   type ObjectService,
+  type OutpostObject,
   Scope,
   type UnitDefinition,
   type UnitObject,
@@ -59,7 +59,7 @@ export class CaptureActionService extends BaseActionService<CaptureActionInput, 
   }
 
   commit({ unit, target }: CaptureActionResult): CaptureActionOutput {
-    this.objectService.save<CaptureObject>(Scope.Capture, target);
+    this.objectService.save<OutpostObject>(Scope.Outpost, target);
     this.objectService.save<UnitObject>(Scope.Unit, unit);
     return { definition: CAPTURE_ACTION, unit, target };
   }

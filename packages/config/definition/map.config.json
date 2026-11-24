@@ -5,103 +5,6 @@
     "defaultTerrain": { "scope": "terrain", "name": "sea" },
     "terrain": [
       {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 0, "y": 19 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 29, "y": 19 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 2, "y": 0 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "black-hole" },
-        "positions": [
-          { "x": 29, "y": 0 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 1, "y": 18 }, { "x": 5, "y": 19 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 26, "y": 18 }, { "x": 28, "y": 18 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 4, "y": 1 }, { "x": 6, "y": 0 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "black-hole" },
-        "positions": [
-          { "x": 28, "y": 1 }, { "x": 28, "y": 5 }, { "x": 29, "y": 3 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "positions": [
-          { "x": 5, "y": 15 }, { "x": 7, "y": 16 }, { "x": 8, "y": 3 }, { "x": 10, "y": 1 },
-          { "x": 20, "y": 19 }, { "x": 22, "y": 17 }, { "x": 26, "y": 4 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "airport" },
-        "player": { "scope": "player", "name": "black-hole" },
-        "positions": [
-          { "x": 17, "y": 7 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "airport" },
-        "positions": [
-          { "x": 13, "y": 7 }, { "x": 13, "y": 11 }, { "x": 17, "y": 11 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "port" },
-        "positions": [
-          { "x": 15, "y": 9 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "black-hole" },
-        "positions": [
-          { "x": 25, "y": 1 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "positions": [
-          { "x": 2, "y": 15 }, { "x": 5, "y": 3 }, { "x": 11, "y": 7 }, { "x": 11, "y": 11 },
-          { "x": 13, "y": 13 }, { "x": 14, "y": 5 }, { "x": 18, "y": 13 }, { "x": 19, "y": 7 },
-          { "x": 20, "y": 13 }, { "x": 21, "y": 5 }, { "x": 25, "y": 17 }
-        ]
-      },
-      {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
           { "x": 0, "y": 17 }, { "x": 1, "y": 15 }, { "x": 1, "y": 16 }, { "x": 1, "y": 17 },
@@ -222,6 +125,105 @@
           { "x": 14, "y": 17 }, { "x": 15, "y": 15 }, { "x": 16, "y": 1 }, { "x": 16, "y": 19 },
           { "x": 17, "y": 4 }, { "x": 19, "y": 2 }, { "x": 20, "y": 0 }, { "x": 22, "y": 10 },
           { "x": 25, "y": 13 }, { "x": 27, "y": 11 }, { "x": 28, "y": 15 }, { "x": 29, "y": 9 }
+        ]
+      }
+    ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 0, "y": 19 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 29, "y": 19 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 2, "y": 0 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "black-hole" },
+        "positions": [
+          { "x": 29, "y": 0 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 1, "y": 18 }, { "x": 5, "y": 19 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 26, "y": 18 }, { "x": 28, "y": 18 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 4, "y": 1 }, { "x": 6, "y": 0 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "black-hole" },
+        "positions": [
+          { "x": 28, "y": 1 }, { "x": 28, "y": 5 }, { "x": 29, "y": 3 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "positions": [
+          { "x": 5, "y": 15 }, { "x": 7, "y": 16 }, { "x": 8, "y": 3 }, { "x": 10, "y": 1 },
+          { "x": 20, "y": 19 }, { "x": 22, "y": 17 }, { "x": 26, "y": 4 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "airport" },
+        "player": { "scope": "player", "name": "black-hole" },
+        "positions": [
+          { "x": 17, "y": 7 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "airport" },
+        "positions": [
+          { "x": 13, "y": 7 }, { "x": 13, "y": 11 }, { "x": 17, "y": 11 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "port" },
+        "positions": [
+          { "x": 15, "y": 9 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "black-hole" },
+        "positions": [
+          { "x": 25, "y": 1 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "positions": [
+          { "x": 2, "y": 15 }, { "x": 5, "y": 3 }, { "x": 11, "y": 7 }, { "x": 11, "y": 11 },
+          { "x": 13, "y": 13 }, { "x": 14, "y": 5 }, { "x": 18, "y": 13 }, { "x": 19, "y": 7 },
+          { "x": 20, "y": 13 }, { "x": 21, "y": 5 }, { "x": 25, "y": 17 }
         ]
       }
     ],
@@ -352,100 +354,6 @@
     "size": { "x": 30, "y": 20 },
     "defaultTerrain": { "scope": "terrain", "name": "sea" },
     "terrain": [
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 5, "y": 3 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 4, "y": 16 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 24, "y": 10 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 4, "y": 5 }, { "x": 7, "y": 4 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 5, "y": 14 }, { "x": 5, "y": 17 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 21, "y": 11 }, { "x": 23, "y": 6 }, { "x": 23, "y": 12 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "positions": [
-          { "x": 5, "y": 10 }, { "x": 7, "y": 16 }, { "x": 9, "y": 5 }, { "x": 20, "y": 8 },
-          { "x": 21, "y": 14 }, { "x": 26, "y": 9 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "port" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 26, "y": 10 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "port" },
-        "positions": [
-          { "x": 6, "y": 2 }, { "x": 6, "y": 17 }, { "x": 13, "y": 4 }, { "x": 13, "y": 17 },
-          { "x": 17, "y": 16 }, { "x": 18, "y": 3 }, { "x": 23, "y": 16 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 4, "y": 4 }, { "x": 7, "y": 3 }, { "x": 8, "y": 3 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 4, "y": 14 }, { "x": 6, "y": 13 }, { "x": 8, "y": 16 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 22, "y": 6 }, { "x": 22, "y": 13 }, { "x": 23, "y": 10 }, { "x": 24, "y": 11 },
-          { "x": 25, "y": 6 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "positions": [
-          { "x": 4, "y": 7 }, { "x": 9, "y": 9 }, { "x": 10, "y": 17 }, { "x": 12, "y": 7 },
-          { "x": 12, "y": 12 }, { "x": 13, "y": 7 }, { "x": 14, "y": 15 }, { "x": 15, "y": 4 },
-          { "x": 16, "y": 16 }, { "x": 17, "y": 5 }, { "x": 17, "y": 6 }, { "x": 20, "y": 17 },
-          { "x": 21, "y": 6 }, { "x": 22, "y": 2 }, { "x": 26, "y": 12 }, { "x": 27, "y": 4 }
-        ]
-      },
       {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
@@ -578,6 +486,102 @@
         ]
       }
     ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 5, "y": 3 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 4, "y": 16 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 24, "y": 10 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 4, "y": 5 }, { "x": 7, "y": 4 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 5, "y": 14 }, { "x": 5, "y": 17 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 21, "y": 11 }, { "x": 23, "y": 6 }, { "x": 23, "y": 12 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "positions": [
+          { "x": 5, "y": 10 }, { "x": 7, "y": 16 }, { "x": 9, "y": 5 }, { "x": 20, "y": 8 },
+          { "x": 21, "y": 14 }, { "x": 26, "y": 9 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "port" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 26, "y": 10 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "port" },
+        "positions": [
+          { "x": 6, "y": 2 }, { "x": 6, "y": 17 }, { "x": 13, "y": 4 }, { "x": 13, "y": 17 },
+          { "x": 17, "y": 16 }, { "x": 18, "y": 3 }, { "x": 23, "y": 16 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 4, "y": 4 }, { "x": 7, "y": 3 }, { "x": 8, "y": 3 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 4, "y": 14 }, { "x": 6, "y": 13 }, { "x": 8, "y": 16 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 22, "y": 6 }, { "x": 22, "y": 13 }, { "x": 23, "y": 10 }, { "x": 24, "y": 11 },
+          { "x": 25, "y": 6 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "positions": [
+          { "x": 4, "y": 7 }, { "x": 9, "y": 9 }, { "x": 10, "y": 17 }, { "x": 12, "y": 7 },
+          { "x": 12, "y": 12 }, { "x": 13, "y": 7 }, { "x": 14, "y": 15 }, { "x": 15, "y": 4 },
+          { "x": 16, "y": 16 }, { "x": 17, "y": 5 }, { "x": 17, "y": 6 }, { "x": 20, "y": 17 },
+          { "x": 21, "y": 6 }, { "x": 22, "y": 2 }, { "x": 26, "y": 12 }, { "x": 27, "y": 4 }
+        ]
+      }
+    ],
     "units": []
   },
   {
@@ -585,58 +589,6 @@
     "size": { "x": 21, "y": 20 },
     "defaultTerrain": { "scope": "terrain", "name": "sea" },
     "terrain": [
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 1, "y": 7 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 15, "y": 0 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 4, "y": 17 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 0, "y": 6 }, { "x": 1, "y": 9 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 13, "y": 16 }, { "x": 15, "y": 19 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 3, "y": 16 }, { "x": 6, "y": 18 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "positions": [
-          { "x": 0, "y": 10 }, { "x": 0, "y": 15 }, { "x": 0, "y": 19 }, { "x": 1, "y": 1 },
-          { "x": 3, "y": 5 }, { "x": 4, "y": 3 }, { "x": 4, "y": 10 }, { "x": 5, "y": 0 },
-          { "x": 6, "y": 4 }, { "x": 7, "y": 15 }, { "x": 8, "y": 6 }, { "x": 8, "y": 13 },
-          { "x": 9, "y": 2 }, { "x": 9, "y": 17 }, { "x": 11, "y": 14 }, { "x": 13, "y": 3 },
-          { "x": 14, "y": 18 }, { "x": 16, "y": 1 }
-        ]
-      },
       {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
@@ -739,6 +691,60 @@
           { "x": 10, "y": 10 }, { "x": 11, "y": 7 }, { "x": 13, "y": 5 }, { "x": 13, "y": 11 },
           { "x": 15, "y": 8 }, { "x": 15, "y": 14 }, { "x": 16, "y": 4 }, { "x": 17, "y": 10 },
           { "x": 17, "y": 16 }
+        ]
+      }
+    ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 1, "y": 7 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 15, "y": 0 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 4, "y": 17 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 0, "y": 6 }, { "x": 1, "y": 9 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 13, "y": 16 }, { "x": 15, "y": 19 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 3, "y": 16 }, { "x": 6, "y": 18 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "positions": [
+          { "x": 0, "y": 10 }, { "x": 0, "y": 15 }, { "x": 0, "y": 19 }, { "x": 1, "y": 1 },
+          { "x": 3, "y": 5 }, { "x": 4, "y": 3 }, { "x": 4, "y": 10 }, { "x": 5, "y": 0 },
+          { "x": 6, "y": 4 }, { "x": 7, "y": 15 }, { "x": 8, "y": 6 }, { "x": 8, "y": 13 },
+          { "x": 9, "y": 2 }, { "x": 9, "y": 17 }, { "x": 11, "y": 14 }, { "x": 13, "y": 3 },
+          { "x": 14, "y": 18 }, { "x": 16, "y": 1 }
         ]
       }
     ],
@@ -879,81 +885,6 @@
     "defaultTerrain": { "scope": "terrain", "name": "mountain" },
     "terrain": [
       {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 25, "y": 15 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 4, "y": 4 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 4, "y": 15 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 25, "y": 4 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 25, "y": 16 }, { "x": 26, "y": 15 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 3, "y": 4 }, { "x": 4, "y": 3 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 3, "y": 15 }, { "x": 4, "y": 16 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 25, "y": 3 }, { "x": 26, "y": 4 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "positions": [
-          { "x": 13, "y": 10 }, { "x": 16, "y": 9 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "positions": [
-          { "x": 0, "y": 0 }, { "x": 0, "y": 19 }, { "x": 1, "y": 7 }, { "x": 1, "y": 12 },
-          { "x": 4, "y": 6 }, { "x": 4, "y": 13 }, { "x": 6, "y": 3 }, { "x": 6, "y": 16 },
-          { "x": 7, "y": 10 }, { "x": 8, "y": 12 }, { "x": 9, "y": 1 }, { "x": 9, "y": 7 },
-          { "x": 9, "y": 18 }, { "x": 13, "y": 6 }, { "x": 13, "y": 18 }, { "x": 16, "y": 1 },
-          { "x": 16, "y": 13 }, { "x": 20, "y": 1 }, { "x": 20, "y": 12 }, { "x": 20, "y": 18 },
-          { "x": 21, "y": 7 }, { "x": 22, "y": 9 }, { "x": 23, "y": 3 }, { "x": 23, "y": 16 },
-          { "x": 25, "y": 6 }, { "x": 25, "y": 13 }, { "x": 28, "y": 7 }, { "x": 28, "y": 12 },
-          { "x": 29, "y": 0 }, { "x": 29, "y": 19 }
-        ]
-      },
-      {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
           { "x": 0, "y": 4 }, { "x": 0, "y": 5 }, { "x": 0, "y": 7 }, { "x": 0, "y": 11 },
@@ -1087,6 +1018,83 @@
         ]
       }
     ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 25, "y": 15 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 4, "y": 4 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 4, "y": 15 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 25, "y": 4 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 25, "y": 16 }, { "x": 26, "y": 15 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 3, "y": 4 }, { "x": 4, "y": 3 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 3, "y": 15 }, { "x": 4, "y": 16 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 25, "y": 3 }, { "x": 26, "y": 4 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "positions": [
+          { "x": 13, "y": 10 }, { "x": 16, "y": 9 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "positions": [
+          { "x": 0, "y": 0 }, { "x": 0, "y": 19 }, { "x": 1, "y": 7 }, { "x": 1, "y": 12 },
+          { "x": 4, "y": 6 }, { "x": 4, "y": 13 }, { "x": 6, "y": 3 }, { "x": 6, "y": 16 },
+          { "x": 7, "y": 10 }, { "x": 8, "y": 12 }, { "x": 9, "y": 1 }, { "x": 9, "y": 7 },
+          { "x": 9, "y": 18 }, { "x": 13, "y": 6 }, { "x": 13, "y": 18 }, { "x": 16, "y": 1 },
+          { "x": 16, "y": 13 }, { "x": 20, "y": 1 }, { "x": 20, "y": 12 }, { "x": 20, "y": 18 },
+          { "x": 21, "y": 7 }, { "x": 22, "y": 9 }, { "x": 23, "y": 3 }, { "x": 23, "y": 16 },
+          { "x": 25, "y": 6 }, { "x": 25, "y": 13 }, { "x": 28, "y": 7 }, { "x": 28, "y": 12 },
+          { "x": 29, "y": 0 }, { "x": 29, "y": 19 }
+        ]
+      }
+    ],
     "units": []
   },
   {
@@ -1094,42 +1102,6 @@
     "size": { "x": 15, "y": 10 },
     "defaultTerrain": { "scope": "terrain", "name": "sea" },
     "terrain": [
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 2, "y": 6 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 12, "y": 2 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 1, "y": 5 }, { "x": 1, "y": 6 }, { "x": 2, "y": 7 }, { "x": 3, "y": 7 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 11, "y": 1 }, { "x": 13, "y": 1 }, { "x": 13, "y": 2 }, { "x": 13, "y": 3 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "positions": [
-          { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 4, "y": 5 }, { "x": 5, "y": 8 },
-          { "x": 8, "y": 8 }, { "x": 9, "y": 2 }, { "x": 9, "y": 4 }, { "x": 11, "y": 4 },
-          { "x": 12, "y": 8 }, { "x": 13, "y": 5 }, { "x": 13, "y": 8 }
-        ]
-      },
       {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
@@ -1173,6 +1145,44 @@
         ]
       }
     ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 2, "y": 6 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 12, "y": 2 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 1, "y": 5 }, { "x": 1, "y": 6 }, { "x": 2, "y": 7 }, { "x": 3, "y": 7 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 11, "y": 1 }, { "x": 13, "y": 1 }, { "x": 13, "y": 2 }, { "x": 13, "y": 3 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "positions": [
+          { "x": 1, "y": 3 }, { "x": 2, "y": 3 }, { "x": 4, "y": 5 }, { "x": 5, "y": 8 },
+          { "x": 8, "y": 8 }, { "x": 9, "y": 2 }, { "x": 9, "y": 4 }, { "x": 11, "y": 4 },
+          { "x": 12, "y": 8 }, { "x": 13, "y": 5 }, { "x": 13, "y": 8 }
+        ]
+      }
+    ],
     "units": []
   },
   {
@@ -1180,69 +1190,6 @@
     "size": { "x": 26, "y": 20 },
     "defaultTerrain": { "scope": "terrain", "name": "sea" },
     "terrain": [
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 14, "y": 14 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 11, "y": 18 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 18, "y": 14 }, { "x": 20, "y": 15 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 5, "y": 9 }, { "x": 7, "y": 14 }, { "x": 10, "y": 16 }, { "x": 10, "y": 17 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "base" },
-        "positions": [
-          { "x": 7, "y": 4 }, { "x": 14, "y": 2 }, { "x": 14, "y": 18 }, { "x": 21, "y": 7 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "airport" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 11, "y": 14 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "airport" },
-        "positions": [
-          { "x": 4, "y": 12 }, { "x": 11, "y": 2 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "yellow-comet" },
-        "positions": [
-          { "x": 5, "y": 15 }, { "x": 6, "y": 11 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "positions": [
-          { "x": 3, "y": 10 }, { "x": 4, "y": 5 }, { "x": 6, "y": 7 }, { "x": 7, "y": 2 },
-          { "x": 8, "y": 18 }, { "x": 12, "y": 0 }, { "x": 15, "y": 16 }, { "x": 15, "y": 17 },
-          { "x": 16, "y": 3 }, { "x": 18, "y": 2 }, { "x": 19, "y": 6 }, { "x": 19, "y": 16 },
-          { "x": 21, "y": 12 }, { "x": 22, "y": 9 }
-        ]
-      },
       {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
@@ -1308,6 +1255,71 @@
         ]
       }
     ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 14, "y": 14 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 11, "y": 18 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 18, "y": 14 }, { "x": 20, "y": 15 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 5, "y": 9 }, { "x": 7, "y": 14 }, { "x": 10, "y": 16 }, { "x": 10, "y": 17 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "factory" },
+        "positions": [
+          { "x": 7, "y": 4 }, { "x": 14, "y": 2 }, { "x": 14, "y": 18 }, { "x": 21, "y": 7 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "airport" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 11, "y": 14 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "airport" },
+        "positions": [
+          { "x": 4, "y": 12 }, { "x": 11, "y": 2 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "yellow-comet" },
+        "positions": [
+          { "x": 5, "y": 15 }, { "x": 6, "y": 11 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "positions": [
+          { "x": 3, "y": 10 }, { "x": 4, "y": 5 }, { "x": 6, "y": 7 }, { "x": 7, "y": 2 },
+          { "x": 8, "y": 18 }, { "x": 12, "y": 0 }, { "x": 15, "y": 16 }, { "x": 15, "y": 17 },
+          { "x": 16, "y": 3 }, { "x": 18, "y": 2 }, { "x": 19, "y": 6 }, { "x": 19, "y": 16 },
+          { "x": 21, "y": 12 }, { "x": 22, "y": 9 }
+        ]
+      }
+    ],
     "units": []
   },
   {
@@ -1315,71 +1327,6 @@
     "size": { "x": 30, "y": 20 },
     "defaultTerrain": { "scope": "terrain", "name": "sea" },
     "terrain": [
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 1, "y": 3 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 1, "y": 10 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "green-earth" },
-        "positions": [
-          { "x": 0, "y": 17 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "black-hole" },
-        "positions": [
-          { "x": 29, "y": 3 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "port" },
-        "positions": [
-          { "x": 29, "y": 15 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 3, "y": 4 }, { "x": 7, "y": 1 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 3, "y": 10 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "black-hole" },
-        "positions": [
-          { "x": 11, "y": 2 }, { "x": 15, "y": 2 }, { "x": 17, "y": 5 }, { "x": 19, "y": 2 },
-          { "x": 20, "y": 6 }, { "x": 21, "y": 0 }, { "x": 23, "y": 4 }, { "x": 28, "y": 9 },
-          { "x": 29, "y": 10 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "positions": [
-          { "x": 5, "y": 11 }, { "x": 7, "y": 5 }, { "x": 8, "y": 10 }, { "x": 9, "y": 6 },
-          { "x": 10, "y": 8 }, { "x": 14, "y": 9 }, { "x": 19, "y": 12 }, { "x": 21, "y": 8 },
-          { "x": 21, "y": 19 }, { "x": 24, "y": 12 }, { "x": 29, "y": 17 }
-        ]
-      },
       {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
@@ -1498,6 +1445,73 @@
           { "x": 11, "y": 15 }, { "x": 13, "y": 18 }, { "x": 15, "y": 11 }, { "x": 17, "y": 17 },
           { "x": 18, "y": 10 }, { "x": 19, "y": 19 }, { "x": 21, "y": 11 }, { "x": 21, "y": 15 },
           { "x": 23, "y": 17 }, { "x": 26, "y": 10 }, { "x": 26, "y": 16 }, { "x": 28, "y": 19 }
+        ]
+      }
+    ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 1, "y": 3 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 1, "y": 10 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "green-earth" },
+        "positions": [
+          { "x": 0, "y": 17 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "black-hole" },
+        "positions": [
+          { "x": 29, "y": 3 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "port" },
+        "positions": [
+          { "x": 29, "y": 15 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 3, "y": 4 }, { "x": 7, "y": 1 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 3, "y": 10 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "black-hole" },
+        "positions": [
+          { "x": 11, "y": 2 }, { "x": 15, "y": 2 }, { "x": 17, "y": 5 }, { "x": 19, "y": 2 },
+          { "x": 20, "y": 6 }, { "x": 21, "y": 0 }, { "x": 23, "y": 4 }, { "x": 28, "y": 9 },
+          { "x": 29, "y": 10 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "positions": [
+          { "x": 5, "y": 11 }, { "x": 7, "y": 5 }, { "x": 8, "y": 10 }, { "x": 9, "y": 6 },
+          { "x": 10, "y": 8 }, { "x": 14, "y": 9 }, { "x": 19, "y": 12 }, { "x": 21, "y": 8 },
+          { "x": 21, "y": 19 }, { "x": 24, "y": 12 }, { "x": 29, "y": 17 }
         ]
       }
     ],
@@ -1692,36 +1706,6 @@
     "defaultTerrain": { "scope": "terrain", "name": "sea" },
     "terrain": [
       {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 13, "y": 10 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "headquarters" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 16, "y": 10 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "orange-star" },
-        "positions": [
-          { "x": 5, "y": 8 }, { "x": 5, "y": 12 }, { "x": 8, "y": 9 }, { "x": 9, "y": 10 },
-          { "x": 10, "y": 11 }
-        ]
-      },
-      {
-        "definition": { "scope": "terrain", "name": "city" },
-        "player": { "scope": "player", "name": "blue-moon" },
-        "positions": [
-          { "x": 19, "y": 11 }, { "x": 20, "y": 10 }, { "x": 21, "y": 9 }, { "x": 24, "y": 8 },
-          { "x": 24, "y": 12 }
-        ]
-      },
-      {
         "definition": { "scope": "terrain", "name": "plain" },
         "positions": [
           { "x": 6, "y": 7 }, { "x": 6, "y": 8 }, { "x": 6, "y": 12 }, { "x": 6, "y": 13 },
@@ -1776,6 +1760,38 @@
           { "x": 12, "y": 5 }, { "x": 13, "y": 15 }, { "x": 15, "y": 5 }, { "x": 15, "y": 15 },
           { "x": 16, "y": 7 }, { "x": 16, "y": 14 }, { "x": 19, "y": 5 }, { "x": 19, "y": 15 },
           { "x": 23, "y": 10 }, { "x": 25, "y": 5 }
+        ]
+      }
+    ],
+    "outposts": [
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 13, "y": 10 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "headquarters" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 16, "y": 10 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "orange-star" },
+        "positions": [
+          { "x": 5, "y": 8 }, { "x": 5, "y": 12 }, { "x": 8, "y": 9 }, { "x": 9, "y": 10 },
+          { "x": 10, "y": 11 }
+        ]
+      },
+      {
+        "definition": { "scope": "outpost", "name": "city" },
+        "player": { "scope": "player", "name": "blue-moon" },
+        "positions": [
+          { "x": 19, "y": 11 }, { "x": 20, "y": 10 }, { "x": 21, "y": 9 }, { "x": 24, "y": 8 },
+          { "x": 24, "y": 12 }
         ]
       }
     ],

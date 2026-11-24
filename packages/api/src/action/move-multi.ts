@@ -1,14 +1,14 @@
-import { CaptureObject, MovementObject, TerrainObject, UnitObject } from "../object";
+import { MovementObject, OutpostObject, TerrainObject, UnitObject } from "../object";
 import { ActionPlan, ActionResult, UnitActionInput } from "./app";
 import { MoveActionOutput } from "./move";
 
 export type MultiMoveActionInput = UnitActionInput & {
-  targets: (TerrainObject | CaptureObject)[];
+  targets: (TerrainObject | OutpostObject)[];
 };
 
 export type MultiMoveActionPlan = ActionPlan & {
   unit: UnitObject;
-  targets: (TerrainObject | CaptureObject)[];
+  targets: (TerrainObject | OutpostObject)[];
   movement: MovementObject;
   others: UnitObject[];
   costs: number[];

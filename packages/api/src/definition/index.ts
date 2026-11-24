@@ -1,9 +1,10 @@
 export { type Definition, type DefinitionHandler, type DefinitionKey, type DefinitionService } from "./app";
 export { type CaptureAllowedDefinition, type CaptureDefinition } from "./capture";
 export { type GameDefinition } from "./game";
-export { type MapDefinition, type MapTerrainDefinition, type MapUnitDefinition } from "./map";
+export { type MapDefinition, type MapOutpostDefinition, type MapTerrainDefinition, type MapUnitDefinition } from "./map";
 export { type MovementCostDefinition, type MovementDefinition } from "./movement";
 export { type OffenseDamageDefinition, type OffenseDefinition } from "./offense";
+export { type OutpostDefinition } from "./outpost";
 export { type PlayerDefinition } from "./player";
 export { type TerrainDefinition } from "./terrain";
 export { type TransportAllowedDefinition, type TransportDefinition } from "./transport";

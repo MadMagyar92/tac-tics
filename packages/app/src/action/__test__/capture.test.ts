@@ -2,13 +2,13 @@ import type {
   BaseObject,
   CaptureActionInput,
   CaptureDefinition,
-  CaptureObject,
   Definition,
   DefinitionKey,
   DefinitionService,
   GameObject,
   Id,
   ObjectService,
+  OutpostObject,
   UnitDefinition,
   UnitObject,
 } from "@tac-tics/api";
@@ -29,9 +29,9 @@ const unitDefinition = (name: string, capture: string | undefined = undefined): 
   transport: undefined,
 });
 
-const captureDefinition = (name: string, terrains: string[]): CaptureDefinition => ({
+const captureDefinition = (name: string, outposts: string[]): CaptureDefinition => ({
   definition: key("capture", name),
-  allowed: terrains.map((terrain) => ({ terrain: key("terrain", terrain) })),
+  allowed: outposts.map((outpost) => ({ outpost: key("outpost", outpost) })),
 });
 
 const definitions: Definition[] = [
@@ -52,7 +52,7 @@ function createWorld(units: UnitObject[] = []) {
   };
 
   const saves: string[] = [];
-  const savedCaptures: CaptureObject[] = [];
+  const savedOutposts: OutpostObject[] = [];
   const savedUnits: UnitObject[] = [];
   const unexpected = (what: string): never => {
     throw new Error(`unexpected ${what}`);
@@ -66,8 +66,8 @@ function createWorld(units: UnitObject[] = []) {
     delete: () => unexpected("delete"),
     save<O extends BaseObject<Id>>(scope: string, object: O) {
       saves.push(scope);
-      if (scope === "capture") {
-        savedCaptures.push(object as unknown as CaptureObject);
+      if (scope === "outpost") {
+        savedOutposts.push(object as unknown as OutpostObject);
       } else if (scope === "unit") {
         savedUnits.push(object as unknown as UnitObject);
       } else {
@@ -77,7 +77,7 @@ function createWorld(units: UnitObject[] = []) {
     },
   };
 
-  return { service: new CaptureActionService(definitionService, objectService), saves, savedCaptures, savedUnits };
+  return { service: new CaptureActionService(definitionService, objectService), saves, savedOutposts, savedUnits };
 }
 
 const game = (id = "g1"): GameObject => ({ identifier: { id }, definition: key("game", "2-player"), turn: 0, playerTurn: 0, mapId: "m1" });
@@ -97,69 +97,69 @@ const capturer = ({ x = 1, health = 100, acted = false, gameId = "g1", definitio
   transportIds: [],
 });
 
-type TerrainOptions = { health?: number; playerId?: string; gameId?: string; definition?: string };
+type OutpostOptions = { health?: number; playerId?: string; gameId?: string; definition?: string };
 
-const city = ({ health = 20, playerId = undefined, gameId = "g1", definition = "city" }: TerrainOptions = {}): CaptureObject => ({
+const city = ({ health = 20, playerId = undefined, gameId = "g1", definition = "city" }: OutpostOptions = {}): OutpostObject => ({
   identifier: { id: "city", gameId },
-  definition: key("terrain", definition),
+  definition: key("outpost", definition),
   position: { x: 1, y: 1 },
   health,
   playerId,
 });
 
-const capture = (unit: UnitObject, target: CaptureObject): CaptureActionInput => ({ definition: CAPTURE_ACTION, game: game(), unit, target });
+const capture = (unit: UnitObject, target: OutpostObject): CaptureActionInput => ({ definition: CAPTURE_ACTION, game: game(), unit, target });
 
 /** The captures the capture service refuses, and why. */
 const refused: [reason: string, actionInput: CaptureActionInput][] = [
   ["the unit's definition names no capture definition", capture(capturer({ definition: "tank" }), city())],
   ["the capture definition the unit's definition names is not defined", capture(capturer({ definition: "rogue" }), city())],
-  ["the unit's capture definition does not allow the terrain", capture(capturer(), city({ definition: "plain" }))],
-  ["the unit is not on the terrain", capture(capturer({ x: 2 }), city())],
-  ["the unit's player already holds the terrain", capture(capturer(), city({ playerId: "p1" }))],
+  ["the unit's capture definition does not allow the outpost", capture(capturer(), city({ definition: "airport" }))],
+  ["the unit is not on the outpost", capture(capturer({ x: 2 }), city())],
+  ["the unit's player already holds the outpost", capture(capturer(), city({ playerId: "p1" }))],
   ["the unit has already acted", capture(capturer({ acted: true }), city())],
   ["the unit is in another game", capture(capturer({ gameId: "g2" }), city())],
-  ["the terrain is in another game", capture(capturer(), city({ gameId: "g2" }))],
+  ["the outpost is in another game", capture(capturer(), city({ gameId: "g2" }))],
   ["the unit is not defined", capture(capturer({ definition: "ghost" }), city())],
 ];
 
 describe("CaptureActionService", () => {
-  it("takes a tenth of the unit's health off the terrain's health, and leaves the terrain to whoever held it", () => {
-    const { service, savedCaptures } = createWorld();
+  it("takes a tenth of the unit's health off the outpost's health, and leaves the outpost to whoever held it", () => {
+    const { service, savedOutposts } = createWorld();
 
     const output = service.execute(service.plan(capture(capturer(), city()))!);
 
     expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer(), acted: true }, target: city({ health: 10 }) });
-    expect(savedCaptures).toEqual([city({ health: 10 })]);
+    expect(savedOutposts).toEqual([city({ health: 10 })]);
   });
 
   it("takes less off for a damaged unit, rounding its tenth up", () => {
-    const { service, savedCaptures } = createWorld();
+    const { service, savedOutposts } = createWorld();
 
     const output = service.execute(service.plan(capture(capturer({ health: 45 }), city()))!);
 
     expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer({ health: 45 }), acted: true }, target: city({ health: 15 }) });
-    expect(savedCaptures).toEqual([city({ health: 15 })]);
+    expect(savedOutposts).toEqual([city({ health: 15 })]);
   });
 
   it.each([[10, 100], [5, 100], [1, 1]])(
-    "captures terrain whose %i health the unit's %i health takes to zero or below: it is the player's, and its health is full again",
+    "captures an outpost whose %i health the unit's %i health takes to zero or below: it is the player's, and its health is full again",
     (health, unitHealth) => {
-      const { service, savedCaptures } = createWorld();
+      const { service, savedOutposts } = createWorld();
 
       const output = service.execute(service.plan(capture(capturer({ health: unitHealth }), city({ health })))!);
 
       expect(output).toEqual({ definition: CAPTURE_ACTION, unit: { ...capturer({ health: unitHealth }), acted: true }, target: city({ playerId: "p1" }) });
-      expect(savedCaptures).toEqual([city({ playerId: "p1" })]);
+      expect(savedOutposts).toEqual([city({ playerId: "p1" })]);
     },
   );
 
-  it("captures terrain another player holds, which stays theirs until its health reaches zero", () => {
-    const { service, savedCaptures } = createWorld();
+  it("captures an outpost another player holds, which stays theirs until its health reaches zero", () => {
+    const { service, savedOutposts } = createWorld();
 
     service.execute(service.plan(capture(capturer(), city({ playerId: "p2" })))!);
-    service.execute(service.plan(capture(capturer(), savedCaptures[0]))!);
+    service.execute(service.plan(capture(capturer(), savedOutposts[0]))!);
 
-    expect(savedCaptures).toEqual([city({ health: 10, playerId: "p2" }), city({ playerId: "p1" })]);
+    expect(savedOutposts).toEqual([city({ health: 10, playerId: "p2" }), city({ playerId: "p1" })]);
   });
 
   it("marks the unit as acted, and changes nothing else about it", () => {
@@ -178,13 +178,13 @@ describe("CaptureActionService", () => {
     expect(service.plan(capture(savedUnits[0], city({ health: 10 })))).toBeUndefined();
   });
 
-  it("saves the capture, then the unit", () => {
+  it("saves the outpost, then the unit", () => {
     const { service, saves } = createWorld();
     service.execute(service.plan(capture(capturer(), city()))!);
-    expect(saves).toEqual(["capture", "unit"]);
+    expect(saves).toEqual(["outpost", "unit"]);
   });
 
-  it("previews the unit and the terrain executing saves, and saves nothing", () => {
+  it("previews the unit and the outpost executing saves, and saves nothing", () => {
     const { service, saves } = createWorld();
 
     expect(service.preview(service.plan(capture(capturer(), city()))!)).toEqual({ unit: { ...capturer(), acted: true }, target: city({ health: 10 }) });

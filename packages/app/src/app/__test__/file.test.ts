@@ -125,8 +125,8 @@ describe("loadAppConfigFile", () => {
 
     it("loads the repo's app config, which lists the scopes of every definition and object file", () => {
         const config = loadAppConfigFile(realAppConfig);
-        expect(config.map((item) => item.scope)).toEqual(["capture", "game", "map", "movement", "offense", "player", "terrain", "transport", "unit"]);
-        expect(config.filter((item) => item.object).map((item) => item.scope)).toEqual(["capture", "game", "map", "movement", "offense", "player", "terrain", "unit"]);
+        expect(config.map((item) => item.scope)).toEqual(["capture", "game", "map", "movement", "offense", "outpost", "player", "terrain", "transport", "unit"]);
+        expect(config.filter((item) => item.object).map((item) => item.scope)).toEqual(["game", "map", "movement", "offense", "outpost", "player", "terrain", "unit"]);
     });
 
     it("lists files in the repo's app config that all exist and hold a list", () => {

@@ -24,8 +24,9 @@ describe("DefinitionServiceImpl", () => {
             ["game", 3],
             ["movement", 7],
             ["offense", 20],
+            ["outpost", 5],
             ["player", 5],
-            ["terrain", 14],
+            ["terrain", 9],
             ["transport", 4],
             ["unit", 18],
         ])("serves every %s definition in its file (%i of them)", (scope, count) => {
@@ -40,6 +41,7 @@ describe("DefinitionServiceImpl", () => {
             expect(service.get({ scope: "game", name: "2-player" })).toEqual({ definition: { scope: "game", name: "2-player" }, turnsMax: 100, playersMax: 2 });
             expect(service.get({ scope: "player", name: "orange-star" })).toEqual({ definition: { scope: "player", name: "orange-star" }, fundsMax: 999999 });
             expect(service.get({ scope: "terrain", name: "mountain" })).toEqual({ definition: { scope: "terrain", name: "mountain" }, defense: 4 });
+            expect(service.get({ scope: "outpost", name: "factory" })).toEqual({ definition: { scope: "outpost", name: "factory" }, defense: 3 });
             expect(service.get({ scope: "unit", name: "tank" })).toEqual({
                 definition: { scope: "unit", name: "tank" },
                 fundsCost: 7000,
@@ -59,7 +61,7 @@ describe("DefinitionServiceImpl", () => {
             expect(service.get<Definition & { ammoMax: number; rangeMin: number }>({ scope: "offense", name: "tank1" })).toMatchObject({ ammoMax: 9, rangeMin: 1 });
             expect(service.get({ scope: "capture", name: "infantry" })).toEqual({
                 definition: { scope: "capture", name: "infantry" },
-                allowed: ["airport", "base", "city", "headquarters", "port"].map((name) => ({ terrain: { scope: "terrain", name } })),
+                allowed: ["airport", "city", "factory", "headquarters", "port"].map((name) => ({ outpost: { scope: "outpost", name } })),
             });
             expect(service.get({ scope: "transport", name: "apc" })).toEqual({
                 definition: { scope: "transport", name: "apc" },

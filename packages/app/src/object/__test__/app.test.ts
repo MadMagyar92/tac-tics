@@ -1,11 +1,11 @@
-import type { BaseObject, CaptureObject, Id, TerrainObject } from "@tac-tics/api";
+import type { BaseObject, DefinitionKey, Id, OutpostObject, Position, TerrainObject } from "@tac-tics/api";
 import { readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanUp, copyConfig, scopeItem } from "../../../test/config";
 import { loadAppConfigFile } from "../../app";
 import { CaptureDefinitionHandler, MapDefinitionHandler } from "../../definition";
-import { CaptureObjectHandler, GameObjectHandler, MapObjectHandler, type MemoryObjectHandler, MovementObjectHandler, OffenseObjectHandler, PlayerObjectHandler, TerrainObjectHandler, UnitObjectHandler } from "..";
+import { GameObjectHandler, MapObjectHandler, type MemoryObjectHandler, MovementObjectHandler, OffenseObjectHandler, OutpostObjectHandler, PlayerObjectHandler, TerrainObjectHandler, UnitObjectHandler } from "..";
 
 afterEach(cleanUp);
 
@@ -13,11 +13,11 @@ type Item = BaseObject<Id> & Record<string, any>;
 type AnyService = MemoryObjectHandler<any, any>;
 
 const services: { name: string; scope: string; file: string; create: (appConfig: string) => AnyService }[] = [
-    { name: "CaptureObjectHandler", scope: "capture", file: "object/capture.json", create: (appConfig) => new CaptureObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "GameObjectHandler", scope: "game", file: "object/game.json", create: (appConfig) => new GameObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "MapObjectHandler", scope: "map", file: "object/map.json", create: (appConfig) => new MapObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "MovementObjectHandler", scope: "movement", file: "object/movement.json", create: (appConfig) => new MovementObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "OffenseObjectHandler", scope: "offense", file: "object/offense.json", create: (appConfig) => new OffenseObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
+    { name: "OutpostObjectHandler", scope: "outpost", file: "object/outpost.json", create: (appConfig) => new OutpostObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "PlayerObjectHandler", scope: "player", file: "object/player.json", create: (appConfig) => new PlayerObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "TerrainObjectHandler", scope: "terrain", file: "object/terrain.json", create: (appConfig) => new TerrainObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
     { name: "UnitObjectHandler", scope: "unit", file: "object/unit.json", create: (appConfig) => new UnitObjectHandler(appConfig, loadAppConfigFile(appConfig)) },
@@ -323,7 +323,7 @@ describe("telling objects apart", () => {
 
     it.each([
         ["unit", "object/unit.json", (appConfig: string) => new UnitObjectHandler(appConfig, loadAppConfigFile(appConfig))],
-        ["capture", "object/capture.json", (appConfig: string) => new CaptureObjectHandler(appConfig, loadAppConfigFile(appConfig))],
+        ["outpost", "object/outpost.json", (appConfig: string) => new OutpostObjectHandler(appConfig, loadAppConfigFile(appConfig))],
         ["player", "object/player.json", (appConfig: string) => new PlayerObjectHandler(appConfig, loadAppConfigFile(appConfig))],
     ])("holds the %s with an id in one game apart from the one with that id in another game", (_scope, file, create) => {
         const { service, items } = start(create, file);
@@ -391,59 +391,67 @@ describe("telling objects apart", () => {
     });
 });
 
-describe("the static terrain and the captures of the repo's config", () => {
-    /** The static terrain of map-1 and the captures of game-1, which is played on it, as a copy of the repo's config holds them, with the map definition of Spann Island and the names of the terrain the capture definitions allow. */
+describe("the static terrain and the outposts of the repo's config", () => {
+    /** The static terrain of map-1 and the outposts of game-1, which is played on it, as a copy of the repo's config holds them, with the map definition of Spann Island and the outposts the capture definitions allow. */
     const start = () => {
         const { appConfig } = copyConfig();
         const config = loadAppConfigFile(appConfig);
         return {
             appConfig,
             terrain: values(new TerrainObjectHandler(appConfig, config)) as TerrainObject[],
-            captures: values(new CaptureObjectHandler(appConfig, config)) as CaptureObject[],
+            outposts: values(new OutpostObjectHandler(appConfig, config)) as OutpostObject[],
             map: new MapDefinitionHandler(appConfig, config).get({ scope: "map", name: "spann-island" })!,
-            allowed: [...new CaptureDefinitionHandler(appConfig, config).loadAll().values()].flatMap(({ allowed }) => allowed.map(({ terrain }) => terrain.name)),
+            allowed: [...new CaptureDefinitionHandler(appConfig, config).loadAll().values()].flatMap(({ allowed }) => allowed.map(({ outpost }) => outpost)),
         };
     };
 
-    it("holds the static terrain by the id of its map, and the captures by the id of their game", () => {
-        const { terrain, captures } = start();
+    /** The definition of whichever of `placed` holds the square at `position`. */
+    const getDefinitionAtPosition = (placed: { definition: DefinitionKey; positions: Position[] }[], { x, y }: Position) =>
+        placed.find(({ positions }) => positions.some((position) => position.x === x && position.y === y))?.definition;
+
+    it("holds the static terrain by the id of its map, and the outposts by the id of their game", () => {
+        const { terrain, outposts } = start();
         for (const { identifier } of terrain) expect(identifier).toEqual({ id: identifier.id, mapId: "map-1" });
-        for (const { identifier } of captures) expect(identifier).toEqual({ id: identifier.id, gameId: "game-1" });
+        for (const { identifier } of outposts) expect(identifier).toEqual({ id: identifier.id, gameId: "game-1" });
     });
 
-    it("makes up every square of Spann Island once, between the static terrain of its map and the captures of its game", () => {
-        const { terrain, captures } = start();
-        const squares = [...terrain, ...captures];
-        expect([terrain.length, captures.length]).toEqual([129, 21]);
+    it("makes up every square of Spann Island once, between the static terrain of its map and the outposts of its game", () => {
+        const { terrain, outposts } = start();
+        const squares = [...terrain, ...outposts];
+        expect([terrain.length, outposts.length]).toEqual([129, 21]);
         expect(new Set(squares.map(({ position }) => `${position.x},${position.y}`)).size).toBe(150);
     });
 
-    it("numbers each square from zero by its position, as the map does", () => {
-        const { terrain, captures } = start();
-        for (const { identifier, position } of [...terrain, ...captures]) expect(identifier.id).toBe(`terrain-${String(position.y * 15 + position.x).padStart(3, "0")}`);
+    it("numbers each square from zero by its position, as the map does, under the scope that holds it", () => {
+        const { terrain, outposts } = start();
+        const number = ({ x, y }: Position) => String(y * 15 + x).padStart(3, "0");
+        for (const { identifier, position } of terrain) expect(identifier.id).toBe(`terrain-${number(position)}`);
+        for (const { identifier, position } of outposts) expect(identifier.id).toBe(`outpost-${number(position)}`);
     });
 
-    it("holds each square as the map definition places it, or else as the default terrain of the map", () => {
-        const { terrain, captures, map } = start();
-        for (const { identifier, definition, position } of [...terrain, ...captures]) {
-            const placed = map.terrain.find(({ positions }) => positions.some(({ x, y }) => x === position.x && y === position.y));
-            expect(definition, identifier.id).toEqual(placed?.definition ?? map.defaultTerrain);
-        }
+    it("holds the static terrain as the terrain of the map definition places it, or else as its default terrain", () => {
+        const { terrain, map } = start();
+        for (const { identifier, definition, position } of terrain) expect(definition, identifier.id).toEqual(getDefinitionAtPosition(map.terrain, position) ?? map.defaultTerrain);
     });
 
-    it("holds a capture for every square whose terrain a capture definition allows, and static terrain for every other square", () => {
-        const { terrain, captures, allowed } = start();
-        for (const { identifier, definition } of captures) expect(allowed, identifier.id).toContain(definition.name);
-        for (const { identifier, definition } of terrain) expect(allowed, identifier.id).not.toContain(definition.name);
+    it("holds the outposts as the outposts of the map definition place them", () => {
+        const { outposts, map } = start();
+        for (const { identifier, definition, position } of outposts) expect(definition, identifier.id).toEqual(getDefinitionAtPosition(map.outposts, position));
+        expect(outposts).toHaveLength(map.outposts.flatMap(({ positions }) => positions).length);
     });
 
-    it("holds the captures under the definitions of their terrain, and refuses one under a capture definition", () => {
-        const { appConfig, captures } = start();
-        const service = new CaptureObjectHandler(appConfig, loadAppConfigFile(appConfig));
-        for (const { identifier, definition } of captures) expect(definition.scope, identifier.id).toBe("terrain");
-        expect(() => service.save({ ...captures[0], definition: { scope: "capture", name: "infantry" } })).toThrow(
-            `The capture objects cannot hold the object "${captures[0].identifier.id}", whose definition has the scope "capture"`,
+    it("holds only outposts that a capture definition allows", () => {
+        const { outposts, allowed } = start();
+        for (const { identifier, definition } of outposts) expect(allowed, identifier.id).toContainEqual(definition);
+    });
+
+    it("holds the outposts under outpost definitions, and refuses one under the definition of a terrain", () => {
+        const { appConfig, outposts } = start();
+        const service = new OutpostObjectHandler(appConfig, loadAppConfigFile(appConfig));
+        for (const { identifier, definition } of outposts) expect(definition.scope, identifier.id).toBe("outpost");
+        expect(() => service.save({ ...outposts[0], definition: { scope: "terrain", name: "city" } })).toThrow(
+            `The outpost objects cannot hold the object "${outposts[0].identifier.id}", whose definition has the scope "terrain"`,
         );
-        expect(service.load(captures[0].identifier)).toEqual(captures[0]);
+        expect(service.load(outposts[0].identifier)).toEqual(outposts[0]);
     });
 });
